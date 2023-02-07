@@ -5,6 +5,7 @@ import os
 from Maxs_Modules.files import SaveFile
 from Maxs_Modules.tools import debug, error
 from Maxs_Modules.renderer import Menu
+from Maxs_Modules.game import get_saved_games, Game
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -55,23 +56,37 @@ class UserSettings(SaveFile):
 # - - - - - - - MENUS - - - - - - -#
 
 def continue_game():
-    print("Continue Game")
+
+    # Get all the saved files and create a menu
+    saves = get_saved_games()
+    continue_menu = Menu("Continue Game", saves)
+
     # Load the game object
+    quiz = Game(continue_menu.user_input)
+
     # Start the game
+    quiz.begin()
 
 
 def new_game():
-    print("New Game")
-    # Show the user the game options
-    # Get the questions from the server if networked
+    # Create a new game object
+    quiz = Game()
+
+    # Get the user to configure the game
+    quiz.set_settings()
+
     # Save the game object
+    quiz.save()
+
     # Start the game
+    quiz.begin()
 
 
 def join_game():
     print("Join Game")
     # Show the user the join menu
     # Connect to server and wait for game to start
+
 
 def settings():
     usersettings = UserSettings()
