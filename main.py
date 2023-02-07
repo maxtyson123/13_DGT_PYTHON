@@ -1,16 +1,19 @@
 # - - - - - - - Imports - - - - - - -#
 import sys
 import os
-import time
-import json
+
+from Maxs_Modules.files import SaveFile
+from Maxs_Modules.tools import debug, error
 
 #              Variables       #
 console_width = 30
 divider_symbol = "#"
 divider = divider_symbol * console_width
+data_folder = "UserData/"
 
 
 # - - - - - - - Functions - - - - - - -#
+
 def try_convert(variable, type_to_convert):
     if variable is None:
         return None
@@ -28,13 +31,6 @@ def handle_args(args):
         print(arg)
 
 
-def error(error_message):
-    print(error_message)
-    time.sleep(2)
-
-
-def debug(debug_message, log_type="info"):
-    print("[DEBUG] : " + debug_message)
 
 
 def validate_user_input_number(user_input):
@@ -64,65 +60,6 @@ def show_menu(menu_items):
 
 # - - - - - - - Classes - - - - - - -#
 
-class SaveFile:
-    save_file = "settings.json"
-    save_data = {}
-
-    def __init__(self, save_file, auto_load=True):
-        self.save_file = save_file
-
-        # If the user wants to autoload the settings then try run the load function
-        if auto_load:
-            debug("Auto loading settings", "save_file")
-            self.load()
-
-    def load(self):
-        debug("Loading file from " + self.save_file, "save_file")
-
-        # Try to load the settings from the save file in read mode, if it fails then warn the user
-        try:
-            with open(self.save_file, "r") as file:
-                debug("File opened", "save_file")
-
-                # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and
-                # close the file then delete the file
-                try:
-                    self.save_data = json.load(file)
-                except json.decoder.JSONDecodeError:
-                    error("Settings file is corrupt, deleting file automatically")
-                    file.close()
-                    os.remove(self.save_file)
-                    return
-
-                debug(str(self.save_data), "save_file")
-
-                # Note: the subclass has to load the data from the save_data dictionary as there is no way for the
-                # super class to interact with the subclass
-
-                # Close the file
-                file.close()
-
-        except FileNotFoundError:
-            error("Settings file not found")
-
-    def save(self):
-        debug("Saving file to " + self.save_file, "save_file")
-
-        # Open the file and dump the UserSettings object as a dictionary, then close the file
-        with open(self.save_file, "w") as file:
-            save_dict = self.save_data
-
-            # Try to remove the save_data dictionary from the save data as this causes an loop error when serializing
-            try:
-                del save_dict["save_data"]
-            except KeyError:
-                print("KeyError: save_data")
-
-            debug("File data: " + str(save_dict), "save_file")
-
-            json.dump(save_dict, file)
-            file.close()
-
 
 class UserSettings(SaveFile):
     display_mode = None
@@ -130,7 +67,7 @@ class UserSettings(SaveFile):
 
     def __init__(self):
         # Call the super class and pass the save file name, this will automatically load the settings
-        super().__init__("settings.json")
+        super().__init__(data_folder + "settings.json")
 
         # Set the variables to the saved data (using ".get()" to prevent errors if the data is not found)
         self.display_mode = try_convert(self.save_data.get("display_mode"), str)
