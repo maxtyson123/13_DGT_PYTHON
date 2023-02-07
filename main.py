@@ -22,6 +22,11 @@ def error(error_message):
     print(error_message)
     time.sleep(2)
 
+
+def debug(debug_message, type="info"):
+    print("[DEBUG] : " + debug_message)
+
+
 def validate_user_input_number(input):
     try:
         int(input)  # trys to convert to int
@@ -50,27 +55,39 @@ def show_menu(menu_items):
 
 
 ################ Classes ################
-class UserSettings:
+
+class SaveFile:
 
     save_file = "settings.json"
-    display_mode = "none"
+    save_data = {}
 
     def __init__(self, save_file, auto_load=True):
         self.save_file = save_file
 
-        # If the user wants to auto load the settings then try run the load function
+        # If the user wants to autoload the settings then try run the load function
         if auto_load:
+            debug("Auto loading settings", "save_file")
             self.load()
 
     def load(self):
+        debug("Loading file from " + self.save_file, "save_file")
+
         # Try to load the settings from the save file in read mode, if it fails then warn the user
         try:
             with open(self.save_file, "r") as file:
-                # Load the data from the file and convert it to a dictionary
-                saved_data = json.loads(file.read())
+                debug("File opened", "save_file")
+
+                # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and close the file then delete the file
+                try:
+                    self.save_data = json.load(file)
+                except json.decoder.JSONDecodeError:
+                    error("Settings file is corrupt, deleting file automatically")
+                    file.close()
+                    os.remove(self.save_file)
+                    return
 
                 # Set the variables to the saved data
-                self.display_mode = saved_data.display_mode
+                debug(str(self.save_data), "save_file")
 
                 # Close the file
                 file.close()
@@ -79,14 +96,49 @@ class UserSettings:
             error("Settings file not found")
 
     def save(self):
+        debug("Saving file to " + self.save_file, "save_file")
 
         # Open the file and dump the UserSettings object as a dictionary, then close the file
         with open(self.save_file, "w") as file:
-            json.dump(self, file)
+            save_dict = self.save_data
+
+            # Try Remove the save_data dictionary from the save data as this causes an loop error when serializing
+            try:
+                del save_dict["save_data"]
+            except KeyError:
+                print("KeyError: save_data")
+
+            debug("File data: " + str(save_dict), "save_file")
+
+            json.dump(save_dict, file)
             file.close()
 
 
+class UserSettings(SaveFile):
+
+    display_mode = None
+    network = None
+
+    def __init__(self):
+
+        # Call the super class and pass the save file name, this will automatically load the settings
+        super().__init__("settings.json")
+
+        # Set the variables to the saved data (using ".get()" to prevent errors if the data is not found)
+        self.display_mode = self.save_data.get("display_mode")
+
+    def save(self):
+
+        # Create the save data for the UserSettings object
+        self.save_data = self.__dict__
+
+        # Call the super class save function
+        super().save()
+
+
 class Menu:
+
+    # Note for future, the print should be changed to a render() function that allows for the menu to be rendered in different ways (CLI, GUI)
 
     title = "None"
     items = []
@@ -127,20 +179,86 @@ class Menu:
 
 ################ Menus ################
 
+def continue_game():
+    print("Continue Game")
+
+
+def new_game():
+    print("New Game")
+
+
+def join_game():
+    print("Join Game")
+
+
+def settings_menu():
+    print("Settings Menu")
+
+
+def game_main_menu():
+
+    game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Settings", "Quit"])
+
+    usersettings = UserSettings()
+    if usersettings.network is not None:
+        if usersettings.network:
+            game_menu.items.insert(2, "Join Game")
+
+    game_menu.show()
+
+    match game_menu.user_input:
+        case "Continue Game":
+            continue_game()
+        case "New Game":
+            new_game()
+
+        case "Join Game":
+            join_game()
+
+        case "Settings":
+            settings_menu()
+        case "Quit":
+            sys.exit()
+
+
+def online_or_offline():
+    online_or_offline_menu = Menu("Online or Offline", ["Online", "Offline"])
+    online_or_offline_menu.show()
+
+    usersettings = UserSettings()
+
+    if usersettings.network is not None:
+        debug(usersettings.network, "user_settings")
+
+    match online_or_offline_menu.user_input:
+        case "Online":
+            usersettings.network = True
+        case "Offline":
+            usersettings.network = False
+
+    # Save the settings and move on
+    usersettings.save()
+    game_main_menu()
+
 def gui_or_cli():
     gui_or_cli_menu = Menu("GUI or CLI", ["GUI", "CLI"])
     gui_or_cli_menu.show()
 
-    usersettings = UserSettings("settings.json")
-    print(usersettings.display_mode)
+    usersettings = UserSettings()
+    if usersettings.display_mode is not None:
+        debug(usersettings.display_mode, "user_settings")
 
     match gui_or_cli_menu.user_input:
         case "GUI":
             usersettings.display_mode = "GUI"
-            usersettings.save()
+
         case "CLI":
             usersettings.display_mode = "CLI"
-            usersettings.save()
+
+    # Save the settings and move on
+    usersettings.save()
+    online_or_offline()
+
 
 
 def main():
@@ -152,7 +270,6 @@ def main():
             sys.exit()
         case "Continue":
             gui_or_cli()
-
 
     print("Done")
 
