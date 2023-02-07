@@ -31,8 +31,6 @@ def handle_args(args):
         print(arg)
 
 
-
-
 def validate_user_input_number(user_input):
     try:
         int(user_input)  # try to convert to int
@@ -149,11 +147,7 @@ def game_main_menu():
             debug("Network is enabled", "network")
             game_menu.items.insert(2, "Join Game")
         else:
-            print("Network is disabled")
-
-    else:
-        debug("Network is not set", "network")
-        game_menu.items.insert(2, "Online or Offline")
+            debug("Network is disabled", "network")
 
     game_menu.show()
 
@@ -166,9 +160,6 @@ def game_main_menu():
 
         case "Join Game":
             join_game()
-
-        case "Online or Offline":
-            online_or_offline()
 
         case "Settings":
             settings_menu()
@@ -214,7 +205,18 @@ def gui_or_cli():
 
     # Save the settings and move on
     usersettings.save()
-    online_or_offline()
+
+
+def get_settings():
+    usersettings = UserSettings()
+
+    if usersettings.display_mode is None:
+        gui_or_cli()
+
+    if usersettings.network is None:
+        online_or_offline()
+
+    game_main_menu()
 
 
 def main():
@@ -225,7 +227,7 @@ def main():
         case "Quit":
             sys.exit()
         case "Continue":
-            gui_or_cli()
+            get_settings()
 
     print("Done")
 

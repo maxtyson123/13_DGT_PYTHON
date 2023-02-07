@@ -1,4 +1,5 @@
 import json
+from Maxs_Modules.tools import debug, error
 
 
 class SaveFile:
