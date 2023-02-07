@@ -1,5 +1,8 @@
+# - - - - - - - Imports - - - - - - -#
 import json
 from Maxs_Modules.tools import debug, error
+
+# - - - - - - - Classes - - - - - - -#
 
 
 class SaveFile:

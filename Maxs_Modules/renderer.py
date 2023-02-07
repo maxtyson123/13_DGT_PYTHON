@@ -1,9 +1,17 @@
+# - - - - - - - Imports - - - - - - -#
+
+
 import os
 from Maxs_Modules.tools import validate_user_input_number, error
+
+# - - - - - - - Variables - - - - - - -#
+
 
 console_width = 30
 divider_symbol = "#"
 divider = divider_symbol * console_width
+
+# - - - - - - - Functions - - - - - - -#
 
 
 def text_in_divider(item_to_print, auto_truncate=True):
@@ -55,6 +63,8 @@ def show_menu_double(menu_items):
         print(final_item_to_print)
 
     print(divider)
+
+# - - - - - - - Classes - - - - - - -#
 
 
 class Menu:

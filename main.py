@@ -6,7 +6,7 @@ from Maxs_Modules.files import SaveFile
 from Maxs_Modules.tools import debug, error
 from Maxs_Modules.renderer import Menu
 
-#              Variables       #
+# - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
 
 
@@ -52,19 +52,26 @@ class UserSettings(SaveFile):
         super().save()
 
 
-# - - - - - - - Functions - - - - - - -#
+# - - - - - - - MENUS - - - - - - -#
 
 def continue_game():
     print("Continue Game")
+    # Load the game object
+    # Start the game
 
 
 def new_game():
     print("New Game")
+    # Show the user the game options
+    # Get the questions from the server if networked
+    # Save the game object
+    # Start the game
 
 
 def join_game():
     print("Join Game")
-
+    # Show the user the join menu
+    # Connect to server and wait for game to start
 
 def settings():
     usersettings = UserSettings()

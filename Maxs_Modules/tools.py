@@ -1,5 +1,8 @@
+# - - - - - - - Imports - - - - - - -#
 import time
 
+
+# - - - - - - - Functions - - - - - - -#
 
 def error(error_message):
     print(error_message)
