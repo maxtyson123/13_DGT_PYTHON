@@ -3,7 +3,7 @@ import sys
 import os
 
 from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import debug, error
+from Maxs_Modules.tools import debug, try_convert
 from Maxs_Modules.renderer import Menu
 from Maxs_Modules.game import get_saved_games, Game
 
@@ -12,17 +12,6 @@ data_folder = "UserData/"
 
 
 # - - - - - - - Functions - - - - - - -#
-
-def try_convert(variable, type_to_convert):
-    if variable is None:
-        return None
-
-    try:
-        return type_to_convert(variable)
-    except ValueError:
-        error("Invalid input")
-        return None
-
 
 def handle_args(args):
     print("Quiz running with args:")

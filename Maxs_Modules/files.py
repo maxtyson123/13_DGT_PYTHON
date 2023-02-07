@@ -12,9 +12,9 @@ class SaveFile:
     def __init__(self, save_file, auto_load=True):
         self.save_file = save_file
 
-        # If the user wants to autoload the settings then try run the load function
+        # If the user wants to autoload the file then try run the load function
         if auto_load:
-            debug("Auto loading settings", "save_file")
+            debug("Auto loading file", "save_file")
             self.load()
 
     def load(self):
@@ -30,7 +30,7 @@ class SaveFile:
                 try:
                     self.save_data = json.load(file)
                 except json.decoder.JSONDecodeError:
-                    error("Settings file is corrupt, deleting file automatically")
+                    error("File is corrupt, deleting file automatically")
                     file.close()
                     os.remove(self.save_file)
                     return
@@ -44,7 +44,7 @@ class SaveFile:
                 file.close()
 
         except FileNotFoundError:
-            error("Settings file not found")
+            error("File not found")
 
     def save(self):
         debug("Saving file to " + self.save_file, "save_file")
