@@ -1,16 +1,26 @@
-################ Imports ################
+# - - - - - - - Imports - - - - - - -#
 import sys
 import os
 import time
 import json
 
-################ Variables ################
+#              Variables       #
 console_width = 30
 divider_symbol = "#"
 divider = divider_symbol * console_width
 
 
-################ Functions ################
+# - - - - - - - Functions - - - - - - -#
+def try_convert(variable, type_to_convert):
+    if variable is None:
+        return None
+
+    try:
+        return type_to_convert(variable)
+    except ValueError:
+        error("Invalid input")
+        return None
+
 
 def handle_args(args):
     print("Quiz running with args:")
@@ -23,19 +33,17 @@ def error(error_message):
     time.sleep(2)
 
 
-def debug(debug_message, type="info"):
+def debug(debug_message, log_type="info"):
     print("[DEBUG] : " + debug_message)
 
 
-def validate_user_input_number(input):
+def validate_user_input_number(user_input):
     try:
-        int(input)  # trys to convert to int
+        int(user_input)  # try to convert to int
         return True
     except ValueError:  # if it cant the return error
         error("Invalid input, please enter a number")
         return False
-
-
 
 
 def text_in_divider(item_to_print):
@@ -54,10 +62,9 @@ def show_menu(menu_items):
     print(divider)
 
 
-################ Classes ################
+# - - - - - - - Classes - - - - - - -#
 
 class SaveFile:
-
     save_file = "settings.json"
     save_data = {}
 
@@ -77,7 +84,8 @@ class SaveFile:
             with open(self.save_file, "r") as file:
                 debug("File opened", "save_file")
 
-                # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and close the file then delete the file
+                # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and
+                # close the file then delete the file
                 try:
                     self.save_data = json.load(file)
                 except json.decoder.JSONDecodeError:
@@ -86,8 +94,10 @@ class SaveFile:
                     os.remove(self.save_file)
                     return
 
-                # Set the variables to the saved data
                 debug(str(self.save_data), "save_file")
+
+                # Note: the subclass has to load the data from the save_data dictionary as there is no way for the
+                # super class to interact with the subclass
 
                 # Close the file
                 file.close()
@@ -102,7 +112,7 @@ class SaveFile:
         with open(self.save_file, "w") as file:
             save_dict = self.save_data
 
-            # Try Remove the save_data dictionary from the save data as this causes an loop error when serializing
+            # Try to remove the save_data dictionary from the save data as this causes an loop error when serializing
             try:
                 del save_dict["save_data"]
             except KeyError:
@@ -115,20 +125,18 @@ class SaveFile:
 
 
 class UserSettings(SaveFile):
-
     display_mode = None
     network = None
 
     def __init__(self):
-
         # Call the super class and pass the save file name, this will automatically load the settings
         super().__init__("settings.json")
 
         # Set the variables to the saved data (using ".get()" to prevent errors if the data is not found)
-        self.display_mode = self.save_data.get("display_mode")
+        self.display_mode = try_convert(self.save_data.get("display_mode"), str)
+        self.network = try_convert(self.save_data.get("network"), bool)
 
     def save(self):
-
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__
 
@@ -137,8 +145,8 @@ class UserSettings(SaveFile):
 
 
 class Menu:
-
-    # Note for future, the print should be changed to a render() function that allows for the menu to be rendered in different ways (CLI, GUI)
+    # Note for future, the print should be changed to a render() function that allows for the menu to be rendered in
+    # different ways (CLI, GUI)
 
     title = "None"
     items = []
@@ -177,7 +185,7 @@ class Menu:
         self.user_input = self.items[int(user_input)]
 
 
-################ Menus ################
+# - - - - - - - Functions - - - - - - -#
 
 def continue_game():
     print("Continue Game")
@@ -196,27 +204,38 @@ def settings_menu():
 
 
 def game_main_menu():
-
     game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Settings", "Quit"])
 
     usersettings = UserSettings()
     if usersettings.network is not None:
         if usersettings.network:
+            debug("Network is enabled", "network")
             game_menu.items.insert(2, "Join Game")
+        else:
+            print("Network is disabled")
+
+    else:
+        debug("Network is not set", "network")
+        game_menu.items.insert(2, "Online or Offline")
 
     game_menu.show()
 
     match game_menu.user_input:
         case "Continue Game":
             continue_game()
+
         case "New Game":
             new_game()
 
         case "Join Game":
             join_game()
 
+        case "Online or Offline":
+            online_or_offline()
+
         case "Settings":
             settings_menu()
+
         case "Quit":
             sys.exit()
 
@@ -228,7 +247,7 @@ def online_or_offline():
     usersettings = UserSettings()
 
     if usersettings.network is not None:
-        debug(usersettings.network, "user_settings")
+        debug(str(usersettings.network), "user_settings")
 
     match online_or_offline_menu.user_input:
         case "Online":
@@ -239,6 +258,7 @@ def online_or_offline():
     # Save the settings and move on
     usersettings.save()
     game_main_menu()
+
 
 def gui_or_cli():
     gui_or_cli_menu = Menu("GUI or CLI", ["GUI", "CLI"])
@@ -258,7 +278,6 @@ def gui_or_cli():
     # Save the settings and move on
     usersettings.save()
     online_or_offline()
-
 
 
 def main():
