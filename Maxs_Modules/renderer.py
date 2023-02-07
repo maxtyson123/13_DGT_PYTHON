@@ -38,11 +38,13 @@ def show_menu_double(menu_items):
         item_to_print_2 = "(" + menu_items[1][x] + ") "
 
         # Truncate the text if it is too long
-        if len(item_to_print_1) > console_width/2:
-            item_to_print = item_to_print_1[:console_width/2 - 2]  # Truncate the text to fit half the console width
+        allowed_width = int(console_width / 2)
 
-        if len(item_to_print_2) > console_width / 2:
-            item_to_print = item_to_print_1[:console_width / 2 - 2]  # Truncate the text to fit half the console width
+        if len(item_to_print_1) > allowed_width:
+            item_to_print = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
+
+        if len(item_to_print_2) > allowed_width:
+            item_to_print = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
         # Spacing inbetween the two items (similar to how it is done in "text_in_divider()" function)
         width_left = console_width - len(item_to_print_1) - len(item_to_print_2) - 2  # The length of the text, minus console width, minus 2 for the border
@@ -77,22 +79,34 @@ class Menu:
         # Print the menu
         print(divider)
         print(text_in_divider(" " + self.title))
-        show_menu(self.items)
+        if self.multi_dimensional:
+            show_menu_double(self.items)
+        else:
+            show_menu(self.items)
 
         # Calculate the possible options
-        options = [*range(len(self.items))]
+        if self.multi_dimensional:
+            options = [*range(len(self.items[0]))]
+        else:
+            options = [*range(len(self.items))]
 
         # Get the user input and validate it
         invalid_input = True
         user_input = "null"
+
         while invalid_input:
-            user_input = input("Choose an option (" + str(options[0]) + "-" + str(
-                options[len(options) - 1]) + ") :")  # Get the user input
-            if validate_user_input_number(user_input):  # Check if the user inputted a number
+            # Get the user input
+            user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") :")
+
+            # Check if the user inputted a number
+            if validate_user_input_number(user_input):
                 if int(user_input) in options:  # Check if the user inputted a valid option
                     invalid_input = False  # If it is valid then stop the loop
                 else:
                     error("Invalid input, please enter a valid option")  # If it is not valid then print error
 
         # Store the input
-        self.user_input = self.items[int(user_input)]
+        if self.multi_dimensional:
+            self.user_input = self.items[0][int(user_input)]
+        else:
+            self.user_input = self.items[int(user_input)]

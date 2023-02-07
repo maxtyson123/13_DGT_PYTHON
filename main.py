@@ -66,8 +66,26 @@ def join_game():
     print("Join Game")
 
 
-def settings_menu():
-    print("Settings Menu")
+def settings():
+    usersettings = UserSettings()
+
+    settings_options = ["Display Mode", "Network", "Back"]
+    settings_values = [str(usersettings.display_mode), str(usersettings.network), "Back"]
+
+    settings_menu = Menu("Settings", [settings_options, settings_values], True)
+    settings_menu.show()
+
+    match settings_menu.user_input:
+        case "Display Mode":
+            gui_or_cli()
+            settings()
+
+        case "Network":
+            online_or_offline()
+            settings()
+
+        case "Back":
+            game_main_menu()
 
 
 def game_main_menu():
@@ -94,7 +112,7 @@ def game_main_menu():
             join_game()
 
         case "Settings":
-            settings_menu()
+            settings()
 
         case "Quit":
             sys.exit()
@@ -117,7 +135,6 @@ def online_or_offline():
 
     # Save the settings and move on
     usersettings.save()
-    game_main_menu()
 
 
 def gui_or_cli():
