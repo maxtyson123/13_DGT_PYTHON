@@ -2,7 +2,7 @@
 
 
 import os
-from Maxs_Modules.tools import validate_user_input_number, error
+from Maxs_Modules.tools import get_user_input_of_type, error
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -101,19 +101,7 @@ class Menu:
             options = [*range(len(self.items))]
 
         # Get the user input and validate it
-        invalid_input = True
-        user_input = "null"
-
-        while invalid_input:
-            # Get the user input
-            user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") :")
-
-            # Check if the user inputted a number
-            if validate_user_input_number(user_input):
-                if int(user_input) in options:  # Check if the user inputted a valid option
-                    invalid_input = False  # If it is valid then stop the loop
-                else:
-                    error("Invalid input, please enter a valid option")  # If it is not valid then print error
+        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")")
 
         # Store the input
         if self.multi_dimensional:
