@@ -71,7 +71,7 @@ import os
 import time
 
 from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import debug, error, try_convert, set_if_none
+from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type
 from Maxs_Modules.renderer import Menu
 
 # - - - - - - - Variables - - - - - - -#
@@ -311,6 +311,9 @@ def game_settings_local(game):
     single_player_menu.show()
 
     match single_player_menu.user_input:
+        case "How many players":
+            game.how_many_players = get_user_input_of_type(int, "How many players")
+
         case "Next":
             game.set_users()
 
@@ -323,6 +326,16 @@ def game_settings_networking(game):
     networking_menu.show()
 
     match networking_menu.user_input:
+
+        case "Server Name":
+            game.server_name = get_user_input_of_type(str, "Server Name")
+
+        case "Server Port":
+            game.server_port = get_user_input_of_type(int, "Server Port")
+
+        case "Max Players":
+            game.max_players = get_user_input_of_type(int, "Max Players")
+
         case "Next":
             print("NETWORKING UNDEFINED")
             while True:
@@ -355,11 +368,52 @@ def game_settings_gameplay(game):
     gameplay_menu.show()
 
     match gameplay_menu.user_input:
+        case "Host a server":
+            game.host_a_server = get_user_input_of_type(bool, "Host a server (True/False)")
+
+        case "Time limit":
+            game.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
+
+        case "Show score after Question/Game":
+            game.show_score_after_question_or_game = get_user_input_of_type(str, "Show score after: (Question/Game)", ["Question", "Game"])
+
+        case "Show correct answer after Question/Game":
+            game.show_correct_answer_after_question_or_game = get_user_input_of_type(str, "Show correct answer after: (Question/Game)", ["Question", "Game"])
+
+        case "Points for correct answer":
+            game.points_for_correct_answer = get_user_input_of_type(int, "Points for correct answer")
+
+        case "Points for incorrect answer":
+            game.points_for_incorrect_answer = get_user_input_of_type(int, "Points for incorrect answer")
+
+        case "Points for no answer":
+            game.points_for_no_answer = get_user_input_of_type(int, "Points for no answer")
+
+        case "Points multiplier for a streak":
+            game.points_multiplier_for_a_streak = get_user_input_of_type(int, "Points multiplier for a streak")
+
+        case "Compounding amount for a streak":
+            game.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
+
+        case "Pick random question":
+            game.pick_random_question = get_user_input_of_type(bool, "Pick random question (True/False)")
+
+        case "Bot difficulty":
+            game.bot_difficulty = get_user_input_of_type(int , "Bot difficulty (1-10)", range(1, 11))
+
+        case "Number of bots":
+            game.how_many_bots = get_user_input_of_type(int, "Number of bots")
+
         case "Next":
             if game.host_a_server:
                 game_settings_networking(game)
             elif not game.host_a_server:
                 game_settings_local(game)
+
+            # Skip the function loop
+            return
+
+    game_settings_gameplay(game)
 
 
 def game_settings_how_to(game):
