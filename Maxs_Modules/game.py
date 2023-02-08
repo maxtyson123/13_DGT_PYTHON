@@ -71,11 +71,11 @@ import os
 import time
 
 from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import debug, error, try_convert
+from Maxs_Modules.tools import debug, error, try_convert, set_if_none
 from Maxs_Modules.renderer import Menu
 
 # - - - - - - - Variables - - - - - - -#
-data_folder = "UserData/Games"
+data_folder = "UserData/Games/"
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -94,7 +94,7 @@ def generate_new_save_file():
         name_index += 1
         save_name = name + str(name_index) + ".json"
 
-        # If there is more then 1000 save files, then something probably went wrong
+        # If there is more than 1000 save files, then something probably went wrong
         if name_index > 1000:
             raise Exception("Could not find a save file name")
 
@@ -104,6 +104,7 @@ def generate_new_save_file():
 def get_saved_games():
     # Get a list of all the files in the data folder
     files = os.listdir(data_folder)
+    debug("Files in data folder: " + str(files), "Game")
 
     # Remove all the files that are not .json files
     for file in files:
@@ -129,11 +130,20 @@ class User:
         self.colour = colour
         self.icon = icon
 
+    def load(self, data):
+        self.name = data["name"]
+        self.colour = data["colour"]
+        self.icon = data["icon"]
+        self.points = data["points"]
+        self.correct = data["correct"]
+        self.wrong = data["wrong"]
+        self.questions_missed = data["questions_missed"]
+
 
 class Game(SaveFile):
 
     # User Chosen Settings
-    game_mode = None
+    host_a_server = None
     time_limit = None
     show_score_after_question_or_game = None
     show_correct_answer_after_question_or_game = None
@@ -173,10 +183,10 @@ class Game(SaveFile):
             super().__init__(data_folder + generate_new_save_file())
 
         # Load User Settings
-        self.game_mode = try_convert(self.save_data.get("game_mode"), str)
+        self.host_a_server = try_convert(self.save_data.get("host_a_server"), str)
         self.time_limit = try_convert(self.save_data.get("time_limit"), int)
-        self.show_score_after_question_or_game = try_convert(self.save_data.get("show_score_after_question_or_game"), bool)
-        self.show_correct_answer_after_question_or_game = try_convert(self.save_data.get("show_correct_answer_after_question_or_game"), bool)
+        self.show_score_after_question_or_game = try_convert(self.save_data.get("show_score_after_question_or_game"), str)
+        self.show_correct_answer_after_question_or_game = try_convert(self.save_data.get("show_correct_answer_after_question_or_game"), str)
         self.points_for_correct_answer = try_convert(self.save_data.get("points_for_correct_answer"), int)
         self.points_for_incorrect_answer = try_convert(self.save_data.get("points_for_incorrect_answer"), int)
         self.points_for_no_answer = try_convert(self.save_data.get("points_for_no_answer"), int)
@@ -201,6 +211,49 @@ class Game(SaveFile):
         # Load Game Data
         self.users = try_convert(self.save_data.get("users"), list)
         self.questions = try_convert(self.save_data.get("questions"), list)
+
+        # Set the default settings if the settings are none
+        self.set_settings_default()
+
+        # Convert the data
+        self.convert_data()
+
+    def set_settings_default(self):
+        # User Chosen Settings
+        self.host_a_server = set_if_none(self.host_a_server, False)
+        self.time_limit = set_if_none(self.time_limit, 10)
+        self.show_score_after_question_or_game = set_if_none(self.show_score_after_question_or_game, "Question")
+        self.show_correct_answer_after_question_or_game = set_if_none(self.show_correct_answer_after_question_or_game, "Question")
+        self.points_for_correct_answer = set_if_none(self.points_for_correct_answer, 1)
+        self.points_for_incorrect_answer = set_if_none(self.points_for_incorrect_answer, -1)
+        self.points_for_no_answer = set_if_none(self.points_for_no_answer, 0)
+        self.points_multiplier_for_a_streak = set_if_none(self.points_multiplier_for_a_streak, 1.1)
+        self.compounding_amount_for_a_streak = set_if_none(self.compounding_amount_for_a_streak, 1)
+        self.pick_random_question = set_if_none(self.pick_random_question, True)
+        self.bot_difficulty = set_if_none(self.bot_difficulty, 50)
+        self.server_name = set_if_none(self.server_name, "Quiz Game Server")
+        self.server_port = set_if_none(self.server_port, 1234)
+        self.max_players = set_if_none(self.max_players, 4)
+        self.how_many_players = set_if_none(self.how_many_players, 1)
+        self.how_many_bots = set_if_none(self.how_many_bots, 0)
+        self.quiz_category = set_if_none(self.quiz_category, "Any")
+        self.quiz_difficulty = set_if_none(self.quiz_difficulty, "Any")
+        self.question_amount = set_if_none(self.question_amount, 10)
+        self.question_type = set_if_none(self.question_type, "Any")
+
+        # State Settings
+        self.current_question = set_if_none(self.current_question, 0)
+        self.current_user_playing = set_if_none(self.current_user_playing, 0)
+
+        # Game Data
+        self.users = set_if_none(self.users, [])
+        self.questions = set_if_none(self.questions, [])
+
+    def convert_data(self):
+
+        # For each user in the list of users convert the dict to a User object using the load() function
+        for user in self.users:
+            User.load(user)
 
     def set_settings(self):
         game_settings_how_to(self)
@@ -229,11 +282,16 @@ class Game(SaveFile):
             self.users.append(user)
 
     def begin(self):
-        pass
+        for user in self.users:
+            print(user.name)
 
     def save(self):
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__
+
+        # Convert the user class to a dict
+        for user_index in range(len(self.users)):
+            self.save_data["users"][user_index] = self.users[user_index].__dict__
 
         # Call the super class save function
         super().save()
@@ -241,7 +299,7 @@ class Game(SaveFile):
 # - - - - - - - MENUS - - - - - - -#
 
 
-def game_settings_single_player(game):
+def game_settings_local(game):
     single_player_menu = Menu("Game Settings: Single Player", ["How many players", "Next"])
     single_player_menu.show()
 
@@ -262,7 +320,7 @@ def game_settings_networking(game):
 
 
 def game_settings_gameplay(game):
-    gameplay_menu = Menu("Game Settings: Gameplay", ["Game Mode", "Time limit", "Show score after Question/Game",
+    gameplay_menu = Menu("Game Settings: Gameplay", ["Host a server", "Time limit", "Show score after Question/Game",
                                                      "Show correct answer after Question/Game",
                                                      "Points for correct answer", "Points for incorrect answer",
                                                      "Points for no answer", "Points multiplier for a streak",
@@ -272,10 +330,10 @@ def game_settings_gameplay(game):
 
     match gameplay_menu.user_input:
         case "Next":
-            if game.game_mode == "Single Player":
-                game_settings_single_player(game)
-            elif game.game_mode == "Multiplayer":
+            if game.host_a_server:
                 game_settings_networking(game)
+            elif not game.host_a_server:
+                game_settings_local(game)
 
 
 def game_settings_how_to(game):

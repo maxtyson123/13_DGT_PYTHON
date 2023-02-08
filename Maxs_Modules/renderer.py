@@ -7,7 +7,7 @@ from Maxs_Modules.tools import validate_user_input_number, error
 # - - - - - - - Variables - - - - - - -#
 
 
-console_width = 30
+console_width = 60
 divider_symbol = "#"
 divider = divider_symbol * console_width
 

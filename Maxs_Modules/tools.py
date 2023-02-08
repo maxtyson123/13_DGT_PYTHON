@@ -4,6 +4,13 @@ import time
 
 # - - - - - - - Functions - - - - - - -#
 
+def set_if_none(variable, value):
+    if variable is None:
+        variable = value
+
+    return variable
+
+
 def try_convert(variable, type_to_convert):
     if variable is None:
         return None

@@ -48,7 +48,9 @@ def continue_game():
 
     # Get all the saved files and create a menu
     saves = get_saved_games()
+
     continue_menu = Menu("Continue Game", saves)
+    continue_menu.show()
 
     # Load the game object
     quiz = Game(continue_menu.user_input)
