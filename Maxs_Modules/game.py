@@ -131,13 +131,13 @@ class User:
         self.icon = icon
 
     def load(self, data):
-        self.name = data["name"]
-        self.colour = data["colour"]
-        self.icon = data["icon"]
-        self.points = data["points"]
-        self.correct = data["correct"]
-        self.wrong = data["wrong"]
-        self.questions_missed = data["questions_missed"]
+        self.name = data.get("name")
+        self.colour = data.get("colour")
+        self.icon = data.get("icon")
+        self.points = data.get("points")
+        self.correct = data.get("correct")
+        self.wrong = data.get("wrong")
+        self.questions_missed = data.get("questions_missed")
 
 
 class Game(SaveFile):
@@ -252,8 +252,10 @@ class Game(SaveFile):
     def convert_data(self):
 
         # For each user in the list of users convert the dict to a User object using the load() function
-        for user in self.users:
-            User.load(user)
+        for x in range(len(self.users)):
+            user_object = User()
+            user_object.load(self.users[x])
+            self.users[x] = user_object
 
     def set_settings(self):
         game_settings_how_to(self)
@@ -296,11 +298,16 @@ class Game(SaveFile):
         # Call the super class save function
         super().save()
 
+        # Convert the data back to the original format
+        self.convert_data()
+
 # - - - - - - - MENUS - - - - - - -#
 
 
 def game_settings_local(game):
-    single_player_menu = Menu("Game Settings: Single Player", ["How many players", "Next"])
+    local_menu_options = ["How many players", "Next"]
+    local_menu_values = [str(game.how_many_players), "Gameplay"]
+    single_player_menu = Menu("Game Settings: Single Player", [local_menu_options, local_menu_values], True)
     single_player_menu.show()
 
     match single_player_menu.user_input:
@@ -309,7 +316,10 @@ def game_settings_local(game):
 
 
 def game_settings_networking(game):
-    networking_menu = Menu("Game Settings: Networking", ["Server Name", "Server Port", "Max Players", "Next"])
+    networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next"]
+    networking_menu_values = [str(game.server_name), str(game.server_port), str(game.max_players), "Players"]
+
+    networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
     networking_menu.show()
 
     match networking_menu.user_input:
@@ -320,12 +330,28 @@ def game_settings_networking(game):
 
 
 def game_settings_gameplay(game):
-    gameplay_menu = Menu("Game Settings: Gameplay", ["Host a server", "Time limit", "Show score after Question/Game",
+    game_play_menu_options = ["Host a server", "Time limit", "Show score after Question/Game",
                                                      "Show correct answer after Question/Game",
                                                      "Points for correct answer", "Points for incorrect answer",
                                                      "Points for no answer", "Points multiplier for a streak",
                                                      "Compounding amount for a streak", "Pick random question",
-                                                     "Bot difficulty", "Number of bots", "Next"])
+                                                     "Bot difficulty", "Number of bots", "Next"]
+
+    game_play_menu_values = [str(game.host_a_server), str(game.time_limit), str(game.show_score_after_question_or_game),
+                             str(game.show_correct_answer_after_question_or_game),
+                             str(game.points_for_correct_answer), str(game.points_for_incorrect_answer),
+                             str(game.points_for_no_answer),
+                             str(game.points_multiplier_for_a_streak), str(game.compounding_amount_for_a_streak),
+                             str(game.pick_random_question),
+                             str(game.bot_difficulty), str(game.how_many_bots)]
+
+
+    if game.host_a_server:
+        game_play_menu_values.append("Networking Settings")
+    elif not game.host_a_server:
+        game_play_menu_values.append("Local Settings")
+
+    gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
     gameplay_menu.show()
 
     match gameplay_menu.user_input:

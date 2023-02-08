@@ -48,9 +48,14 @@ def continue_game():
 
     # Get all the saved files and create a menu
     saves = get_saved_games()
+    saves.append("Back")
 
     continue_menu = Menu("Continue Game", saves)
     continue_menu.show()
+
+    # If the user selected back then return
+    if continue_menu.user_input == "Back":
+        game_main_menu()
 
     # Load the game object
     quiz = Game(continue_menu.user_input)
@@ -83,7 +88,7 @@ def settings():
     usersettings = UserSettings()
 
     settings_options = ["Display Mode", "Network", "Back"]
-    settings_values = [str(usersettings.display_mode), str(usersettings.network), "Back"]
+    settings_values = [str(usersettings.display_mode), str(usersettings.network), "Main Menu"]
 
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
     settings_menu.show()
