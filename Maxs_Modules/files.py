@@ -19,7 +19,7 @@ def load_questions_from_file():
         questions = json.load(file)
 
         # Return the questions
-        return questions
+        return questions["results"]
 
 # - - - - - - - Classes - - - - - - -#
 

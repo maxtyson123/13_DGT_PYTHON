@@ -78,6 +78,10 @@ from Maxs_Modules.renderer import Menu
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
+category_offset = 9
+max_number_of_qeustions = 50
+quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games", "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography", "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets", "Japanese Anime & Manga", "Cartoon & Animations"]
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -150,13 +154,8 @@ class Question:
     correct_answer = None
     incorrect_answers = None
 
-    def __init__(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):
-        self.category = category
-        self.q_type = q_type
-        self.difficulty = difficulty
-        self.question = question
-        self.correct_answer = correct_answer
-        self.incorrect_answers = incorrect_answers
+    def __init__(self):
+        pass
 
     def load(self, data):
         self.category = data.get("category")
@@ -195,6 +194,10 @@ class Game(SaveFile):
     current_question = None
     current_user_playing = None
     online_enabled = None
+
+    # API Conversion
+    api_category = None
+    api_type = None
 
     # Game data
     users = None
@@ -328,20 +331,50 @@ class Game(SaveFile):
         # Check if the user is online
         if self.online_enabled:
 
+            print("Getting questions from the internet...")
+
             # Import the api_get_questions function, this is only imported if the user is online as it is not needed
             # if the user is offline and dont want to run the requests installation
             from Maxs_Modules.network import api_get_questions
 
+            # Convert the settings to the api syntax
+            self.convert_question_settings_to_api()
+
             # Use the api to get the questions
-            self.questions = api_get_questions(self.question_amount, self.quiz_category, self.quiz_difficulty, self.question_type)
+            self.questions = api_get_questions(self.question_amount, self.api_category, self.quiz_difficulty, self.api_type)
 
         else:
+
+            print("Loading questions from file...")
 
             # Load the question from the saved questions
             self.questions = load_questions_from_file()
 
+        debug("Questions: " + str(self.questions), "Game")
+
         # Convert the data into a list of Question objects
         self.convert_questions()
+
+    def convert_question_settings_to_api(self):
+
+        # Convert the category if it is not any
+        if self.quiz_category != "Any":
+            # Get the index of the question type
+            category_index = quiz_categories.index(self.quiz_category)
+
+            # Add the offset to the index. This is because the api starts at 9 and not 0 (ends at 32)
+            self.api_category = category_index + category_offset
+
+        print("Category: " + str(self.api_category))
+
+        # Convert the type if it is not any
+        if self.question_type != "Any":
+
+            match self.question_type:
+                case "Multiple Choice":
+                    self.api_type = "multiple"
+                case "True or False":
+                    self.api_type = "boolean"
 
     def convert_questions(self):
 
@@ -363,6 +396,14 @@ class Game(SaveFile):
         for user in self.users:
             print(user.name)
 
+        # If there are no questions then get them
+        if len(self.questions) == 0:
+            self.get_questions()
+
+        # Print the questions for testing
+        for question in self.questions:
+            print(question.question)
+
     def save(self):
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__
@@ -380,10 +421,48 @@ class Game(SaveFile):
 # - - - - - - - MENUS - - - - - - -#
 
 
+def game_settings_questions(game):
+    questions_menu_options = ["Question Amount", "Category", "Difficulty", "Type", "Next"]
+    questions_menu_values = [str(game.question_amount), game.quiz_category, game.quiz_difficulty, game.question_type]
+
+    if not game.online_enabled:
+        questions_menu_values.append("Set up players")
+    else:
+        questions_menu_values.append("Wait for players")
+
+    questions_menu = Menu("Game Settings: Questions", [questions_menu_options, questions_menu_values], True)
+    questions_menu.show()
+
+    match questions_menu.user_input:
+        case "Question Amount":
+            game.question_amount = get_user_input_of_type(int, "Question Amount", range(1, 51))
+
+        case "Category":
+            category_menu = Menu("Category", quiz_categories)
+            category_menu.show()
+            game.quiz_category = category_menu.user_input
+
+        case "Difficulty":
+            game.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Any, Easy, Medium, Hard)", ["Any", "Easy", "Medium", "Hard"])
+
+        case "Type":
+            game.question_type = get_user_input_of_type(str, "Type (Any, Multiple, True/False)", ["Any", "Multiple", "True/False"])
+
+        case "Next":
+
+            # Set up the users if the user is not hosting a server
+            if not game.host_a_server:
+                game.set_users()
+    
+    # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
+    if questions_menu.user_input != "Next":
+        game_settings_questions(game)
+
+
 def game_settings_local(game):
     local_menu_options = ["How many players", "Next"]
-    local_menu_values = [str(game.how_many_players), "Gameplay"]
-    single_player_menu = Menu("Game Settings: Single Player", [local_menu_options, local_menu_values], True)
+    local_menu_values = [str(game.how_many_players), "Questions Settings"]
+    single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
     single_player_menu.show()
 
     match single_player_menu.user_input:
@@ -391,12 +470,16 @@ def game_settings_local(game):
             game.how_many_players = get_user_input_of_type(int, "How many players")
 
         case "Next":
-            game.set_users()
+            game_settings_questions(game)
+
+    # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
+    if single_player_menu.user_input != "Next":
+        game_settings_local(game)
 
 
 def game_settings_networking(game):
     networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next"]
-    networking_menu_values = [str(game.server_name), str(game.server_port), str(game.max_players), "Players"]
+    networking_menu_values = [str(game.server_name), str(game.server_port), str(game.max_players), "Questions Settings"]
 
     networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
     networking_menu.show()
@@ -413,9 +496,11 @@ def game_settings_networking(game):
             game.max_players = get_user_input_of_type(int, "Max Players")
 
         case "Next":
-            print("NETWORKING UNDEFINED")
-            while True:
-                pass
+            game_settings_questions(game)
+
+    # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
+    if networking_menu.user_input != "Next":
+        game_settings_networking(game)
 
 
 def game_settings_gameplay(game):
@@ -433,7 +518,6 @@ def game_settings_gameplay(game):
                              str(game.points_multiplier_for_a_streak), str(game.compounding_amount_for_a_streak),
                              str(game.pick_random_question),
                              str(game.bot_difficulty), str(game.how_many_bots)]
-
 
     if game.host_a_server:
         game_play_menu_values.append("Networking Settings")
@@ -488,8 +572,9 @@ def game_settings_gameplay(game):
 
             # Skip the function loop
             return
-
-    game_settings_gameplay(game)
+    # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
+    if gameplay_menu.user_input != "Next":
+        game_settings_gameplay(game)
 
 
 def game_settings_how_to(game):

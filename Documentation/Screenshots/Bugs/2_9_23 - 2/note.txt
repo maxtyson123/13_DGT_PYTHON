@@ -1,0 +1,2 @@
+The bug that I got was that the API retured response code 2 which I belive is a "Invalid parameter" however as I could not find API documentation it could mean other
+To do this I first printed the API request and found that I forgot to do the "Any" check on diffulculty. I added that and it worked.
