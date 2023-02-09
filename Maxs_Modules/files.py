@@ -63,7 +63,7 @@ class SaveFile:
                 file.close()
 
         except FileNotFoundError:
-            error("File not found")
+            debug("File not found so creating new file", "save_file")
 
     def save(self):
         debug("Saving file to " + self.save_file, "save_file")

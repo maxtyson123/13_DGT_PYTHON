@@ -1,0 +1,2 @@
+Note: Bug was that any input was accepted as a valid input for bool. This is fixed now.
+This includes text that was "False" and was read as True.

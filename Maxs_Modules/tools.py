@@ -4,6 +4,19 @@ import time
 
 # - - - - - - - Functions - - - - - - -#
 
+def strBool(text):
+    # Note: strBool is a replacement for the built-in bool function as when using bool() to convert a string to a
+    # bool it will return True if there is any text in the string and False if there isnt, however I need it to
+    # return True if the string is "True" and False if the string is "False"
+    # Note: Do not use this when loading from JSON as the JSON module will convert the string to a bool
+    if text == "True":
+        return True
+    elif text == "False":
+        return False
+    else:
+        raise ValueError()
+
+
 def get_user_input_of_type(type_to_convert, input_message="", must_be_one_of_these=None):
     while True:
         user_input = input(input_message+" > ")

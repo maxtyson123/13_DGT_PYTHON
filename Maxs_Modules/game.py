@@ -72,9 +72,9 @@ import os
 import time
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
-from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type
+from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type, strBool
 from Maxs_Modules.renderer import Menu
-from Maxs_Modules.network import api_get_questions
+
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -286,6 +286,14 @@ class Game(SaveFile):
 
     def convert_users(self):
 
+        # Check if the users list is empty
+        if len(self.users) == 0:
+            return
+
+        # Check if the user is already a User object
+        if type(self.users[0]) is User:
+            return
+
         # For each user in the list of users convert the dict to a User object using the load() function
         for x in range(len(self.users)):
             user_object = User()
@@ -320,6 +328,10 @@ class Game(SaveFile):
         # Check if the user is online
         if self.online_enabled:
 
+            # Import the api_get_questions function, this is only imported if the user is online as it is not needed
+            # if the user is offline and dont want to run the requests installation
+            from Maxs_Modules.network import api_get_questions
+
             # Use the api to get the questions
             self.questions = api_get_questions(self.question_amount, self.quiz_category, self.quiz_difficulty, self.question_type)
 
@@ -332,6 +344,10 @@ class Game(SaveFile):
         self.convert_questions()
 
     def convert_questions(self):
+
+        # Check if there are any questions
+        if len(self.questions) == 0:
+            return
 
         # Check if the questions are already in the correct format
         if type(self.questions[0]) is Question:
@@ -429,7 +445,7 @@ def game_settings_gameplay(game):
 
     match gameplay_menu.user_input:
         case "Host a server":
-            game.host_a_server = get_user_input_of_type(bool, "Host a server (True/False)")
+            game.host_a_server = get_user_input_of_type(strBool, "Host a server (True/False)")
 
         case "Time limit":
             game.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
@@ -456,7 +472,7 @@ def game_settings_gameplay(game):
             game.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
 
         case "Pick random question":
-            game.pick_random_question = get_user_input_of_type(bool, "Pick random question (True/False)")
+            game.pick_random_question = get_user_input_of_type(strBool, "Pick random question (True/False)")
 
         case "Bot difficulty":
             game.bot_difficulty = get_user_input_of_type(int , "Bot difficulty (1-10)", range(1, 11))

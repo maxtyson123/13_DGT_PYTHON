@@ -1,4 +1,10 @@
 # - - - - - - - Imports - - - - - - -#
+from Maxs_Modules.setup import SetupData
+
+# Get the setup data
+setup = SetupData()
+setup.get_packages(["requests"])
+
 import requests
 
 

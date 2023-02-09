@@ -3,9 +3,10 @@ import sys
 import os
 
 from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import debug, try_convert
+from Maxs_Modules.tools import debug, try_convert, strBool
 from Maxs_Modules.renderer import Menu
 from Maxs_Modules.game import get_saved_games, Game
+from Maxs_Modules.setup import SetupData
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -192,6 +193,12 @@ def get_settings():
 
 
 def main():
+
+    # Set up the program
+    setup = SetupData()
+    setup.init_script()
+
+    # Show the main menu
     main_menu = Menu("Welcome to QUIZ", ["Quit", "Continue"])
     main_menu.show()
 
