@@ -19,7 +19,7 @@ def strBool(text):
 
 def get_user_input_of_type(type_to_convert, input_message="", must_be_one_of_these=None):
     while True:
-        user_input = input(input_message+" > ")
+        user_input = input(input_message + " > ")
         user_input = try_convert(user_input, type_to_convert)
 
         if user_input is not None:

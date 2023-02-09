@@ -24,7 +24,7 @@ def api_get_questions(amount, category, difficulty, type):
         url += f"&type={type}"
 
     if difficulty != "Any":
-        url += f"&difficulty={difficulty}"
+        url += f"&difficulty={difficulty.lower()}"
 
     debug(url, "API")
 

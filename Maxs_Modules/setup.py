@@ -12,6 +12,11 @@ data_folder = "UserData/"
 # - - - - - - - Classes - - - - - - - -#
 
 
+def install_package(package):
+    install_command = "python -m pip install " + package
+    os.system(install_command)
+
+
 class SetupData(SaveFile):
     setup_complete = False
     has_pip = False
@@ -47,18 +52,12 @@ class SetupData(SaveFile):
 
         super().save()
 
-    def install_package(self, package):
-        if self.use_py_env:
-            os.system(f"{self.py_env_pip_path} install {package}")
-        else:
-            os.system(f"pip install {package}")
-
     def get_packages(self, package_list):
         for package in package_list:
 
             # Check if the package is not already installed
             if package not in self.packages:
-                self.install_package(package)
+                install_package(package)
                 self.packages.append(package)
 
         # Save the list of packages
@@ -96,29 +95,11 @@ class SetupData(SaveFile):
                 exit()
 
     def setup(self):
+        # Will remove later due to PIP is now installed by default
+
         os.system("cls")
         print("Welcome to the setup wizard")
-        user_has_pip = get_user_input_of_type(strBool, "Do you have pip installed? (True/False)")
-        self.has_pip = user_has_pip
-
-        if not self.has_pip:
-
-            # Try to remove the previous virtual environment
-            if os.path.exists("venv"):
-                os.system("rmdir /s /q venv")
-
-            print("Will now setup a python virtual environment use pip from there.")
-            print("Please wait...")
-
-            # Create the virtual environment
-            os.system("python -m venv venv")
-
-            # Store the py, pip path
-            self.py_env_pip_path = os.path.join(os.getcwd(), "venv", "Scripts", "pip.exe")
-            self.py_env_py_path = os.path.join(os.getcwd(), "venv", "Scripts", "python.exe")
-
-            # Set the use_py_env to true
-            self.use_py_env = True
+        os.system("python -m pip --version")
 
         # User has now completed the setup
         self.setup_complete = True
