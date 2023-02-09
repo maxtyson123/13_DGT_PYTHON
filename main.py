@@ -57,16 +57,21 @@ def continue_game():
     if continue_menu.user_input == "Back":
         game_main_menu()
 
+    # Load the user settings
+    usersettings = UserSettings()
+
     # Load the game object
-    quiz = Game(continue_menu.user_input)
+    quiz = Game(usersettings.network, continue_menu.user_input)
 
     # Start the game
     quiz.begin()
 
 
 def new_game():
+    user_settings = UserSettings()
+
     # Create a new game object
-    quiz = Game()
+    quiz = Game(user_settings.network)
 
     # Get the user to configure the game
     quiz.set_settings()

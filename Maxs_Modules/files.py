@@ -3,6 +3,24 @@ import json
 import os
 from Maxs_Modules.tools import debug, error
 
+# - - - - - - - Variables - - - - - - -#
+
+offline_questions_file = "ProgramData/questions.json"
+
+# - - - - - - - Functions - - - - - - -#
+
+
+def load_questions_from_file():
+
+    # Open the file in read mode
+    with open(offline_questions_file, "r") as file:
+
+        # Read the file into a json object
+        questions = json.load(file)
+
+        # Return the questions
+        return questions
+
 # - - - - - - - Classes - - - - - - -#
 
 

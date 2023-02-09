@@ -9,8 +9,6 @@
 #
 # Internal Functions:
 #  == (Main Gameplay functions) ==
-#  [ ] Init : Initializes the GameManager class.
-#  [ ] Main : The main function for the game.
 #  [ ] Start : Starts the game.
 #  [ ] Update : Updates the game
 #  [ ] End : Ends the game.
@@ -19,7 +17,10 @@
 #  [ ] Pause : Pauses the game.
 #  [ ] Unpause : Unpauses the game.
 #  [x] Save : Saves the game to a file.
-#  [ ] Load : Loads the game from a file.
+#  [x] Load : Loads the game from a file.
+#  [ ] Set Settings : Sets the settings for the game.
+#  [ ] Set Users : Sets the users for the game. (Single player mode only)
+#  [ ] Get Questions : Gets the questions from the server (API).
 #  == (Networking functions) ==
 #  [ ] Connect : Connects to a server.
 #  [ ] Disconnect : Disconnects from a server.
@@ -70,9 +71,10 @@
 import os
 import time
 
-from Maxs_Modules.files import SaveFile
+from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type
 from Maxs_Modules.renderer import Menu
+from Maxs_Modules.network import api_get_questions
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -140,6 +142,31 @@ class User:
         self.questions_missed = data.get("questions_missed")
 
 
+class Question:
+    category = None
+    q_type = None       # Has to be q_type because type is a python keyword
+    difficulty = None
+    question = None
+    correct_answer = None
+    incorrect_answers = None
+
+    def __init__(self, category, q_type, difficulty, question, correct_answer, incorrect_answers):
+        self.category = category
+        self.q_type = q_type
+        self.difficulty = difficulty
+        self.question = question
+        self.correct_answer = correct_answer
+        self.incorrect_answers = incorrect_answers
+
+    def load(self, data):
+        self.category = data.get("category")
+        self.q_type = data.get("q_type")
+        self.difficulty = data.get("difficulty")
+        self.question = data.get("question")
+        self.correct_answer = data.get("correct_answer")
+        self.incorrect_answers = data.get("incorrect_answers")
+
+
 class Game(SaveFile):
 
     # User Chosen Settings
@@ -167,12 +194,13 @@ class Game(SaveFile):
     # State Settings
     current_question = None
     current_user_playing = None
+    online_enabled = None
 
     # Game data
     users = None
     questions = None
 
-    def __init__(self, quiz_save=None):
+    def __init__(self, online_enabled, quiz_save=None):
         # Call the super class and pass the save file name, this will automatically load the settings
 
         # If the quiz save is not none, then load the quiz save because the user wants to continue a game otherwise
@@ -181,6 +209,9 @@ class Game(SaveFile):
             super().__init__(data_folder + quiz_save)
         else:
             super().__init__(data_folder + generate_new_save_file())
+
+        # Set the online enabled variable, note it is not saved because the online state can change between runs
+        self.online_enabled = online_enabled
 
         # Load User Settings
         self.host_a_server = try_convert(self.save_data.get("host_a_server"), str)
@@ -216,7 +247,8 @@ class Game(SaveFile):
         self.set_settings_default()
 
         # Convert the data
-        self.convert_data()
+        self.convert_users()
+        self.convert_questions()
 
     def set_settings_default(self):
         # User Chosen Settings
@@ -249,16 +281,16 @@ class Game(SaveFile):
         self.users = set_if_none(self.users, [])
         self.questions = set_if_none(self.questions, [])
 
-    def convert_data(self):
+    def set_settings(self):
+        game_settings_how_to(self)
+
+    def convert_users(self):
 
         # For each user in the list of users convert the dict to a User object using the load() function
         for x in range(len(self.users)):
             user_object = User()
             user_object.load(self.users[x])
             self.users[x] = user_object
-
-    def set_settings(self):
-        game_settings_how_to(self)
 
     def set_users(self):
         userId = 0
@@ -283,6 +315,34 @@ class Game(SaveFile):
             # Add to list of users
             self.users.append(user)
 
+    def get_questions(self):
+
+        # Check if the user is online
+        if self.online_enabled:
+
+            # Use the api to get the questions
+            self.questions = api_get_questions(self.question_amount, self.quiz_category, self.quiz_difficulty, self.question_type)
+
+        else:
+
+            # Load the question from the saved questions
+            self.questions = load_questions_from_file()
+
+        # Convert the data into a list of Question objects
+        self.convert_questions()
+
+    def convert_questions(self):
+
+        # Check if the questions are already in the correct format
+        if type(self.questions[0]) is Question:
+            return
+
+        # For each question in the list of questions convert the dict to a Question object using the load() function
+        for x in range(len(self.questions)):
+            question_object = Question()
+            question_object.load(self.questions[x])
+            self.questions[x] = question_object
+
     def begin(self):
         for user in self.users:
             print(user.name)
@@ -299,7 +359,7 @@ class Game(SaveFile):
         super().save()
 
         # Convert the data back to the original format
-        self.convert_data()
+        self.convert_users()
 
 # - - - - - - - MENUS - - - - - - -#
 
