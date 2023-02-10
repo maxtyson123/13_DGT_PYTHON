@@ -29,7 +29,7 @@ class UserData(SaveFile):
     py_env_pip_path = ""
     py_env_py_path = ""
 
-    def __init__(self) -> object:
+    def __init__(self) -> None:
         """
         Create a new UserData object, loaded from setup.json
         """
@@ -118,7 +118,7 @@ class UserData(SaveFile):
             exec_path = sys.executable
             debug(exec_path, "setup")
 
-            # Check if the user has ran the script with the python virtual environment (if needed)
+            # Check if the user has run the script with the python virtual environment (if needed)
             if not exec_path == self.py_env_py_path:
 
                 print("Please run this script from the python virtual environment. Attempting to run now.")
@@ -140,19 +140,21 @@ class UserData(SaveFile):
         self.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ", ["CLI", "GUI"])
         self.network = get_user_input_of_type(strBool, "Do you want to use the network? (True/False): ")
 
-        print("Note: Fixing the API invovles removing parameters from the API call until it goes though, this can fix "
+        print("Note: Fixing the API involves removing parameters from the API call until it goes though, this can fix "
               "errors where there arent enough questions of that type in the database, however it can mean that the "
               "question types arent the same as the ones you selected.")
-        self.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error occurs? (True/False): ")
+        self.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error occurs? "
+                                                            "(True/False): ")
 
         # Get the python executable command
         self.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command (e.g. python,"
                                                          " python3, py): ")
 
         # Check if the user wants to use a python virtual environment
-        print("Note a python virtual envirovment can be buggy on WBHS computers and/or other admin restricted and is "
-              "only recomended as a work around for certain users.")
-        self.use_py_env = get_user_input_of_type(strBool, "Do you want to use a python virtual environment? (True/False): ")
+        print("Note a python virtual environment can be buggy on WBHS computers and/or other admin restricted and is "
+              "only recommended as a work around for certain users.")
+        self.use_py_env = get_user_input_of_type(strBool, "Do you want to use a python virtual environment? "
+                                                          "(True/False): ")
 
         # User has now completed the setup
         self.setup_complete = True

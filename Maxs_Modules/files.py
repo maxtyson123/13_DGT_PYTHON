@@ -33,7 +33,7 @@ class SaveFile:
     save_file = "save.json"
     save_data = {}
 
-    def __init__(self, save_file: str, auto_load: bool = True) -> object:
+    def __init__(self, save_file: str, auto_load: bool = True) -> None:
         """
         Initialises the save file class
 
@@ -92,7 +92,7 @@ class SaveFile:
         with open(self.save_file, "w") as file:
             save_dict = self.save_data
 
-            # Try to remove the save_data dictionary from the save data as this causes an loop error when serializing
+            # Try to remove the save_data dictionary from the save data as this causes a loop error when serializing
             try:
                 del save_dict["save_data"]
             except KeyError:

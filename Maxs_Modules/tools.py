@@ -6,6 +6,7 @@ debug_ignore = []
 
 # - - - - - - - Functions - - - - - - -#
 
+
 def strBool(text: str) -> bool:
     """
     A replacement for the built-in bool function that allows for the conversion of a string with the text
@@ -15,7 +16,7 @@ def strBool(text: str) -> bool:
     @return: The bool value of the text. Value Error if the text is not "True" or "False"
     """
     # Note: strBool is a replacement for the built-in bool function as when using bool() to convert a string to a
-    # bool it will return True if there is any text in the string and False if there isnt, however I need it to
+    # bool it will return True if there is any text in the string and False if there isn't, however I need it to
     # return True if the string is "True" and False if the string is "False"
     # Note: Do not use this when loading from JSON as the JSON module will convert the string to a bool
     if text == "True":
@@ -28,7 +29,8 @@ def strBool(text: str) -> bool:
 
 def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None) -> object:
     """
-    Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter until they do.
+    Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
+     until they do.
 
     @param type_to_convert: The type to convert the input to
     @param input_message: The message to display to the user

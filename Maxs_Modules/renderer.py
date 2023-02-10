@@ -2,7 +2,7 @@
 
 
 import os
-from Maxs_Modules.tools import get_user_input_of_type, error
+from Maxs_Modules.tools import get_user_input_of_type
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -24,9 +24,11 @@ def text_in_divider(item_to_print: str, auto_truncate: bool = True) -> str:
     """
     # If the text is longer than the console width then truncate it
     if len(item_to_print) > console_width and auto_truncate:
-        item_to_print = item_to_print[:console_width - 2]  # Truncate the text to fit the console width
+        # Truncate the text to fit the console width
+        item_to_print = item_to_print[:console_width - 2]
 
-    width_left = console_width - len(item_to_print) - 2  # The length of the text, minus console width, minus 2 for the border
+    # The length of the text, minus console width, minus 2 for the border
+    width_left = console_width - len(item_to_print) - 2
     return divider_symbol + item_to_print + " " * width_left + divider_symbol
 
 
@@ -54,7 +56,6 @@ def show_menu_double(menu_items: list) -> None:
 
     # Loop through all the items in the menu
     for x in range(len(menu_items[0])):
-        final_item_to_print = ""
 
         # Create the two items to print
         item_to_print_1 = " [" + str(x) + "]" + " " + menu_items[0][x]
@@ -64,13 +65,14 @@ def show_menu_double(menu_items: list) -> None:
         allowed_width = int(console_width / 2)
 
         if len(item_to_print_1) > allowed_width:
-            item_to_print = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
+            item_to_print_1 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
         if len(item_to_print_2) > allowed_width:
-            item_to_print = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
+            item_to_print_2 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
-        # Spacing inbetween the two items (similar to how it is done in "text_in_divider()" function)
-        width_left = console_width - len(item_to_print_1) - len(item_to_print_2) - 2  # The length of the text, minus console width, minus 2 for the border
+        # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
+        # The length of the text, minus console width, minus 2 for the border
+        width_left = console_width - len(item_to_print_1) - len(item_to_print_2) - 2
         spacing = " " * width_left
 
         # Combine the two items
@@ -91,7 +93,7 @@ class Menu:
     user_input = "undefined"
     multi_dimensional = None
 
-    def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> object:
+    def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> None:
         """
         Creates a menu object
 
@@ -129,7 +131,8 @@ class Menu:
         options = [*range(len(input_items))]
 
         # Get the user input and validate it
-        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")", options, alternative_input_array=input_items)
+        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-"
+                                            + str(options[len(options) - 1]) + ")", options)
 
         # Store the input
         if self.multi_dimensional:

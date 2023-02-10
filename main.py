@@ -1,9 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import sys
-import os
 
-from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import debug, try_convert, strBool
+from Maxs_Modules.tools import debug
 from Maxs_Modules.renderer import Menu
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
@@ -39,9 +37,6 @@ def continue_game() -> None:
     # If the user selected back then return
     if continue_menu.user_input == "Back":
         game_main_menu()
-
-    # Load the user settings
-    usersettings = UserData()
 
     # Load the game object
     quiz = Game(continue_menu.user_input)
