@@ -1,15 +1,15 @@
 # - - - - - - - Imports - - - - - - -#
-from Maxs_Modules.setup import SetupData
+from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import error, debug
 
 # Get the setup data
-setup = SetupData()
+setup = UserData()
 setup.get_packages(["requests"])
 
 import requests
 
-
 # - - - - - - - Functions - - - - - - -#
+
 
 def api_get_questions(amount, category, difficulty, type):
     # Create the URL

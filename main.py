@@ -6,7 +6,7 @@ from Maxs_Modules.files import SaveFile
 from Maxs_Modules.tools import debug, try_convert, strBool
 from Maxs_Modules.renderer import Menu
 from Maxs_Modules.game import get_saved_games, Game
-from Maxs_Modules.setup import SetupData
+from Maxs_Modules.setup import UserData
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -21,26 +21,6 @@ def handle_args(args):
 
 
 # - - - - - - - Classes - - - - - - -#
-
-
-class UserSettings(SaveFile):
-    display_mode = None
-    network = None
-
-    def __init__(self):
-        # Call the super class and pass the save file name, this will automatically load the settings
-        super().__init__(data_folder + "settings.json")
-
-        # Set the variables to the saved data (using ".get()" to prevent errors if the data is not found)
-        self.display_mode = try_convert(self.save_data.get("display_mode"), str)
-        self.network = try_convert(self.save_data.get("network"), bool)
-
-    def save(self):
-        # Create the save data for the UserSettings object
-        self.save_data = self.__dict__
-
-        # Call the super class save function
-        super().save()
 
 
 # - - - - - - - MENUS - - - - - - -#
@@ -59,20 +39,19 @@ def continue_game():
         game_main_menu()
 
     # Load the user settings
-    usersettings = UserSettings()
+    usersettings = UserData()
 
     # Load the game object
-    quiz = Game(usersettings.network, continue_menu.user_input)
+    quiz = Game(continue_menu.user_input)
 
     # Start the game
     quiz.begin()
 
 
 def new_game():
-    user_settings = UserSettings()
 
     # Create a new game object
-    quiz = Game(user_settings.network)
+    quiz = Game()
 
     # Get the user to configure the game
     quiz.set_settings()
@@ -91,7 +70,7 @@ def join_game():
 
 
 def settings():
-    usersettings = UserSettings()
+    usersettings = UserData()
 
     settings_options = ["Display Mode", "Network", "Back"]
     settings_values = [str(usersettings.display_mode), str(usersettings.network), "Main Menu"]
@@ -101,11 +80,9 @@ def settings():
 
     match settings_menu.user_input:
         case "Display Mode":
-            gui_or_cli()
             settings()
 
         case "Network":
-            online_or_offline()
             settings()
 
         case "Back":
@@ -115,7 +92,7 @@ def settings():
 def game_main_menu():
     game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Settings", "Quit"])
 
-    usersettings = UserSettings()
+    usersettings = UserData()
     if usersettings.network is not None:
         if usersettings.network:
             debug("Network is enabled", "network")
@@ -142,60 +119,10 @@ def game_main_menu():
             sys.exit()
 
 
-def online_or_offline():
-    online_or_offline_menu = Menu("Online or Offline", ["Online", "Offline"])
-    online_or_offline_menu.show()
-
-    usersettings = UserSettings()
-
-    if usersettings.network is not None:
-        debug(str(usersettings.network), "user_settings")
-
-    match online_or_offline_menu.user_input:
-        case "Online":
-            usersettings.network = True
-        case "Offline":
-            usersettings.network = False
-
-    # Save the settings and move on
-    usersettings.save()
-
-
-def gui_or_cli():
-    gui_or_cli_menu = Menu("GUI or CLI", ["GUI", "CLI"])
-    gui_or_cli_menu.show()
-
-    usersettings = UserSettings()
-    if usersettings.display_mode is not None:
-        debug(usersettings.display_mode, "user_settings")
-
-    match gui_or_cli_menu.user_input:
-        case "GUI":
-            usersettings.display_mode = "GUI"
-
-        case "CLI":
-            usersettings.display_mode = "CLI"
-
-    # Save the settings and move on
-    usersettings.save()
-
-
-def get_settings():
-    usersettings = UserSettings()
-
-    if usersettings.display_mode is None:
-        gui_or_cli()
-
-    if usersettings.network is None:
-        online_or_offline()
-
-    game_main_menu()
-
-
 def main():
 
     # Set up the program
-    setup = SetupData()
+    setup = UserData()
     setup.init_script()
 
     # Show the main menu
@@ -206,7 +133,7 @@ def main():
         case "Quit":
             sys.exit()
         case "Continue":
-            get_settings()
+            game_main_menu()
 
     print("Done")
 

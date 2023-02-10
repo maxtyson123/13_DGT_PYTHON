@@ -72,6 +72,7 @@ import os
 import time
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
+from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type, strBool
 from Maxs_Modules.renderer import Menu
 
@@ -79,8 +80,11 @@ from Maxs_Modules.renderer import Menu
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
 category_offset = 9
-max_number_of_qeustions = 50
-quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games", "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography", "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets", "Japanese Anime & Manga", "Cartoon & Animations"]
+max_number_of_questions = 50
+quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games",
+                   "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography",
+                   "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets",
+                   "Japanese Anime & Manga", "Cartoon & Animations"]
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -203,7 +207,7 @@ class Game(SaveFile):
     users = None
     questions = None
 
-    def __init__(self, online_enabled, quiz_save=None):
+    def __init__(self, quiz_save=None):
         # Call the super class and pass the save file name, this will automatically load the settings
 
         # If the quiz save is not none, then load the quiz save because the user wants to continue a game otherwise
@@ -214,7 +218,8 @@ class Game(SaveFile):
             super().__init__(data_folder + generate_new_save_file())
 
         # Set the online enabled variable, note it is not saved because the online state can change between runs
-        self.online_enabled = online_enabled
+        usersettings = UserData()
+        self.online_enabled = usersettings.network
 
         # Load User Settings
         self.host_a_server = try_convert(self.save_data.get("host_a_server"), str)

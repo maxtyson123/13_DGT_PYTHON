@@ -12,14 +12,18 @@ data_folder = "UserData/"
 # - - - - - - - Classes - - - - - - - -#
 
 
-def install_package(package):
-    install_command = "python -m pip install " + package
-    os.system(install_command)
+class UserData(SaveFile):
 
-
-class SetupData(SaveFile):
+    # States
     setup_complete = False
-    has_pip = False
+
+    # User settings
+    display_mode = None
+    network = None
+    auto_fix_api = None
+
+    # Executable settings
+    python_exe_command = None
     packages = []
     use_py_env = False
     py_env_pip_path = ""
@@ -30,7 +34,10 @@ class SetupData(SaveFile):
 
         # Load the data from the save file
         self.setup_complete = try_convert(self.save_data.get("setup_complete"), bool)
-        self.has_pip = try_convert(self.save_data.get("has_pip"), bool)
+        self.display_mode = try_convert(self.save_data.get("display_mode"), str)
+        self.network = try_convert(self.save_data.get("network"), bool)
+        self.auto_fix_api = try_convert(self.save_data.get("auto_fix_api"), bool)
+        self.python_exe_command = try_convert(self.save_data.get("python_exe_command"), str)
         self.packages = try_convert(self.save_data.get("packages"), list)
         self.use_py_env = try_convert(self.save_data.get("use_py_env"), bool)
         self.py_env_pip_path = try_convert(self.save_data.get("py_env_pip_path"), str)
@@ -39,9 +46,16 @@ class SetupData(SaveFile):
         # Load the default values if the data is not found
         self.load_defaults()
 
+    def install_package(self, package):
+        install_command = self.python_exe_command + " -m pip install " + package
+        os.system(install_command)
+
     def load_defaults(self):
         self.setup_complete = set_if_none(self.setup_complete, False)
-        self.has_pip = set_if_none(self.has_pip, False)
+        self.display_mode = set_if_none(self.display_mode, "CLI")
+        self.network = set_if_none(self.network, False)
+        self.auto_fix_api = set_if_none(self.auto_fix_api, True)
+        self.python_exe_command = set_if_none(self.python_exe_command, False)
         self.packages = set_if_none(self.packages, [])
         self.use_py_env = set_if_none(self.use_py_env, False)
         self.py_env_pip_path = set_if_none(self.py_env_pip_path, "")
@@ -57,7 +71,7 @@ class SetupData(SaveFile):
 
             # Check if the package is not already installed
             if package not in self.packages:
-                install_package(package)
+                self.install_package(package)
                 self.packages.append(package)
 
         # Save the list of packages
@@ -95,11 +109,28 @@ class SetupData(SaveFile):
                 exit()
 
     def setup(self):
-        # Will remove later due to PIP is now installed by default
+        # Will remove later due to PIP is now installed by default, however could be useful when the time comes
 
         os.system("cls")
         print("Welcome to the setup wizard")
-        os.system("python -m pip --version")
+
+        # Get the user settings
+        self.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ", ["CLI", "GUI"])
+        self.network = get_user_input_of_type(strBool, "Do you want to use the network? (True/False): ")
+
+        print("Note: Fixing the API invovles removing parameters from the API call until it goes though, this can fix "
+              "errors where there arent enough questions of that type in the database, however it can mean that the "
+              "question types arent the same as the ones you selected.")
+        self.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error occurs? (True/False): ")
+
+        # Get the python executable command
+        self.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command (e.g. python,"
+                                                         " python3, py): ")
+
+        # Check if the user wants to use a python virtual environment
+        print("Note a python virtual envirovment can be buggy on WBHS computers and/or other admin restricted and is only recomended as a work around for certain users. "
+              "computers.")
+        self.use_py_env = get_user_input_of_type(strBool, "Do you want to use a python virtual environment? (True/False): ")
 
         # User has now completed the setup
         self.setup_complete = True
