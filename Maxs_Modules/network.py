@@ -12,43 +12,54 @@ import requests
 
 
 def api_get_questions(amount, category, difficulty, type):
-    # Create the URL
-    url = f"https://opentdb.com/api.php?amount={amount}"
 
-    # Ignore the options if they are "Any" (or none because 'convert_question_settings_to_api()' already does this)
-    # since the API gives any by default
-    if category is not None:
-        url += f"&category={category}"
+    redo = True
+    api_fix = 0
 
-    if type is not None:
-        url += f"&type={type}"
+    user_data = UserData()
 
-    if difficulty != "Any":
-        url += f"&difficulty={difficulty.lower()}"
+    while redo:
 
-    debug(url, "API")
+        # Create the URL
+        url = f"https://opentdb.com/api.php?amount={amount}"
 
-    # Get the questions from the API
-    response = requests.get(url)
+        # Ignore the options if they are "Any" (or none because 'convert_question_settings_to_api()' already does this)
+        # since the API gives any by default
 
-    # Check if the was any errors
-    if response.status_code != 200:
-        error("Failed to get questions from the API")
-        return
+        if type is not None and api_fix < 1:
+            url += f"&type={type}"
 
-    # Debug
-    debug(str(response.json()), "API")
+        if difficulty != "Any" and api_fix < 2:
+            url += f"&difficulty={difficulty.lower()}"
 
-    # Check for errors
-    match response.json()["response_code"]:
-        case 0:
-            pass # No errors, just good to have a defined case so that I don't forget it
-        case 1:
-            error("No results found")
-        case 2:
-            error("Invalid parameter")
+        if category is not None and api_fix < 3:
+            url += f"&category={category}"
 
+        debug(url, "API")
 
+        # Get the questions from the API
+        response = requests.get(url)
 
-    # Return the questions
-    return response.json()["results"]
+        # Check if the was any errors
+        if response.status_code != 200:
+            error("Failed to get questions from the API")
+            return
+
+        # Debug
+        debug(str(response.json()), "API")
+
+        # Check for errors
+        match response.json()["response_code"]:
+            case 0:
+                pass # No errors, just good to have a defined case so that I don't forget it
+            case 1:
+                error("No results found")
+                if user_data.auto_fix_api:
+                    api_fix += 1
+                    continue
+
+            case 2:
+                error("Invalid parameter")
+
+        # Return the questions
+        return response.json()["results"]

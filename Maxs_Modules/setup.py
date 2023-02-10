@@ -128,8 +128,8 @@ class UserData(SaveFile):
                                                          " python3, py): ")
 
         # Check if the user wants to use a python virtual environment
-        print("Note a python virtual envirovment can be buggy on WBHS computers and/or other admin restricted and is only recomended as a work around for certain users. "
-              "computers.")
+        print("Note a python virtual envirovment can be buggy on WBHS computers and/or other admin restricted and is "
+              "only recomended as a work around for certain users.")
         self.use_py_env = get_user_input_of_type(strBool, "Do you want to use a python virtual environment? (True/False): ")
 
         # User has now completed the setup

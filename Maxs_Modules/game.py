@@ -66,10 +66,10 @@
 #  [ ] Player Colour : The colour of the player.
 #  [ ] Player Icon : The icon of the player (GUI Only).
 
-
 # - - - - - - - Imports - - - - - - -#
 import os
 import time
+import html
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
@@ -165,7 +165,8 @@ class Question:
         self.category = data.get("category")
         self.q_type = data.get("q_type")
         self.difficulty = data.get("difficulty")
-        self.question = data.get("question")
+        self.question = html.unescape(data.get("question"))
+
         self.correct_answer = data.get("correct_answer")
         self.incorrect_answers = data.get("incorrect_answers")
 
