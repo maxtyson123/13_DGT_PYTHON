@@ -5,22 +5,19 @@
 # External Functions:
 #  - Join Game : Connects to a server and joins a game.
 #  - Play Game : Starts a game.
-#  - Init : Initializes the GameManager class.
 #
 # Internal Functions:
 #  == (Main Gameplay functions) ==
-#  [ ] Start : Starts the game.
-#  [ ] Update : Updates the game
-#  [ ] End : Ends the game.
+#  [x] Start : Starts the game.
 #  [ ] Quit : Quits the game.
 #  [ ] Restart : Restarts the game.
 #  [ ] Pause : Pauses the game.
 #  [ ] Unpause : Unpauses the game.
 #  [x] Save : Saves the game to a file.
 #  [x] Load : Loads the game from a file.
-#  [ ] Set Settings : Sets the settings for the game.
-#  [ ] Set Users : Sets the users for the game. (Single player mode only)
-#  [ ] Get Questions : Gets the questions from the server (API).
+#  [x] Set Settings : Sets the settings for the game.
+#  [x] Set Users : Sets the users for the game. (Single player mode only)
+#  [x] Get Questions : Gets the questions from the server (API).
 #  == (Networking functions) ==
 #  [ ] Connect : Connects to a server.
 #  [ ] Disconnect : Disconnects from a server.
@@ -28,11 +25,11 @@
 #  [ ] Receive : Receives data from a server.
 #  [ ] Sync : Syncs the game with the server.
 #  [ ] Host : Hosts a server.
-#  [ ] Get Quiz Data : Gets the quiz data from the server (API).
+#  [x] Get Quiz Data : Gets the quiz data from the server (API).
 #  == (Gameplay functions) ==
-#  [ ] Display Options : Displays the options for the question.
-#  [ ] Mark Answer : Marks the answer as correct or incorrect.
-#  [ ] Get Input : Gets the user input.
+#  [x] Display Options : Displays the options for the question.
+#  [x] Mark Answer : Marks the answer as correct or incorrect.
+#  [x] Get Input : Gets the user input.
 #  [ ] Display Score : Displays the score of each player.
 #  [ ] Bot Answer : Makes the bot answer the question.
 #
@@ -47,10 +44,12 @@
 #      game.
 #  [x] Points for Correct Answer : The points for a correct answer.
 #  [x] Points for Incorrect Answer : The points for an incorrect answer.
-#  [ ] Points for No Answer : The points for no answer.
-#  [ ] Points multiplier for a streak : The points multiplier for a streak.
-#  [ ] Compounding amount for a streak : The compounding amount for a streak.
-#  [ ] Pick Random Question : Whether to pick a random question or not once the time limit has been reached.
+#  [x] Points for No Answer : The points for no answer.
+#  [x] Points multiplier for a streak : The points multiplier for a streak.
+#  [x] Compounding amount for a streak : The compounding amount for a streak.
+#  [x] Randomise Questions : Whether to randomise the questions or not.
+#  [x] Randomise Answers : Whether to randomise the answers placement or not.
+#  [x] Pick Random Question : Whether to pick a random question or not once the time limit has been reached.
 #  [ ] Bot Difficulty : The difficulty of the bot (% chance of picking the right answer out of 100).
 #  == (Network Settings) ==
 #  [ ] Server Name : The name of the server.
@@ -65,7 +64,7 @@
 #  [x] Question Amount : The amount of questions.
 #  [x] Question Type : The type of questions (True/False, Multi choice).
 #  == (Player Settings) ==
-#  [ ] Player Name : The name of the player.
+#  [x] Player Name : The name of the player.
 #  [ ] Player Colour : The colour of the player.
 #  [ ] Player Icon : The icon of the player (GUI Only).
 
@@ -79,7 +78,7 @@ import random
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import debug, try_convert, set_if_none, get_user_input_of_type, strBool
-from Maxs_Modules.renderer import Menu
+from Maxs_Modules.renderer import Menu, divider
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -148,7 +147,7 @@ class User:
     icon = None
     points = 0
     correct = 0
-    wrong = 0
+    incorrect = 0
     streak = 0
     questions_missed = 0
 
@@ -169,7 +168,7 @@ class User:
         self.icon = data.get("icon")
         self.points = data.get("points")
         self.correct = data.get("correct")
-        self.wrong = data.get("wrong")
+        self.incorrect = data.get("incorrect")
         self.streak = data.get("streak")
         self.questions_missed = data.get("questions_missed")
         self.load_defaults()
@@ -183,7 +182,7 @@ class User:
         self.icon = set_if_none(self.icon, "X")
         self.points = set_if_none(self.points, 0)
         self.correct = set_if_none(self.correct, 0)
-        self.wrong = set_if_none(self.wrong, 0)
+        self.incorrect = set_if_none(self.incorrect, 0)
         self.streak = set_if_none(self.streak, 0)
         self.questions_missed = set_if_none(self.questions_missed, 0)
 
@@ -209,9 +208,12 @@ class Question:
         self.difficulty = data.get("difficulty")
         self.question = html.unescape(data.get("question"))
 
-        self.correct_answer = data.get("correct_answer")
+        self.correct_answer = html.unescape(data.get("correct_answer"))
         self.incorrect_answers = data.get("incorrect_answers")
 
+        # Unescape the incorrect answers
+        for i in range(len(self.incorrect_answers)):
+            self.incorrect_answers[i] = html.unescape(self.incorrect_answers[i])
 
 class Game(SaveFile):
 
@@ -224,6 +226,7 @@ class Game(SaveFile):
     points_for_incorrect_answer = None
     points_for_no_answer = None
     points_multiplier_for_a_streak = None
+    points_multiplier_for_a_streak_base = None
     compounding_amount_for_a_streak = None
     randomise_questions = None
     randomise_answer_placement = None
@@ -282,6 +285,7 @@ class Game(SaveFile):
         self.points_for_incorrect_answer = try_convert(self.save_data.get("points_for_incorrect_answer"), int)
         self.points_for_no_answer = try_convert(self.save_data.get("points_for_no_answer"), int)
         self.points_multiplier_for_a_streak = try_convert(self.save_data.get("points_multiplier_for_a_streak"), int)
+        self.points_multiplier_for_a_streak_base = try_convert(self.save_data.get("points_multiplier_for_a_streak_base"), int)
         self.compounding_amount_for_a_streak = try_convert(self.save_data.get("compounding_amount_for_a_streak"), int)
         self.randomise_questions = try_convert(self.save_data.get("randomise_questions"), bool)
         self.randomise_answer_placement = try_convert(self.save_data.get("randomise_answer_placement"), bool)
@@ -326,6 +330,7 @@ class Game(SaveFile):
         self.points_for_incorrect_answer = set_if_none(self.points_for_incorrect_answer, -1)
         self.points_for_no_answer = set_if_none(self.points_for_no_answer, 0)
         self.points_multiplier_for_a_streak = set_if_none(self.points_multiplier_for_a_streak, 1.1)
+        self.points_multiplier_for_a_streak_base = set_if_none(self.points_multiplier_for_a_streak_base, 1.1)
         self.randomise_questions = set_if_none(self.randomise_questions, True)
         self.randomise_answer_placement = set_if_none(self.randomise_answer_placement, True)
         self.compounding_amount_for_a_streak = set_if_none(self.compounding_amount_for_a_streak, 1)
@@ -498,8 +503,53 @@ class Game(SaveFile):
         if len(self.questions) == 0:
             self.get_questions()
 
-        # Start the game
-        self.play()
+        # Start the game, using the next_question function as this checks for the end of the game
+        self.next_question()
+
+    def mark_question(self, user_input) -> None:
+        # Get the current question
+        current_question = self.questions[self.current_question]
+
+        # Get the current user
+        current_user = self.users[self.current_user_playing]
+
+        # Check if the answer is correct
+        if user_input == current_question.correct_answer:
+            # Tell the user that the answer is correct
+            print("Correct!")
+
+            # Set the point to the default point
+            point = self.points_for_correct_answer
+
+            # Check if the user has a streak
+            if current_user.streak > 0:
+                # Compound the streak
+                self.points_multiplier_for_a_streak *= self.compounding_amount_for_a_streak
+
+                # If the user has a streak then add the streak to the point
+                point = self.points_multiplier_for_a_streak * current_user.streak
+
+            # If the answer is correct then add a point to the user
+            current_user.points += point
+
+            # Add a point to the streak
+            current_user.streak += 1
+
+            # Add correct
+            current_user.correct += 1
+
+        else:
+            print("Incorrect.")
+
+            # Reset the streak
+            current_user.streak = 0
+            self.points_multiplier_for_a_streak = self.points_multiplier_for_a_streak_base
+
+            # Add incorrect
+            current_user.incorrect += 1
+
+            # If the answer is not correct then remove a point from the user
+            current_user.points -= self.points_for_incorrect_answer
 
     def play(self) -> None:
         """
@@ -507,6 +557,9 @@ class Game(SaveFile):
         thread for the user input. Then it marks the question and calculates the score for the player. Afterwards it
         runs the next question
         """
+        # Save the users progress
+        self.save()
+
         # Get the current question
         current_question = self.questions[self.current_question]
 
@@ -517,13 +570,21 @@ class Game(SaveFile):
         options = current_question.incorrect_answers
         options.append(current_question.correct_answer)
 
+        # Shuffle the options
+        if self.randomise_answer_placement:
+            random.shuffle(options)
+
         # Print some info
+        print(divider)
         print("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
         print("User: " + current_user.name)
         print("Time Limit: " + str(self.time_limit) + " seconds")
 
         # Create the question menu
         question_menu = Menu(current_question.question, options)
+
+        # Don't clear the screen as information is printed before the menu
+        question_menu.dont_clear_screen()
 
         # Store the time and input
         time_limit = self.time_limit
@@ -532,28 +593,24 @@ class Game(SaveFile):
         t.join(timeout=time_limit)
 
         if not t.is_alive():
+            self.mark_question(question_menu.user_input)
 
-            # Check if the answer is correct
-            if question_menu.user_input == current_question.correct_answer:
-                # Tell the user that the answer is correct
-                print("Correct!")
+        else:
 
-                # If the answer is correct then add a point to the user
-                point = self.points_for_correct_answer
-
-                # Check if the user has a streak
-                if current_user.streak > 0:
-                    # If the user has a streak then add the streak to the point
-                    point = self.points_multiplier_for_a_streak * current_user.streak
-
-                current_user.points += point
+            # If the game should pick a random question when the time runs out
+            if self.pick_random_question:
+                # Get a random option
+                random_option = random.choice(options)
+                print("Auto picking: "+random_option)
+                self.mark_question(random_option)
 
             else:
-                print("Incorrect.")
+                # Add the points for no answer
+                current_user.points += self.points_for_no_answer
 
-                # If the answer is not correct then remove a point from the user
-                current_user.points -= self.points_for_incorrect_answer
-        else:
+            # Add missed question to the user
+            current_user.questions_missed += 1
+
             print("\nTime's up! Moving to next question.")
 
         # Give user time to read the answer
@@ -571,10 +628,21 @@ class Game(SaveFile):
 
         # Check if the game has finished
         if self.current_question == self.question_amount:
+
+            # Check if it is another user's turn
+            if self.current_user_playing < len(self.users) - 1:
+                # If it is another user's turn then move onto the next user
+                self.current_user_playing += 1
+                self.current_question = 0
+
+                # Move onto the next question
+                self.play()
+
             # If the game has finished then show the results
             print("Game finished!")
+
         else:
-            # If the game has not finished then move onto the next question
+            # Move onto the question
             self.play()
 
     def save(self) -> None:
