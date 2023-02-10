@@ -38,12 +38,12 @@
 #
 # Settings:
 #  == (Gameplay Settings) ==
-#  [ ] Game Mode : The game mode (Local Players or Multiplayer).
-#  [ ] Time Limit : The time limit for each question.
+#  [x] Game Mode : The game mode (Local Players or Multiplayer).
+#  [x] Time Limit : The time limit for each question.
 #  [ ] Show Score after Question or Game : Whether to show the score after each question or after the game (This means that if it is shown after each question in single player, a snapshot of each players score at that question is needed).
 #  [ ] Show Correct Answer after Question or Game : Whether to show the correct answer after each question or after the game.
-#  [ ] Points for Correct Answer : The points for a correct answer.
-#  [ ] Points for Incorrect Answer : The points for an incorrect answer.
+#  [x] Points for Correct Answer : The points for a correct answer.
+#  [x] Points for Incorrect Answer : The points for an incorrect answer.
 #  [ ] Points for No Answer : The points for no answer.
 #  [ ] Points multiplier for a streak : The points multiplier for a streak.
 #  [ ] Compounding amount for a streak : The compounding amount for a streak.
@@ -54,13 +54,13 @@
 #  [ ] Server Port : The port of the server (1234 by default).
 #  [ ] Max Players : The maximum amount of players.
 #  == (Single Player Settings) ==
-#  [ ] How many players : The amount of players.
+#  [x] How many players : The amount of players.
 #  [ ] How many bots : The amount of bots.
 #  == (Quiz Settings) ==
-#  [ ] Quiz Category : The category of the quiz.
-#  [ ] Quiz Difficulty : The difficulty of the quiz.
-#  [ ] Question Amount : The amount of questions.
-#  [ ] Question Type : The type of questions (True/False, Multi choice).
+#  [x] Quiz Category : The category of the quiz.
+#  [x] Quiz Difficulty : The difficulty of the quiz.
+#  [x] Question Amount : The amount of questions.
+#  [x] Question Type : The type of questions (True/False, Multi choice).
 #  == (Player Settings) ==
 #  [ ] Player Name : The name of the player.
 #  [ ] Player Colour : The colour of the player.
@@ -68,14 +68,17 @@
 
 # - - - - - - - Imports - - - - - - -#
 import os
+import sys
+import threading
 import time
 import html
+import random
+import msvcrt
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import debug, error, try_convert, set_if_none, get_user_input_of_type, strBool
-from Maxs_Modules.renderer import Menu
-
+from Maxs_Modules.renderer import Menu, divider, text_in_divider
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -133,6 +136,7 @@ class User:
     points = 0
     correct = 0
     wrong = 0
+    streak = 0
     questions_missed = 0
 
     def __int__(self, name, colour, icon):
@@ -147,12 +151,24 @@ class User:
         self.points = data.get("points")
         self.correct = data.get("correct")
         self.wrong = data.get("wrong")
+        self.streak = data.get("streak")
         self.questions_missed = data.get("questions_missed")
+        self.load_defaults()
+
+    def load_defaults(self):
+        self.name = set_if_none(self.name, "Player")
+        self.colour = set_if_none(self.colour, "White")
+        self.icon = set_if_none(self.icon, "X")
+        self.points = set_if_none(self.points, 0)
+        self.correct = set_if_none(self.correct, 0)
+        self.wrong = set_if_none(self.wrong, 0)
+        self.streak = set_if_none(self.streak, 0)
+        self.questions_missed = set_if_none(self.questions_missed, 0)
 
 
 class Question:
     category = None
-    q_type = None       # Has to be q_type because type is a python keyword
+    type = None       # Although type is a reserved word, it is used in the API and is therefore used here
     difficulty = None
     question = None
     correct_answer = None
@@ -163,7 +179,7 @@ class Question:
 
     def load(self, data):
         self.category = data.get("category")
-        self.q_type = data.get("q_type")
+        self.type = data.get("type")
         self.difficulty = data.get("difficulty")
         self.question = html.unescape(data.get("question"))
 
@@ -183,6 +199,8 @@ class Game(SaveFile):
     points_for_no_answer = None
     points_multiplier_for_a_streak = None
     compounding_amount_for_a_streak = None
+    randomise_questions = None
+    randomise_answer_placement = None
     pick_random_question = None
     bot_difficulty = None
     server_name = None
@@ -232,6 +250,8 @@ class Game(SaveFile):
         self.points_for_no_answer = try_convert(self.save_data.get("points_for_no_answer"), int)
         self.points_multiplier_for_a_streak = try_convert(self.save_data.get("points_multiplier_for_a_streak"), int)
         self.compounding_amount_for_a_streak = try_convert(self.save_data.get("compounding_amount_for_a_streak"), int)
+        self.randomise_questions = try_convert(self.save_data.get("randomise_questions"), bool)
+        self.randomise_answer_placement = try_convert(self.save_data.get("randomise_answer_placement"), bool)
         self.pick_random_question = try_convert(self.save_data.get("pick_random_question"), bool)
         self.bot_difficulty = try_convert(self.save_data.get("bot_difficulty"), int)
         self.server_name = try_convert(self.save_data.get("server_name"), str)
@@ -269,6 +289,8 @@ class Game(SaveFile):
         self.points_for_incorrect_answer = set_if_none(self.points_for_incorrect_answer, -1)
         self.points_for_no_answer = set_if_none(self.points_for_no_answer, 0)
         self.points_multiplier_for_a_streak = set_if_none(self.points_multiplier_for_a_streak, 1.1)
+        self.randomise_questions = set_if_none(self.randomise_questions, True)
+        self.randomise_answer_placement = set_if_none(self.randomise_answer_placement, True)
         self.compounding_amount_for_a_streak = set_if_none(self.compounding_amount_for_a_streak, 1)
         self.pick_random_question = set_if_none(self.pick_random_question, True)
         self.bot_difficulty = set_if_none(self.bot_difficulty, 50)
@@ -310,19 +332,19 @@ class Game(SaveFile):
             self.users[x] = user_object
 
     def set_users(self):
-        userId = 0
-        while userId != self.how_many_players:
+        user_id = 0
+        while user_id != self.how_many_players:
 
             # Clear the screen
             os.system("cls")
 
             # Create a new user
-            userId += 1
+            user_id += 1
             user = User()
 
             # Get name and check if it is valid
             while user.name is None:
-                user.name = try_convert(input("Enter the name for user " + str(userId) + ": "), str)
+                user.name = try_convert(input("Enter the name for user " + str(user_id) + ": "), str)
 
             # Get colour
             colour_menu = Menu("Choose a colour for " + user.name, ["Red", "Green", "Blue", "Yellow", "Purple", "Orange", "Pink", "Black", "White"])
@@ -360,6 +382,13 @@ class Game(SaveFile):
 
         # Convert the data into a list of Question objects
         self.convert_questions()
+
+        # Shuffle the questions if the user wants to
+        if self.randomise_questions:
+            random.shuffle(self.questions)
+
+        # Save the questions to the file
+        self.save()
 
     def convert_question_settings_to_api(self):
 
@@ -406,9 +435,78 @@ class Game(SaveFile):
         if len(self.questions) == 0:
             self.get_questions()
 
-        # Print the questions for testing
-        for question in self.questions:
-            print(question.question)
+        # Start the game
+        self.play()
+
+    def play(self):
+
+        # Get the current question
+        current_question = self.questions[self.current_question]
+
+        # Get the current user
+        current_user = self.users[self.current_user_playing]
+
+        # Create options
+        options = current_question.incorrect_answers
+        options.append(current_question.correct_answer)
+
+        # Print some info
+        print("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
+        print("User: " + current_user.name)
+        print("Time Limit: " + str(self.time_limit) + " seconds")
+
+        # Create the question menu
+        question_menu = Menu(current_question.question, options)
+
+        # Store the time and input
+        time_limit = self.time_limit
+        user_input = []
+        t = threading.Thread(target= question_menu.show)
+        t.start()
+        t.join(timeout=time_limit)
+
+        if not t.is_alive():
+
+            # Check if the answer is correct
+            if question_menu.user_input == current_question.correct_answer:
+                # Tell the user that the answer is correct
+                print("Correct!")
+
+                # If the answer is correct then add a point to the user
+                point = self.points_for_correct_answer
+
+                # Check if the user has a streak
+                if current_user.streak > 0:
+                    # If the user has a streak then add the streak to the point
+                    point = self.points_multiplier_for_a_streak * current_user.streak
+
+                current_user.points += point
+
+            else:
+                print("Incorrect.")
+
+                # If the answer is not correct then remove a point from the user
+                current_user.points -= self.points_for_incorrect_answer
+        else:
+            print("\nTime's up! Moving to next question.")
+
+        # Give user time to read the answer
+        time.sleep(1)
+
+        # Move onto the next question
+        self.next_question()
+
+    def next_question(self):
+        # Move onto the next question
+        self.current_question += 1
+
+        # Check if the game has finished
+        if self.current_question == self.question_amount:
+            # If the game has finished then show the results
+            print("Game finished!")
+        else:
+            # If the game has not finished then move onto the next question
+            self.play()
 
     def save(self):
         # Create the save data for the UserSettings object
@@ -418,11 +516,17 @@ class Game(SaveFile):
         for user_index in range(len(self.users)):
             self.save_data["users"][user_index] = self.users[user_index].__dict__
 
+        # Convert the question class to a dict
+        for question_index in range(len(self.questions)):
+            self.save_data["questions"][question_index] = self.questions[question_index].__dict__
+
         # Call the super class save function
         super().save()
 
         # Convert the data back to the original format
         self.convert_users()
+        self.convert_questions()
+
 
 # - - - - - - - MENUS - - - - - - -#
 
@@ -514,7 +618,9 @@ def game_settings_gameplay(game):
                                                      "Show correct answer after Question/Game",
                                                      "Points for correct answer", "Points for incorrect answer",
                                                      "Points for no answer", "Points multiplier for a streak",
-                                                     "Compounding amount for a streak", "Pick random question",
+                                                     "Compounding amount for a streak", "Randomise questions",
+                                                     "Randomise answer placement",
+                                                     "Pick random question when run out of time",
                                                      "Bot difficulty", "Number of bots", "Next"]
 
     game_play_menu_values = [str(game.host_a_server), str(game.time_limit), str(game.show_score_after_question_or_game),
@@ -522,6 +628,7 @@ def game_settings_gameplay(game):
                              str(game.points_for_correct_answer), str(game.points_for_incorrect_answer),
                              str(game.points_for_no_answer),
                              str(game.points_multiplier_for_a_streak), str(game.compounding_amount_for_a_streak),
+                             str(game.randomise_questions), str(game.randomise_answer_placement),
                              str(game.pick_random_question),
                              str(game.bot_difficulty), str(game.how_many_bots)]
 
@@ -561,7 +668,13 @@ def game_settings_gameplay(game):
         case "Compounding amount for a streak":
             game.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
 
-        case "Pick random question":
+        case "Randomise questions":
+            game.randomise_questions = get_user_input_of_type(strBool, "Randomise questions (True/False)")
+
+        case "Randomise answer placement":
+            game.randomise_answer_placement = get_user_input_of_type(strBool, "Randomise answer placement (True/False)")
+
+        case "Pick random question when run out of time":
             game.pick_random_question = get_user_input_of_type(strBool, "Pick random question (True/False)")
 
         case "Bot difficulty":

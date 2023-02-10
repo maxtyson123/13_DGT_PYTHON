@@ -7,7 +7,7 @@ from Maxs_Modules.tools import get_user_input_of_type, error
 # - - - - - - - Variables - - - - - - -#
 
 
-console_width = 60
+console_width = 100
 divider_symbol = "#"
 divider = divider_symbol * console_width
 
@@ -101,7 +101,7 @@ class Menu:
             options = [*range(len(self.items))]
 
         # Get the user input and validate it
-        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")")
+        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")", options)
 
         # Store the input
         if self.multi_dimensional:
