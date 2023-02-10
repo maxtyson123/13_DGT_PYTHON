@@ -29,7 +29,10 @@ class UserData(SaveFile):
     py_env_pip_path = ""
     py_env_py_path = ""
 
-    def __init__(self):
+    def __init__(self) -> object:
+        """
+        Create a new UserData object, loaded from setup.json
+        """
         super().__init__(data_folder+"setup.json")
 
         # Load the data from the save file
@@ -46,11 +49,18 @@ class UserData(SaveFile):
         # Load the default values if the data is not found
         self.load_defaults()
 
-    def install_package(self, package):
+    def install_package(self, package: str) -> None:
+        """
+        Install a package using pip. (Built in module pip not pip.exe)
+        @param package: The package to install
+        """
         install_command = self.python_exe_command + " -m pip install " + package
         os.system(install_command)
 
-    def load_defaults(self):
+    def load_defaults(self) -> None:
+        """
+        Load the default values for the user data if they are not found
+        """
         self.setup_complete = set_if_none(self.setup_complete, False)
         self.display_mode = set_if_none(self.display_mode, "CLI")
         self.network = set_if_none(self.network, False)
@@ -61,12 +71,19 @@ class UserData(SaveFile):
         self.py_env_pip_path = set_if_none(self.py_env_pip_path, "")
         self.py_env_py_path = set_if_none(self.py_env_py_path, "")
 
-    def save(self):
+    def save(self) -> None:
+        """
+        Save the user data to setup.json
+        """
         self.save_data = self.__dict__
 
         super().save()
 
-    def get_packages(self, package_list):
+    def get_packages(self, package_list: list) -> None:
+        """
+        Installs a list of packages if they are not already installed
+        @param package_list: The list of packages to install
+        """
         for package in package_list:
 
             # Check if the package is not already installed
@@ -77,8 +94,11 @@ class UserData(SaveFile):
         # Save the list of packages
         self.save()
 
-    def init_script(self):
-
+    def init_script(self) -> None:
+        """
+        Initialise the script, checking if the setup is complete and if the user is using the python virtual
+        environment if they chose to configure the script to use it.
+        """
         # Check if the setup is complete
         if not self.setup_complete:
             self.setup()
@@ -108,9 +128,11 @@ class UserData(SaveFile):
                 os.system(f"{self.py_env_py_path} main.py")
                 exit()
 
-    def setup(self):
-        # Will remove later due to PIP is now installed by default, however could be useful when the time comes
-
+    def setup(self) -> None:
+        """
+        Run the setup wizard, this will ask the user for the settings they want to use and save them to setup.json.
+        This is normally called once when the script is first run.
+        """
         os.system("cls")
         print("Welcome to the setup wizard")
 

@@ -10,8 +10,13 @@ offline_questions_file = "ProgramData/questions.json"
 # - - - - - - - Functions - - - - - - -#
 
 
-def load_questions_from_file():
+def load_questions_from_file() -> dict:
+    """
+    Loads a json array of questions from the offline questions file specified in the offline_questions_file variable.
+    This is just a downloaded JSON api response from the Open Trivia Database API.
 
+    @return: JSON array of questions
+    """
     # Open the file in read mode
     with open(offline_questions_file, "r") as file:
 
@@ -28,7 +33,14 @@ class SaveFile:
     save_file = "save.json"
     save_data = {}
 
-    def __init__(self, save_file, auto_load=True):
+    def __init__(self, save_file: str, auto_load: bool = True) -> object:
+        """
+        Initialises the save file class
+
+        @param save_file: The file to save the data to, will be created if it does not exist
+        @param auto_load: If the file should be loaded automatically when the class is initialised,
+        by default this is True
+        """
         self.save_file = save_file
 
         # If the user wants to autoload the file then try run the load function
@@ -36,7 +48,11 @@ class SaveFile:
             debug("Auto loading file", "save_file")
             self.load()
 
-    def load(self):
+    def load(self) -> None:
+        """
+        Loads the data from the save file into the save_data dictionary
+        @return: None, this function will return if the file is corrupt or does not exist
+        """
         debug("Loading file from " + self.save_file, "save_file")
 
         # Try to load the data from the save file in read mode, if it fails then warn the user
@@ -63,9 +79,13 @@ class SaveFile:
                 file.close()
 
         except FileNotFoundError:
-            debug("File not found so creating new file", "save_file")
+            debug("File not found", "save_file")
+            return
 
-    def save(self):
+    def save(self) -> None:
+        """
+        Saves the data from the save_data dictionary to the save file
+        """
         debug("Saving file to " + self.save_file, "save_file")
 
         # Open the file and dump the object as a dictionary, then close the file

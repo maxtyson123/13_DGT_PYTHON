@@ -14,8 +14,14 @@ divider = divider_symbol * console_width
 # - - - - - - - Functions - - - - - - -#
 
 
-def text_in_divider(item_to_print, auto_truncate=True):
+def text_in_divider(item_to_print: str, auto_truncate: bool = True) -> str:
+    """
+    Prints the text in the divider
 
+    @param item_to_print: The text to print
+    @param auto_truncate: If the text is longer than the console width then truncate it
+    @return: The text in the divider
+    """
     # If the text is longer than the console width then truncate it
     if len(item_to_print) > console_width and auto_truncate:
         item_to_print = item_to_print[:console_width - 2]  # Truncate the text to fit the console width
@@ -24,7 +30,11 @@ def text_in_divider(item_to_print, auto_truncate=True):
     return divider_symbol + item_to_print + " " * width_left + divider_symbol
 
 
-def show_menu(menu_items):
+def show_menu(menu_items: list) -> None:
+    """
+    Prints the menu items and their index. This is wrapped inbetween two dividers
+    @param menu_items: The list of menu items to print
+    """
     print(divider)
 
     # Loop through all the items in the menu
@@ -34,7 +44,12 @@ def show_menu(menu_items):
     print(divider)
 
 
-def show_menu_double(menu_items):
+def show_menu_double(menu_items: list) -> None:
+    """
+    Prints the menu items and their index on the left. On the right it prints the item's value. This is wrapped
+    inbetween two dividers. The item is automatically truncated if it is longer than half the console width,
+    allowing space for the divider and the value. @param menu_items:
+    """
     print(divider)
 
     # Loop through all the items in the menu
@@ -76,13 +91,23 @@ class Menu:
     user_input = "undefined"
     multi_dimensional = None
 
-    def __init__(self, title, items, multi_dimensional=False):
+    def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> object:
+        """
+        Creates a menu object
+
+        @param title: The title of the menu
+        @param items: The items in the menu
+        @param multi_dimensional: If the menu items array is multi-dimensional (i.e. has a value for each item)
+        """
         self.title = title
         self.items = items
         self.multi_dimensional = multi_dimensional
 
-    def show(self):
-
+    def show(self) -> None:
+        """
+        Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
+        item in the user_input variable
+        """
         # Clear the screen
         os.system("cls")
 
@@ -96,12 +121,15 @@ class Menu:
 
         # Calculate the possible options
         if self.multi_dimensional:
-            options = [*range(len(self.items[0]))]
+
+            input_items = self.items[0]
         else:
-            options = [*range(len(self.items))]
+            input_items = self.items
+
+        options = [*range(len(input_items))]
 
         # Get the user input and validate it
-        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")", options)
+        user_input = get_user_input_of_type(int, "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")", options, alternative_input_array=input_items)
 
         # Store the input
         if self.multi_dimensional:

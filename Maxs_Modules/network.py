@@ -11,8 +11,16 @@ import requests
 # - - - - - - - Functions - - - - - - -#
 
 
-def api_get_questions(amount, category, difficulty, type):
+def api_get_questions(amount: int, category: int, difficulty: str, type: str) -> list:
+    """
+    Gets questions from the API at https://opentdb.com/api.php and returns them as a list of dictionaries
 
+    @param amount: How many questions to get (Max 50)
+    @param category: The category of the questions (index, offset by 9)
+    @param difficulty: The difficulty of the questions
+    @param type: The type of the questions
+    @return: A list of dictionaries containing the questions
+    """
     redo = True
     api_fix = 0
 

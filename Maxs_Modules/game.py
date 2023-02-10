@@ -94,6 +94,12 @@ quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Th
 
 
 def generate_new_save_file():
+    """
+    Generates a new save file name by searching through the data folder for a name that is not already taken
+    (most likely: Game_X.json)
+
+    @return: The name of the save file
+    """
     # Get all the save files
     already_saved = get_saved_games()
 
@@ -115,6 +121,12 @@ def generate_new_save_file():
 
 
 def get_saved_games():
+    """
+    Gets a list of all the saved games (note this returns a list of all JSON files in the data folder and if a user
+    has tampered with the data folder, a JSON file that isn't a save file may be returned)
+
+    @return: A list of all the saved games
+    """
     # Get a list of all the files in the data folder
     files = os.listdir(data_folder)
     debug("Files in data folder: " + str(files), "Game")
@@ -139,12 +151,18 @@ class User:
     streak = 0
     questions_missed = 0
 
-    def __int__(self, name, colour, icon):
+    def __int__(self, name: str, colour: str, icon: str) -> object:
+        """
+        Creates a new user
+        @param name: The name of the user
+        @param colour: The colour of the user
+        @param icon: The path to the icon of the user
+        """
         self.name = name
         self.colour = colour
         self.icon = icon
 
-    def load(self, data):
+    def load(self, data: dict) -> None:
         self.name = data.get("name")
         self.colour = data.get("colour")
         self.icon = data.get("icon")
@@ -155,7 +173,10 @@ class User:
         self.questions_missed = data.get("questions_missed")
         self.load_defaults()
 
-    def load_defaults(self):
+    def load_defaults(self) -> None:
+        """
+        Loads the default values for the user, should any of the values be None.
+        """
         self.name = set_if_none(self.name, "Player")
         self.colour = set_if_none(self.colour, "White")
         self.icon = set_if_none(self.icon, "X")
@@ -174,10 +195,14 @@ class Question:
     correct_answer = None
     incorrect_answers = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
-    def load(self, data):
+    def load(self, data: dict) -> None:
+        """
+        Loads the data from the API into the question object
+        @param data: The data from the API
+        """
         self.category = data.get("category")
         self.type = data.get("type")
         self.difficulty = data.get("difficulty")
@@ -226,7 +251,13 @@ class Game(SaveFile):
     users = None
     questions = None
 
-    def __init__(self, quiz_save=None):
+    def __init__(self, quiz_save: str = None) -> None:
+        """
+        Creates a new game. If the quiz save is not none, then load the quiz save because the user wants to continue a
+        game otherwise generate a new save file.
+
+        @param quiz_save:
+        """
         # Call the super class and pass the save file name, this will automatically load the settings
 
         # If the quiz save is not none, then load the quiz save because the user wants to continue a game otherwise
@@ -279,7 +310,10 @@ class Game(SaveFile):
         self.convert_users()
         self.convert_questions()
 
-    def set_settings_default(self):
+    def set_settings_default(self) -> None:
+        """
+        Sets the default settings if the settings are none
+        """
         # User Chosen Settings
         self.host_a_server = set_if_none(self.host_a_server, False)
         self.time_limit = set_if_none(self.time_limit, 10)
@@ -312,11 +346,18 @@ class Game(SaveFile):
         self.users = set_if_none(self.users, [])
         self.questions = set_if_none(self.questions, [])
 
-    def set_settings(self):
+    def set_settings(self) -> None:
+        """
+        Shows the user various menus related to settings, allowing them to change the settings
+        """
         game_settings_how_to(self)
 
-    def convert_users(self):
-
+    def convert_users(self) -> None:
+        """
+        Converts the users list from a list of dicts to a list of User objects
+        
+        @return: This function returns if the list is empty or if the first item is already a User object
+        """
         # Check if the users list is empty
         if len(self.users) == 0:
             return
@@ -331,7 +372,10 @@ class Game(SaveFile):
             user_object.load(self.users[x])
             self.users[x] = user_object
 
-    def set_users(self):
+    def set_users(self) -> None:
+        """
+        Gets the user to enter the names and colours for each user
+        """
         user_id = 0
         while user_id != self.how_many_players:
 
@@ -354,8 +398,12 @@ class Game(SaveFile):
             # Add to list of users
             self.users.append(user)
 
-    def get_questions(self):
-
+    def get_questions(self) -> None:
+        """
+        Gets the questions from the API or from the file depending on the online_enabled setting. Afterward it converts
+        the questions into Question objects and then shuffles the questions if the randomise_questions setting is True.
+        Finally, it saves the questions to the file.
+        """
         # Check if the user is online
         if self.online_enabled:
 
@@ -390,8 +438,11 @@ class Game(SaveFile):
         # Save the questions to the file
         self.save()
 
-    def convert_question_settings_to_api(self):
-
+    def convert_question_settings_to_api(self) -> None:
+        """
+        Since the API uses indices for the categories and lowercase strings for the types, this function converts the
+        user set settings into syntax that the API can understand
+        """
         # Convert the category if it is not any
         if self.quiz_category != "Any":
             # Get the index of the question type
@@ -411,8 +462,12 @@ class Game(SaveFile):
                 case "True or False":
                     self.api_type = "boolean"
 
-    def convert_questions(self):
+    def convert_questions(self) -> None:
+        """
+        Converts the questions list from a list of dicts to a list of Question objects
 
+        @return: This function returns if the list is empty or if the first item is already a Question object
+        """
         # Check if there are any questions
         if len(self.questions) == 0:
             return
@@ -427,7 +482,10 @@ class Game(SaveFile):
             question_object.load(self.questions[x])
             self.questions[x] = question_object
 
-    def begin(self):
+    def begin(self) -> None:
+        """
+        Starts the game by printing all the users and then getting the questions if there are none
+        """
         for user in self.users:
             print(user.name)
 
@@ -438,8 +496,12 @@ class Game(SaveFile):
         # Start the game
         self.play()
 
-    def play(self):
-
+    def play(self) -> None:
+        """
+        Shows the user the question and then gets the user to answer it in the specified time by using a different
+        thread for the user input. Then it marks the question and clacluates the score for the player. Aftewards it
+        runs the next question
+        """
         # Get the current question
         current_question = self.questions[self.current_question]
 
@@ -496,7 +558,10 @@ class Game(SaveFile):
         # Move onto the next question
         self.next_question()
 
-    def next_question(self):
+    def next_question(self) -> None:
+        """
+        Moves onto the next question. If the game has finished then it shows the results.
+        """
         # Move onto the next question
         self.current_question += 1
 
@@ -508,7 +573,11 @@ class Game(SaveFile):
             # If the game has not finished then move onto the next question
             self.play()
 
-    def save(self):
+    def save(self) -> None:
+        """
+        Saves the game data to the file. Converts the user and question objects to dicts before saving and then
+        converts them back once written to the JSON file
+        """
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__
 
@@ -531,7 +600,12 @@ class Game(SaveFile):
 # - - - - - - - MENUS - - - - - - -#
 
 
-def game_settings_questions(game):
+def game_settings_questions(game: Game) -> None:
+    """
+    Shows a menu to configure the questions for the game
+
+    @param game: The game object
+    """
     questions_menu_options = ["Question Amount", "Category", "Difficulty", "Type", "Next"]
     questions_menu_values = [str(game.question_amount), game.quiz_category, game.quiz_difficulty, game.question_type]
 
@@ -569,7 +643,12 @@ def game_settings_questions(game):
         game_settings_questions(game)
 
 
-def game_settings_local(game):
+def game_settings_local(game: Game) -> None:
+    """
+    Shows a menu to configure the settings for a local hosted game
+
+    @param game: The game object
+    """
     local_menu_options = ["How many players", "Next"]
     local_menu_values = [str(game.how_many_players), "Questions Settings"]
     single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
@@ -587,7 +666,12 @@ def game_settings_local(game):
         game_settings_local(game)
 
 
-def game_settings_networking(game):
+def game_settings_networking(game: Game) -> None:
+    """
+    Shows a menu to configure the networking settings for the game
+
+    @param game: The game object
+    """
     networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next"]
     networking_menu_values = [str(game.server_name), str(game.server_port), str(game.max_players), "Questions Settings"]
 
@@ -613,7 +697,12 @@ def game_settings_networking(game):
         game_settings_networking(game)
 
 
-def game_settings_gameplay(game):
+def game_settings_gameplay(game: Game) -> None:
+    """
+    Shows a menu to configure the gameplay settings for the game
+
+    @param game: The game object
+    """
     game_play_menu_options = ["Host a server", "Time limit", "Show score after Question/Game",
                                                      "Show correct answer after Question/Game",
                                                      "Points for correct answer", "Points for incorrect answer",
@@ -689,14 +778,17 @@ def game_settings_gameplay(game):
             elif not game.host_a_server:
                 game_settings_local(game)
 
-            # Skip the function loop
-            return
     # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
     if gameplay_menu.user_input != "Next":
         game_settings_gameplay(game)
 
 
-def game_settings_how_to(game):
+def game_settings_how_to(game: Game) -> None:
+    """
+    Shows a menu to explain how to use the game settings menu
+
+    @param game: The game object
+    """
     os.system("cls")
 
     print("Game Settings: How To")

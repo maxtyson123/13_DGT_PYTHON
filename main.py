@@ -14,7 +14,7 @@ data_folder = "UserData/"
 
 # - - - - - - - Functions - - - - - - -#
 
-def handle_args(args):
+def handle_args(args: list) -> None:
     print("Quiz running with args:")
     for arg in args:
         print(arg)
@@ -25,8 +25,10 @@ def handle_args(args):
 
 # - - - - - - - MENUS - - - - - - -#
 
-def continue_game():
-
+def continue_game() -> None:
+    """
+    Show the user the continue game menu
+    """
     # Get all the saved files and create a menu
     saves = get_saved_games()
     saves.append("Back")
@@ -48,8 +50,10 @@ def continue_game():
     quiz.begin()
 
 
-def new_game():
-
+def new_game() -> None:
+    """
+    Show the user a menu to create a new game
+    """
     # Create a new game object
     quiz = Game()
 
@@ -63,13 +67,19 @@ def new_game():
     quiz.begin()
 
 
-def join_game():
+def join_game() -> None:
+    """
+    Show the user a menu to join a game
+    """
     print("Join Game")
     # Show the user the join menu
     # Connect to server and wait for game to start
 
 
-def settings():
+def settings() -> None:
+    """
+    Show the user a menu that allows them to change their already specified settings
+    """
     usersettings = UserData()
 
     settings_options = ["Display Mode", "Network", "Back"]
@@ -89,7 +99,10 @@ def settings():
             game_main_menu()
 
 
-def game_main_menu():
+def game_main_menu() -> None:
+    """
+    Show the user the main menu
+    """
     game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Settings", "Quit"])
 
     usersettings = UserData()
@@ -119,8 +132,10 @@ def game_main_menu():
             sys.exit()
 
 
-def main():
-
+def main() -> None:
+    """
+    The main function, initialise the program and show the main menu
+    """
     # Set up the program
     setup = UserData()
     setup.init_script()
