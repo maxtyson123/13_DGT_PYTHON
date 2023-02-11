@@ -1,0 +1,6 @@
+This bug was that when trying to select a bot in the socring menu, it would not print their stats but would print "Press
+enter to continue". After awhile of debugging I found that this was becuase of how I indented it (python with its syntax
+ugh). What was happening was that it would loop through the users and print the first users stats if that was the one
+selected, however it would then show the "Press enter to continue" and re run the menu where the expected beahviour was
+to only print and re run if the user was selected. To fix this I just added the proper indentation and the also modified
+the question marking menus as they also had the same bug

@@ -2,6 +2,7 @@
 #  - This module contains the Game class, which is the main class for the game.
 #  - When playing in single player mode person A goes through the whole quiz then person B goes through the whole quiz.
 #  - When playing in multiplayer mode person A and B go through the quiz simultaneously.
+#  - Terminology: User = Person playing the game, Player = User or Bot.
 # External Functions:
 #  - Join Game : Connects to a server and joins a game.
 #  - Play Game : Starts a game.
@@ -11,8 +12,6 @@
 #  [x] Start : Starts the game.
 #  [x] Quit : Quits the game.
 #  [x] Restart : Restarts the game.
-#  [ ] Pause : Pauses the game.
-#  [ ] Unpause : Unpauses the game.
 #  [x] Save : Saves the game to a file.
 #  [x] Load : Loads the game from a file.
 #  [x] Set Settings : Sets the settings for the game.
@@ -140,7 +139,38 @@ def get_saved_games():
 
 # - - - - - - - Classes - - - - - - -#
 
+
+class Question:
+    category = None
+    type = None       # Although type is a reserved word, it is used in the API and is therefore used here
+    difficulty = None
+    question = None
+    correct_answer = None
+    incorrect_answers = None
+
+    def __init__(self) -> None:
+        pass
+
+    def load(self, data: dict) -> None:
+        """
+        Loads the data from the API into the question object
+        @param data: The data from the API
+        """
+        self.category = data.get("category")
+        self.type = data.get("type")
+        self.difficulty = data.get("difficulty")
+        self.question = html.unescape(data.get("question"))
+
+        self.correct_answer = html.unescape(data.get("correct_answer"))
+        self.incorrect_answers = data.get("incorrect_answers")
+
+        # Unescape the incorrect answers
+        for i in range(len(self.incorrect_answers)):
+            self.incorrect_answers[i] = html.unescape(self.incorrect_answers[i])
+
+
 class User:
+    player_type = "User"
     name = None
     colour = None
     icon = None
@@ -151,7 +181,7 @@ class User:
     questions_missed = 0
     answers = []
 
-    def __int__(self, name: str, colour: str, icon: str) -> object:
+    def __int__(self, name: str, colour: str, icon: str) -> None:
         """
         Creates a new user
         @param name: The name of the user
@@ -193,6 +223,7 @@ class User:
         Prints the collected variables to the console
         """
         print(self.name + "'s Stats: ")
+        print("Type: " + self.player_type)
         print("Score: " + str(self.points))
         print("Streak: " + str(self.streak))
         # TODO: print("Highest Streak: " + str(self.highest_streak))
@@ -223,33 +254,53 @@ class User:
         # An alternative way to do this is to None the vars and then call load_defaults()
 
 
-class Question:
-    category = None
-    type = None       # Although type is a reserved word, it is used in the API and is therefore used here
-    difficulty = None
-    question = None
-    correct_answer = None
-    incorrect_answers = None
+class Bot(User):
 
-    def __init__(self) -> None:
-        pass
+    accuracy = 0.5
+
+    def __int__(self, name: str, colour: str, icon: str, accuracy: float) -> None:
+        """
+        Creates a new bot and assigns it a name, colour and icon
+        @param name: The name of the bot
+        @param colour: The colour of the bot
+        @param icon: The path to the icon of the bot
+        @param accuracy: How likely the bot is to get the question correct
+        """
+        self.accuracy = accuracy
+
+        # Set up the user
+        super().__int__(name, colour, icon)
 
     def load(self, data: dict) -> None:
-        """
-        Loads the data from the API into the question object
-        @param data: The data from the API
-        """
-        self.category = data.get("category")
-        self.type = data.get("type")
-        self.difficulty = data.get("difficulty")
-        self.question = html.unescape(data.get("question"))
+        super().load(data)
+        self.accuracy = data.get("accuracy")
+        self.load_defaults()
 
-        self.correct_answer = html.unescape(data.get("correct_answer"))
-        self.incorrect_answers = data.get("incorrect_answers")
+    def load_defaults(self) -> None:
+        super().load_defaults()
+        self.accuracy = set_if_none(self.accuracy, 0.5)
+        self.player_type = "Bot"
 
-        # Unescape the incorrect answers
-        for i in range(len(self.incorrect_answers)):
-            self.incorrect_answers[i] = html.unescape(self.incorrect_answers[i])
+    def show_stats(self) -> None:
+        super().show_stats()
+        print("Accuracy: " + str(self.accuracy*100)+"%")
+
+    def answer(self, question: Question) -> str:
+        """
+        Using the accuracy, the bot will return the correct answer if random.random() is less than the accuracy,
+        otherwise it will return a random incorrect answer
+
+        @param question: The question object where the bot should get its answer from
+        @return: The answer the bot chose
+        """
+
+        # Check if the bot got the question correct
+        correct = random.random() < self.accuracy
+
+        if correct:
+            return question.correct_answer
+        else:
+            return random.choice(question.incorrect_answers)
 
 
 class Game(SaveFile):
@@ -292,6 +343,7 @@ class Game(SaveFile):
     # Game data
     users = None
     questions = None
+    bots = None
 
     def __init__(self, quiz_save: str = None) -> None:
         """
@@ -347,12 +399,14 @@ class Game(SaveFile):
         # Load Game Data
         self.users = try_convert(self.save_data.get("users"), list)
         self.questions = try_convert(self.save_data.get("questions"), list)
+        self.bots = try_convert(self.save_data.get("bots"), list)
 
         # Set the default settings if the settings are none
         self.set_settings_default()
 
         # Convert the data
         self.convert_users()
+        self.convert_bots()
         self.convert_questions()
 
     def set_settings_default(self) -> None:
@@ -392,6 +446,7 @@ class Game(SaveFile):
 
         # Game Data
         self.users = set_if_none(self.users, [])
+        self.bots = set_if_none(self.bots, [])
         self.questions = set_if_none(self.questions, [])
 
     # __ DATA RELATED FUNCTIONS __
@@ -422,9 +477,29 @@ class Game(SaveFile):
             user_object.load(self.users[x])
             self.users[x] = user_object
 
+    def convert_bots(self) -> None:
+        """
+        Converts the bots list from a list of dicts to a list of Bot objects
+
+        @return: This function returns if the list is empty or if the first item is already a Bot object
+        """
+        # Check if the bots list is empty
+        if len(self.bots) == 0:
+            return
+
+        # Check if the bot is already a Bot object
+        if type(self.bots[0]) is Bot:
+            return
+
+        # For each bot in the list of bots convert the dict to a Bot object using the load() function
+        for x in range(len(self.bots)):
+            bot_object = Bot()
+            bot_object.load(self.bots[x])
+            self.bots[x] = bot_object
+
     def set_users(self) -> None:
         """
-        Gets the user to enter the names and colours for each user
+        Gets the user to enter the names and colours for each user and then creates each bot
         """
         user_id = 0
         while user_id != self.how_many_players:
@@ -448,6 +523,14 @@ class Game(SaveFile):
 
             # Add to list of users
             self.users.append(user)
+
+            # Create the bots
+            for x in range(self.how_many_bots):
+                bot = Bot()
+                bot.name = "Bot " + str(x + 1)
+                bot.colour = "Gray"
+                bot.accuracy = self.bot_difficulty / 100
+                self.bots.append(bot)
 
     def get_questions(self) -> None:
         """
@@ -556,25 +639,30 @@ class Game(SaveFile):
 
     def show_scores(self) -> None:
         """
-        Shows the scores of all the users, and then shows the stats of the user selected
+        Shows the scores of all the players, and then shows the stats of the player selected
         """
         # Array to store the names and scores
-        score_menu_users = []
+        score_menu_players = []
         score_menu_scores = []
 
         # Add the users and their scores to the arrays
         for user in self.users:
-            score_menu_users.append(user.name)
+            score_menu_players.append(user.name)
             score_menu_scores.append(str(user.points))
 
+        # Add the bots and their scores to the arrays
+        for bot in self.bots:
+            score_menu_players.append(bot.name)
+            score_menu_scores.append(str(bot.points))
+
         # Add the next option
-        score_menu_users.append("Next")
+        score_menu_players.append("Next")
         if self.game_finished:
-            score_menu_scores.append("Questions Overview")
+            score_menu_scores.append("Game Finished")
         else:
             score_menu_scores.append("Next Question")
 
-        score_menu = Menu("Scores", [score_menu_users, score_menu_scores], True)
+        score_menu = Menu("Scores", [score_menu_players, score_menu_scores], True)
         score_menu.show()
 
         # If the user selected a user then show their stats
@@ -587,13 +675,24 @@ class Game(SaveFile):
                 if user.name == score_menu.user_input:
                     user.show_stats()
 
-                # Give time for the user to read the stats
-                input("Press enter to continue...")
-                self.show_scores()
+                    # Give time for the user to read the stats
+                    input("Press enter to continue...")
+                    self.show_scores()
+
+            # Find the bot selected
+            for bot in self.bots:
+
+                # If the bot is found then show their stats
+                if bot.name == score_menu.user_input:
+                    bot.show_stats()
+
+                    # Give time for the user to read the stats
+                    input("Press enter to continue...")
+                    self.show_scores()
 
     def show_question_markings(self) -> None:
         """
-        Shows the answer each user submited for the questions. It begins at current_question and then goes through each
+        Shows the answer each player submited for the questions. It begins at current_question and then goes through each
         question after that, so when called best practice is to set current_question to 0
         """
 
@@ -601,12 +700,12 @@ class Game(SaveFile):
         question = self.questions[self.current_question]
 
         # Array to store the names and answers
-        marking_menu_users = []
+        marking_menu_players = []
         marking_menu_answers = []
 
         # Loop through each user adding their name and answer to the arrays
         for user in self.users:
-            marking_menu_users.append(user.name)
+            marking_menu_players.append(user.name)
 
             # Check if the user answered all the questions, if not there is an error
             if len(user.answers) < self.current_question:
@@ -614,16 +713,26 @@ class Game(SaveFile):
             else:
                 marking_menu_answers.append(user.answers[self.current_question])
 
+        # Loop through each bot adding their name and answer to the arrays
+        for bot in self.bots:
+            marking_menu_players.append(bot.name)
+
+            # Check if the bot answered all the questions, if not there is an error
+            if len(bot.answers) < self.current_question:
+                marking_menu_answers.append("ERROR")
+            else:
+                marking_menu_answers.append(bot.answers[self.current_question])
+
         # Add the correct answer
-        marking_menu_users.append("Correct Answer")
+        marking_menu_players.append("Correct Answer")
         marking_menu_answers.append(question.correct_answer)
 
         # Add the next and skip option
-        marking_menu_users.append("Next Question")
+        marking_menu_players.append("Next Question")
         marking_menu_answers.append("Game Finished")
 
         # Show the menu
-        marking_menu = Menu("Question: " + question.question, [marking_menu_users, marking_menu_answers], True)
+        marking_menu = Menu("Question: " + question.question, [marking_menu_players, marking_menu_answers], True)
         marking_menu.show()
 
         # Note to self, because python is python with its syntax, the "_" is what default is
@@ -645,7 +754,7 @@ class Game(SaveFile):
                     if user.answers[self.current_question] == question.correct_answer:
                         print(user.name)
 
-                    # Give time for the user to read the correct users
+                # Give time for the user to read the correct users
                 input("Press enter to continue...")
                 self.show_question_markings()
 
@@ -657,26 +766,39 @@ class Game(SaveFile):
                     if user.name == marking_menu.user_input:
                         user.show_stats()
 
-                    # Give time for the user to read the stats
-                    input("Press enter to continue...")
-                    self.show_question_markings()
+                        # Give time for the user to read the stats
+                        input("Press enter to continue...")
+                        self.show_question_markings()
 
-    def mark_question(self, user_input) -> None:
+                # Find the bot selected
+                for bot in self.bots:
+
+                    # If the bot is found then show their stats
+                    if bot.name == marking_menu.user_input:
+                        bot.show_stats()
+
+                        # Give time for the user to read the stats
+                        input("Press enter to continue...")
+                        self.show_question_markings()
+
+    def mark_question(self, user_input, current_user) -> None:
         """
         Marks the question and updates the user class based on the mark
 
         @param user_input: The answer submitted by the user
+        @param current_user: The user that answered the question, and where the points will be added to
         """
         # Get the current question
         question = self.questions[self.current_question]
 
-        # Get the current user
-        current_user = self.users[self.current_user_playing]
+        debug(current_user.player_type + " " + current_user.name + " answered: " + user_input, "Game")
 
         # Check if the answer is correct
         if user_input == question.correct_answer:
+
             # Tell the user that the answer is correct
-            print("Correct!")
+            if current_user.player_type == "User":
+                print("Correct!")
 
             # Set the point to the default point
             point = self.points_for_correct_answer
@@ -699,9 +821,10 @@ class Game(SaveFile):
             current_user.correct += 1
 
         else:
-            print("Incorrect.")
-            if self.show_correct_answer_after_question_or_game:
-                print("The correct answer was: " + question.correct_answer)
+            if current_user.player_type == "User":
+                print("Incorrect.")
+                if self.show_correct_answer_after_question_or_game:
+                    print("The correct answer was: " + question.correct_answer)
 
             # Reset the streak
             current_user.streak = 0
@@ -757,7 +880,7 @@ class Game(SaveFile):
         t.join(timeout=time_limit)
 
         if not t.is_alive():
-            self.mark_question(question_menu.user_input)
+            self.mark_question(question_menu.user_input, current_user)
 
         else:
 
@@ -766,7 +889,7 @@ class Game(SaveFile):
                 # Get a random option
                 random_option = random.choice(options)
                 print("Auto picking: "+random_option)
-                self.mark_question(random_option)
+                self.mark_question(random_option, current_user)
 
             else:
                 # Add the points for no answer
@@ -776,6 +899,14 @@ class Game(SaveFile):
             current_user.questions_missed += 1
 
             print("\nTime's up! Moving to next question.")
+
+        # Make the bots answer
+        for bot in self.bots:
+            # Get the bot to answer the question
+            bot_answer = bot.answer(question)
+
+            # Mark the question
+            self.mark_question(bot_answer, bot)
 
         # Give user time to read the answer
         time.sleep(3)
@@ -835,6 +966,8 @@ class Game(SaveFile):
         """
         Runs when the game ends
         """
+        # Save that the game has ended
+        self.save()
 
         # Create the game end menu
         game_end_menu = Menu("Game Finished", ["Compare Scores", "Compare User Answers", "Finish"])
@@ -846,6 +979,7 @@ class Game(SaveFile):
                 self.show_scores()
                 self.game_end()
             case "Compare User Answers":
+                self.current_question = 0
                 self.show_question_markings()
                 self.game_end()
             case "Finish":
@@ -889,12 +1023,17 @@ class Game(SaveFile):
         for question_index in range(len(self.questions)):
             self.save_data["questions"][question_index] = self.questions[question_index].__dict__
 
+        # Conver the bots to a dict
+        for bot_index in range(len(self.bots)):
+            self.save_data["bots"][bot_index] = self.bots[bot_index].__dict__
+
         # Call the super class save function
         super().save()
 
         # Convert the data back to the original format
         self.convert_users()
         self.convert_questions()
+        self.convert_bots()
 
     # __ MENUS __
 
@@ -1067,7 +1206,7 @@ class Game(SaveFile):
                 self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (True/False)")
 
             case "Bot difficulty":
-                self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (1-10)", range(1, 11))
+                self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (%)", range(1, 101))
 
             case "Number of bots":
                 self.how_many_bots = get_user_input_of_type(int, "Number of bots")
