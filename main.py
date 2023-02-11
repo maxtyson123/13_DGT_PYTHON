@@ -23,6 +23,32 @@ def handle_args(args: list) -> None:
 
 # - - - - - - - MENUS - - - - - - -#
 
+def game_finished(game: Game) -> None:
+    """
+    Once the game is finished ask the user if they want to play again or quit
+
+    @param game: The game object, used for resetting the game when replaying
+    """
+    game_finished_menu = Menu("Game Finished", ["Play Again", "Main Menu", "Quit"])
+    game_finished_menu.show()
+
+    match game_finished_menu.user_input:
+        case "Play Again":
+
+            # Replay the game
+            game.reset()
+            game.begin()
+
+            # Show the game finished menu again
+            game_finished(game)
+
+        case "Main Menu":
+            game_main_menu()
+
+        case "Quit":
+            sys.exit()
+
+
 def continue_game() -> None:
     """
     Show the user the continue game menu
@@ -44,6 +70,9 @@ def continue_game() -> None:
     # Start the game
     quiz.begin()
 
+    # Show the game finished menu
+    game_finished(quiz)
+
 
 def new_game() -> None:
     """
@@ -60,6 +89,9 @@ def new_game() -> None:
 
     # Start the game
     quiz.begin()
+
+    # Show the game finished menu
+    game_finished(quiz)
 
 
 def join_game() -> None:

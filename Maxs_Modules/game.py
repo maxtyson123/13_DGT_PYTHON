@@ -9,8 +9,8 @@
 # Internal Functions:
 #  == (Main Gameplay functions) ==
 #  [x] Start : Starts the game.
-#  [ ] Quit : Quits the game.
-#  [ ] Restart : Restarts the game.
+#  [x] Quit : Quits the game.
+#  [x] Restart : Restarts the game.
 #  [ ] Pause : Pauses the game.
 #  [ ] Unpause : Unpauses the game.
 #  [x] Save : Saves the game to a file.
@@ -31,7 +31,7 @@
 #  [x] Mark Answer : Marks the answer as correct or incorrect.
 #  [x] Get Input : Gets the user input.
 #  [x] Display Score : Displays the score of each player.
-#  [ ] Play Again Or Quit : Asks the user if they want to play again or quit.
+#  [x] Play Again Or Quit : Asks the user if they want to play again or quit.
 #  [ ] Bot Answer : Makes the bot answer the question.
 #
 # Settings:
@@ -205,6 +205,23 @@ class User:
         # TODO: print("Average Time Incorrect: " + str(self.average_time_incorrect))
         # TODO: print("Average Time Skipped: " + str(self.average_time_skipped))
 
+    def reset(self) -> None:
+        """
+        Removes all the set answers, 0s out the points, correct, incorrect, steak, questions_missed variables. Name, icon and colour are kept
+        """
+
+        # Clear the answers array
+        self.answers.clear()
+
+        # Zero out the vars
+        self.points = 0
+        self.correct = 0
+        self.incorrect = 0
+        self.streak = 0
+        self.questions_missed = 0
+
+        # An alternative way to do this is to None the vars and then call load_defaults()
+
 
 class Question:
     category = None
@@ -377,6 +394,8 @@ class Game(SaveFile):
         self.users = set_if_none(self.users, [])
         self.questions = set_if_none(self.questions, [])
 
+    # __ DATA RELATED FUNCTIONS __
+
     def set_settings(self) -> None:
         """
         Shows the user various menus related to settings, allowing them to change the settings
@@ -515,6 +534,8 @@ class Game(SaveFile):
             question_object.load(self.questions[x])
             self.questions[x] = question_object
 
+    # __ GAME FUNCTIONS __
+
     def begin(self) -> None:
         """
         Starts the game by printing all the users and then getting the questions if there are none
@@ -572,7 +593,8 @@ class Game(SaveFile):
 
     def show_question_markings(self) -> None:
         """
-        Shows how each user scored for the questions
+        Shows the answer each user submited for the questions. It begins at current_question and then goes through each
+        question after that, so when called best practice is to set current_question to 0
         """
 
         # Get the current question
@@ -596,7 +618,7 @@ class Game(SaveFile):
         marking_menu_users.append("Correct Answer")
         marking_menu_answers.append(question.correct_answer)
 
-        # Add the next option
+        # Add the next and skip option
         marking_menu_users.append("Next Question")
         marking_menu_answers.append("Game Finished")
 
@@ -604,42 +626,40 @@ class Game(SaveFile):
         marking_menu = Menu("Question: " + question.question, [marking_menu_users, marking_menu_answers], True)
         marking_menu.show()
 
-        if marking_menu.user_input == "Next Question":
+        # Note to self, because python is python with its syntax, the "_" is what default is
+        match marking_menu.user_input:
+            case "Next Question":
+                if self.current_question == len(self.questions) - 1:
+                    return
 
-            if self.current_question == len(self.questions) - 1:
-                print("Show some sorta Play Again thing here")
-                input()
+                # If there are any questions left to overview then show the next question
+                else:
+                    self.current_question += 1
+                    self.show_question_markings()
+                
+            case "Correct Answer":
+                print("These players got the question correct: ")
 
-            # If there are any questions left to overview then show the next question
-            else:
-                self.current_question += 1
-                self.show_question_markings()
+                # Show all the users that got the question correct
+                for user in self.users:
+                    if user.answers[self.current_question] == question.correct_answer:
+                        print(user.name)
 
-        elif marking_menu.user_input == "Correct Answer":
-
-            print("These players got the question correct: ")
-
-            # Show all the users that got the question correct
-            for user in self.users:
-                if user.answers[self.current_question] == question.correct_answer:
-                    print(user.name)
-
-            # Give time for the user to read the correct users
-            input("Press enter to continue...")
-            self.show_question_markings()
-
-        # If the user selected a user then show their stats
-        else:
-            # Find the user selected
-            for user in self.users:
-
-                # If the user is found then show their stats
-                if user.name == marking_menu.user_input:
-                    user.show_stats()
-
-                # Give time for the user to read the stats
+                    # Give time for the user to read the correct users
                 input("Press enter to continue...")
                 self.show_question_markings()
+
+            case _:
+                # Find the user selected
+                for user in self.users:
+
+                    # If the user is found then show their stats
+                    if user.name == marking_menu.user_input:
+                        user.show_stats()
+
+                    # Give time for the user to read the stats
+                    input("Press enter to continue...")
+                    self.show_question_markings()
 
     def mark_question(self, user_input) -> None:
         """
@@ -711,7 +731,7 @@ class Game(SaveFile):
         current_user = self.users[self.current_user_playing]
 
         # Create options
-        options = question.incorrect_answers
+        options = question.incorrect_answers.copy()
         options.append(question.correct_answer)
 
         # Shuffle the options
@@ -815,16 +835,43 @@ class Game(SaveFile):
         """
         Runs when the game ends
         """
-        # If the game has finished then show the results
-        print("Game finished!")
-        time.sleep(1)
 
-        # Show the scores
-        self.show_scores()
+        # Create the game end menu
+        game_end_menu = Menu("Game Finished", ["Compare Scores", "Compare User Answers", "Finish"])
+        game_end_menu.show()
 
-        # Show the question markings
+        # Check what the user selected
+        match game_end_menu.user_input:
+            case "Compare Scores":
+                self.show_scores()
+                self.game_end()
+            case "Compare User Answers":
+                self.show_question_markings()
+                self.game_end()
+            case "Finish":
+                return
+
+    def reset(self) -> None:
+        """
+        Resets the game back to a state that allows the game to be played again from the start. This will clear all user
+         data but all settings and questions will be kept
+        """
+
+        # Reset the current question
         self.current_question = 0
-        self.show_question_markings()
+
+        # Reset the current user playing
+        self.current_user_playing = 0
+
+        # Reset the game finished variable
+        self.game_finished = False
+
+        # Reset the users
+        for user in self.users:
+            user.reset()
+
+        # Save the game
+        self.save()
 
     def save(self) -> None:
         """
@@ -848,6 +895,8 @@ class Game(SaveFile):
         # Convert the data back to the original format
         self.convert_users()
         self.convert_questions()
+
+    # __ MENUS __
 
     def settings_questions(self) -> None:
         """
