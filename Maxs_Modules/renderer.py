@@ -106,12 +106,6 @@ class Menu:
         self.items = items
         self.multi_dimensional = multi_dimensional
 
-    def dont_clear_screen(self) -> None:
-        """
-        Sets the clear_screen variable to false
-        """
-        self.clear_screen = False
-
     def show(self) -> None:
         """
         Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
