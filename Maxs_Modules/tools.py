@@ -7,6 +7,29 @@ debug_ignore = []
 # - - - - - - - Functions - - - - - - -#
 
 
+def sort_multi_array(data: list, decsending: bool = False) -> list:
+    """
+    Sorts a multi-dimensional array by the second value in each array using lambda shorthand, returns a copy of the list
+    instead of sorting the original incase caller wants to keep the original list
+
+    @param data: The list to be sorted
+    @param decsending: Weather to sort in decsending order or not. By default, this is False.
+    @return: The sorted list (a copy of the original list)
+    """
+
+    # Unpack the data into two lists, one for the names and one for the scores
+    names, scores = data[0], data[1]
+
+    # Sort the data by the scores
+    sorted_data = sorted(zip(names, scores), key=lambda x: x[1], reverse=decsending)
+
+    # Put the data back into the original format
+    result = list(zip(*sorted_data))
+    result = [list(r) for r in result]
+
+    return result
+
+
 def strBool(text: str) -> bool:
     """
     A replacement for the built-in bool function that allows for the conversion of a string with the text

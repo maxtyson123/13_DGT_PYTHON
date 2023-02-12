@@ -31,7 +31,7 @@
 #  [x] Get Input : Gets the user input.
 #  [x] Display Score : Displays the score of each player.
 #  [x] Play Again Or Quit : Asks the user if they want to play again or quit.
-#  [ ] Bot Answer : Makes the bot answer the question.
+#  [x] Bot Answer : Makes the bot answer the question.
 #
 # Settings:
 #  == (Gameplay Settings) ==
@@ -48,14 +48,14 @@
 #  [x] Randomise Questions : Whether to randomise the questions or not.
 #  [x] Randomise Answers : Whether to randomise the answers placement or not.
 #  [x] Pick Random Question : Whether to pick a random question or not once the time limit has been reached.
-#  [ ] Bot Difficulty : The difficulty of the bot (% chance of picking the right answer out of 100).
+#  [x] Bot Difficulty : The difficulty of the bot (% chance of picking the right answer out of 100).
 #  == (Network Settings) ==
 #  [ ] Server Name : The name of the server.
 #  [ ] Server Port : The port of the server (1234 by default).
 #  [ ] Max Players : The maximum amount of players.
 #  == (Single Player Settings) ==
 #  [x] How many players : The amount of players.
-#  [ ] How many bots : The amount of bots.
+#  [x] How many bots : The amount of bots.
 #  == (Quiz Settings) ==
 #  [x] Quiz Category : The category of the quiz.
 #  [x] Quiz Difficulty : The difficulty of the quiz.
@@ -75,7 +75,7 @@ import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
-from Maxs_Modules.tools import debug, try_convert, set_if_none, get_user_input_of_type, strBool, error
+from Maxs_Modules.tools import debug, try_convert, set_if_none, get_user_input_of_type, strBool, error, sort_multi_array
 from Maxs_Modules.renderer import Menu, divider
 
 # - - - - - - - Variables - - - - - - -#
@@ -170,6 +170,8 @@ class Question:
 
 
 class User:
+
+    # Game Variables
     player_type = "User"
     name = None
     colour = None
@@ -178,8 +180,18 @@ class User:
     correct = 0
     incorrect = 0
     streak = 0
+    highest_streak = 0
     questions_missed = 0
     answers = []
+    times = []
+
+    # Calculated Stats
+    questions_answered = 0
+    average_time = 0
+    average_time_correct = 0
+    average_time_incorrect = 0
+    average_time_missed = 0
+    accuracy = 0
 
     def __int__(self, name: str, colour: str, icon: str) -> None:
         """
@@ -200,8 +212,10 @@ class User:
         self.correct = data.get("correct")
         self.incorrect = data.get("incorrect")
         self.streak = data.get("streak")
+        self.highest_streak = data.get("highest_streak")
         self.questions_missed = data.get("questions_missed")
         self.answers = data.get("answers")
+        self.times = data.get("times")
         self.load_defaults()
 
     def load_defaults(self) -> None:
@@ -215,34 +229,79 @@ class User:
         self.correct = set_if_none(self.correct, 0)
         self.incorrect = set_if_none(self.incorrect, 0)
         self.streak = set_if_none(self.streak, 0)
+        self.highest_streak = set_if_none(self.highest_streak, 0)
         self.questions_missed = set_if_none(self.questions_missed, 0)
         self.answers = set_if_none(self.answers, [])
+        self.times = set_if_none(self.times, [])
+
+    def calculate_stats(self) -> None:
+        """
+        Calculates the stats for the user, this saves time as the stats only need to be calculated when the user selects
+        to display them
+        """
+
+        # Simple stats
+        self.questions_answered = self.correct + self.incorrect
+        self.accuracy = self.correct / self.questions_answered
+
+        # Add all the times together and then divide by the length to get the mean
+        self.average_time = sum(self.times) / len(self.times)
+
+        # Loop through the answers and times and calculate the average time for correct and incorrect answers
+        time_correct = []
+        time_incorrect = []
+        time_missed = []
+
+        for i in range(len(self.answers)):
+            if self.answers[i] == "Correct":
+                time_correct.append(self.times[i])
+            elif self.answers[i] == "Incorrect":
+                time_incorrect.append(self.times[i])
+            elif self.answers[i] == "Missed_Correct" or self.answers[i] == "Missed_Incorrect":
+                time_missed.append(self.times[i])
+
+        # Calculate the average time for correct incorrect and missed answers (skip if zero as that causes a divide by
+        # zero error)
+        if len(time_correct) != 0:
+            self.average_time_correct = sum(time_correct) / len(time_correct)
+        if len(time_incorrect) != 0:
+            self.average_time_incorrect = sum(time_incorrect) / len(time_incorrect)
+        if len(time_missed) != 0:
+            self.average_time_missed = sum(time_missed) / len(time_missed)
 
     def show_stats(self) -> None:
         """
-        Prints the collected variables to the console
+        Prints the collected stats variables to the console
         """
+
+        # Calculate any stats that arent just supplied by the game
+        self.calculate_stats()
+
+        # Print the stats
         print(self.name + "'s Stats: ")
         print("Type: " + self.player_type)
         print("Score: " + str(self.points))
         print("Streak: " + str(self.streak))
-        # TODO: print("Highest Streak: " + str(self.highest_streak))
-        print("Questions Answered: " + str(self.correct + self.incorrect))
+        print("Highest Streak: " + str(self.highest_streak))
+        print("Questions Answered: " + str(self.questions_answered))
         print("Questions Correct: " + str(self.correct))
         print("Questions Incorrect: " + str(self.incorrect))
         print("Questions Skipped: " + str(self.questions_missed))
-        # TODO: print("Average Time: " + str(self.average_time))
-        # TODO: print("Average Time Correct: " + str(self.average_time_correct))
-        # TODO: print("Average Time Incorrect: " + str(self.average_time_incorrect))
-        # TODO: print("Average Time Skipped: " + str(self.average_time_skipped))
+        print("Average Time: " + str(self.average_time))
+        print("Average Time Correct: " + str(self.average_time_correct))
+        print("Average Time Incorrect: " + str(self.average_time_incorrect))
+        print("Average Time Skipped: " + str(self.average_time_missed))
+        print("Accuracy: " + str(self.accuracy * 100) + "%")
 
     def reset(self) -> None:
         """
-        Removes all the set answers, 0s out the points, correct, incorrect, steak, questions_missed variables. Name, icon and colour are kept
+        Removes all the set answers, 0s out the points, correct, incorrect, steak, questions_missed variables. Name,
+        icon and colour are kept
         """
 
-        # Clear the answers array
+        # Clear the arrays
         self.answers.clear()
+        self.times.clear()
 
         # Zero out the vars
         self.points = 0
@@ -282,8 +341,20 @@ class Bot(User):
         self.player_type = "Bot"
 
     def show_stats(self) -> None:
+        """
+        Prints the collected stats variables to the console
+        """
+        # Ensure that calculations dont mess with accuracy
+        save_accuracy = self.accuracy
+
+        # Calculate the stats
         super().show_stats()
-        print("Accuracy: " + str(self.accuracy*100)+"%")
+
+        # Reset the accuracy
+        self.accuracy = save_accuracy
+
+        # Print the stats
+        print("Accuracy (EXPECTED): " + str(self.accuracy * 100) + "%")
 
     def answer(self, question: Question) -> str:
         """
@@ -648,21 +719,33 @@ class Game(SaveFile):
         # Add the users and their scores to the arrays
         for user in self.users:
             score_menu_players.append(user.name)
-            score_menu_scores.append(str(user.points))
+            score_menu_scores.append(user.points)
 
         # Add the bots and their scores to the arrays
         for bot in self.bots:
             score_menu_players.append(bot.name)
-            score_menu_scores.append(str(bot.points))
+            score_menu_scores.append(bot.points)
 
-        # Add the next option
-        score_menu_players.append("Next")
+        # Sort the arrays based on the scores
+        score_menu_multi = [score_menu_players, score_menu_scores]
+        debug("Score menu multi unsorted: " + str(score_menu_multi), "Game")
+        score_menu_multi = sort_multi_array(score_menu_multi, True)
+        debug("Score menu multi sorted: " + str(score_menu_multi), "Game")
+
+        # Convert the scores to strings
+        for x in range(len(score_menu_multi[1])):
+            score_menu_multi[1][x] = str(score_menu_multi[1][x])
+
+        # Add the next option (has to be after sort as "Game Finished/Next Question" is added to the end and also
+        # causes errors becuase they are not ints)
+        score_menu_multi[0].append("Next")
         if self.game_finished:
-            score_menu_scores.append("Game Finished")
+            score_menu_multi[1].append("Game Finished")
         else:
-            score_menu_scores.append("Next Question")
+            score_menu_multi[1].append("Next Question")
 
-        score_menu = Menu("Scores", [score_menu_players, score_menu_scores], True)
+        # Show the menu
+        score_menu = Menu("Scores", score_menu_multi, True)
         score_menu.show()
 
         # If the user selected a user then show their stats
@@ -800,6 +883,9 @@ class Game(SaveFile):
             if current_user.player_type == "User":
                 print("Correct!")
 
+            # Add the answer to the user
+            current_user.answers[len(current_user.answers)-1] += "Correct"
+
             # Set the point to the default point
             point = self.points_for_correct_answer
 
@@ -816,6 +902,8 @@ class Game(SaveFile):
 
             # Add a point to the streak
             current_user.streak += 1
+            if current_user.streak > current_user.highest_streak:
+                current_user.highest_streak = current_user.streak
 
             # Add correct
             current_user.correct += 1
@@ -826,6 +914,9 @@ class Game(SaveFile):
                 if self.show_correct_answer_after_question_or_game:
                     print("The correct answer was: " + question.correct_answer)
 
+            # Add the answer to the user
+            current_user.answers[len(current_user.answers) - 1] += "Incorrect"
+
             # Reset the streak
             current_user.streak = 0
             self.points_multiplier_for_a_streak = self.points_multiplier_for_a_streak_base
@@ -835,8 +926,6 @@ class Game(SaveFile):
 
             # If the answer is not correct then remove a point from the user
             current_user.points += self.points_for_incorrect_answer
-
-        current_user.answers.append(user_input)
 
     def play(self) -> None:
         """
@@ -875,17 +964,25 @@ class Game(SaveFile):
 
         # Store the time and input
         time_limit = self.time_limit
+        start_time = time.time()
         t = threading.Thread(target=question_menu.show)
         t.start()
         t.join(timeout=time_limit)
 
         if not t.is_alive():
+            # As the user didnt miss then just leave the preheader blank
+            current_user.answers.append("")
+
+            # Mark the question
             self.mark_question(question_menu.user_input, current_user)
 
         else:
 
             # If the game should pick a random question when the time runs out
             if self.pick_random_question:
+                # Add the Missed part to the user
+                current_user.answers.append("Missed_")
+
                 # Get a random option
                 random_option = random.choice(options)
                 print("Auto picking: "+random_option)
@@ -893,6 +990,7 @@ class Game(SaveFile):
 
             else:
                 # Add the points for no answer
+                current_user.answers.append("Missed_Incorrect")
                 current_user.points += self.points_for_no_answer
 
             # Add missed question to the user
@@ -900,13 +998,24 @@ class Game(SaveFile):
 
             print("\nTime's up! Moving to next question.")
 
+        # Store the time data
+        end_time = time.time() - start_time
+        debug("Time taken: " + str(end_time) + " seconds", "Game")
+        current_user.times.append(end_time)
+
         # Make the bots answer
         for bot in self.bots:
             # Get the bot to answer the question
             bot_answer = bot.answer(question)
 
+            # As the cant miss miss then just leave the preheader blank
+            bot.answers.append("")
+
             # Mark the question
             self.mark_question(bot_answer, bot)
+
+            # Add the time, for use in stats
+            bot.times.append(0)
 
         # Give user time to read the answer
         time.sleep(3)
