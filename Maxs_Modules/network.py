@@ -1,6 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
 from Maxs_Modules.setup import UserData
-from Maxs_Modules.tools import error, debug
+from Maxs_Modules.debug import debug, error
 
 # Get the setup data
 setup = UserData()

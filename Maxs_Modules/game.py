@@ -63,7 +63,7 @@
 #  [x] Question Type : The type of questions (True/False, Multi choice).
 #  == (Player Settings) ==
 #  [x] Player Name : The name of the player.
-#  [ ] Player Colour : The colour of the player.
+#  [x] Player Colour : The colour of the player.
 #  [ ] Player Icon : The icon of the player (GUI Only).
 
 # - - - - - - - Imports - - - - - - -#
@@ -75,8 +75,9 @@ import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
-from Maxs_Modules.tools import debug, try_convert, set_if_none, get_user_input_of_type, strBool, error, sort_multi_array
-from Maxs_Modules.renderer import Menu, divider
+from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
+from Maxs_Modules.debug import debug, error
+from Maxs_Modules.renderer import Menu, divider, Colour
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -142,7 +143,7 @@ def get_saved_games():
 
 class Question:
     category = None
-    type = None       # Although type is a reserved word, it is used in the API and is therefore used here
+    type = None  # Although type is a reserved word, it is used in the API and is therefore used here
     difficulty = None
     question = None
     correct_answer = None
@@ -170,7 +171,6 @@ class Question:
 
 
 class User:
-
     # Game Variables
     player_type = "User"
     name = None
@@ -278,7 +278,7 @@ class User:
         self.calculate_stats()
 
         # Print the stats
-        print(self.name + "'s Stats: ")
+        print(self.styled_name() + "'s Stats: ")
         print("Type: " + self.player_type)
         print("Score: " + str(self.points))
         print("Streak: " + str(self.streak))
@@ -312,9 +312,15 @@ class User:
 
         # An alternative way to do this is to None the vars and then call load_defaults()
 
+    def styled_name(self) -> str:
+        """
+        Returns the name of the user with the colour (includes reset char)
+        @return: The name of the user with the colour (includes reset char)
+        """
+        return self.colour + self.name + Colour.RESET
+
 
 class Bot(User):
-
     accuracy = 0.5
 
     def __int__(self, name: str, colour: str, icon: str, accuracy: float) -> None:
@@ -375,7 +381,6 @@ class Bot(User):
 
 
 class Game(SaveFile):
-
     # User Chosen Settings
     host_a_server = None
     time_limit = None
@@ -441,12 +446,14 @@ class Game(SaveFile):
         self.time_limit = try_convert(self.save_data.get("time_limit"), int)
         self.show_score_after_question_or_game = try_convert(self.save_data.get("show_score_after_question_or_game"),
                                                              str)
-        self.show_correct_answer_after_question_or_game = try_convert(self.save_data.get("show_correct_answer_after_question_or_game"), str)
+        self.show_correct_answer_after_question_or_game = try_convert(
+            self.save_data.get("show_correct_answer_after_question_or_game"), str)
         self.points_for_correct_answer = try_convert(self.save_data.get("points_for_correct_answer"), int)
         self.points_for_incorrect_answer = try_convert(self.save_data.get("points_for_incorrect_answer"), int)
         self.points_for_no_answer = try_convert(self.save_data.get("points_for_no_answer"), int)
         self.points_multiplier_for_a_streak = try_convert(self.save_data.get("points_multiplier_for_a_streak"), int)
-        self.points_multiplier_for_a_streak_base = try_convert(self.save_data.get("points_multiplier_for_a_streak_base"), int)
+        self.points_multiplier_for_a_streak_base = try_convert(
+            self.save_data.get("points_multiplier_for_a_streak_base"), int)
         self.compounding_amount_for_a_streak = try_convert(self.save_data.get("compounding_amount_for_a_streak"), int)
         self.randomise_questions = try_convert(self.save_data.get("randomise_questions"), bool)
         self.randomise_answer_placement = try_convert(self.save_data.get("randomise_answer_placement"), bool)
@@ -587,10 +594,12 @@ class Game(SaveFile):
                 user.name = try_convert(input("Enter the name for user " + str(user_id) + ": "), str)
 
             # Get colour
-            colour_menu = Menu("Choose a colour for " + user.name, ["Red", "Green", "Blue", "Yellow", "Purple",
-                                                                    "Orange", "Pink", "Black", "White"])
+            colour_menu = Menu("Choose a colour for " + user.name, Colour.colours_names_list)
             colour_menu.show()
-            user.colour = colour_menu.user_input
+            user.colour = Colour.colours_list[Colour.colours_names_list.index(colour_menu.user_input)]
+
+            if user.name == "Max":
+                user.colour += Colour.BLINK
 
             # Add to list of users
             self.users.append(user)
@@ -599,7 +608,7 @@ class Game(SaveFile):
             for x in range(self.how_many_bots):
                 bot = Bot()
                 bot.name = "Bot " + str(x + 1)
-                bot.colour = "Gray"
+                bot.colour = Colour.GREY + Colour.ITALIC
                 bot.accuracy = self.bot_difficulty / 100
                 self.bots.append(bot)
 
@@ -695,7 +704,7 @@ class Game(SaveFile):
         Starts the game by printing all the users and then getting the questions if there are none
         """
         for user in self.users:
-            print(user.name)
+            print(user.styled_name())
 
         # If there are no questions then get them
         if len(self.questions) == 0:
@@ -718,12 +727,12 @@ class Game(SaveFile):
 
         # Add the users and their scores to the arrays
         for user in self.users:
-            score_menu_players.append(user.name)
+            score_menu_players.append(user.styled_name())
             score_menu_scores.append(user.points)
 
         # Add the bots and their scores to the arrays
         for bot in self.bots:
-            score_menu_players.append(bot.name)
+            score_menu_players.append(bot.styled_name())
             score_menu_scores.append(bot.points)
 
         # Sort the arrays based on the scores
@@ -755,7 +764,7 @@ class Game(SaveFile):
             for user in self.users:
 
                 # If the user is found then show their stats
-                if user.name == score_menu.user_input:
+                if user.styled_name() == score_menu.user_input:
                     user.show_stats()
 
                     # Give time for the user to read the stats
@@ -766,7 +775,7 @@ class Game(SaveFile):
             for bot in self.bots:
 
                 # If the bot is found then show their stats
-                if bot.name == score_menu.user_input:
+                if bot.styled_name() == score_menu.user_input:
                     bot.show_stats()
 
                     # Give time for the user to read the stats
@@ -788,7 +797,7 @@ class Game(SaveFile):
 
         # Loop through each user adding their name and answer to the arrays
         for user in self.users:
-            marking_menu_players.append(user.name)
+            marking_menu_players.append(user.styled_name())
 
             # Check if the user answered all the questions, if not there is an error
             if len(user.answers) < self.current_question:
@@ -798,7 +807,7 @@ class Game(SaveFile):
 
         # Loop through each bot adding their name and answer to the arrays
         for bot in self.bots:
-            marking_menu_players.append(bot.name)
+            marking_menu_players.append(bot.styled_name())
 
             # Check if the bot answered all the questions, if not there is an error
             if len(bot.answers) < self.current_question:
@@ -828,14 +837,14 @@ class Game(SaveFile):
                 else:
                     self.current_question += 1
                     self.show_question_markings()
-                
+
             case "Correct Answer":
                 print("These players got the question correct: ")
 
                 # Show all the users that got the question correct
                 for user in self.users:
                     if user.answers[self.current_question] == question.correct_answer:
-                        print(user.name)
+                        print(user.styled_name())
 
                 # Give time for the user to read the correct users
                 input("Press enter to continue...")
@@ -846,7 +855,7 @@ class Game(SaveFile):
                 for user in self.users:
 
                     # If the user is found then show their stats
-                    if user.name == marking_menu.user_input:
+                    if user.styled_name() == marking_menu.user_input:
                         user.show_stats()
 
                         # Give time for the user to read the stats
@@ -857,7 +866,7 @@ class Game(SaveFile):
                 for bot in self.bots:
 
                     # If the bot is found then show their stats
-                    if bot.name == marking_menu.user_input:
+                    if bot.styled_name() == marking_menu.user_input:
                         bot.show_stats()
 
                         # Give time for the user to read the stats
@@ -884,7 +893,7 @@ class Game(SaveFile):
                 print("Correct!")
 
             # Add the answer to the user
-            current_user.answers[len(current_user.answers)-1] += "Correct"
+            current_user.answers[len(current_user.answers) - 1] += "Correct"
 
             # Set the point to the default point
             point = self.points_for_correct_answer
@@ -953,7 +962,7 @@ class Game(SaveFile):
         # Print some info
         print(divider)
         print("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
-        print("User: " + current_user.name)
+        print("User: " + current_user.styled_name())
         print("Time Limit: " + str(self.time_limit) + " seconds")
 
         # Create the question menu
@@ -985,7 +994,7 @@ class Game(SaveFile):
 
                 # Get a random option
                 random_option = random.choice(options)
-                print("Auto picking: "+random_option)
+                print("Auto picking: " + random_option)
                 self.mark_question(random_option, current_user)
 
             else:
@@ -1049,7 +1058,8 @@ class Game(SaveFile):
         @return: True if the game has finished
         """
 
-        debug("Checking if game has finished: "+str(self.current_question)+" of "+str(len(self.questions))+" questions",
+        debug("Checking if game has finished: " + str(self.current_question) + " of " + str(
+            len(self.questions)) + " questions",
               "Game")
 
         # Check if the game has finished
@@ -1273,7 +1283,8 @@ class Game(SaveFile):
 
         match gameplay_menu.user_input:
             case "Host a server":
-                self.host_a_server = get_user_input_of_type(strBool, "Host a server (True/False)")
+                self.host_a_server = get_user_input_of_type(strBool,
+                                                            "Host a server (" + Colour.true_or_false_styled() + ")")
 
             case "Time limit":
                 self.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
@@ -1305,14 +1316,17 @@ class Game(SaveFile):
                 self.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
 
             case "Randomise questions":
-                self.randomise_questions = get_user_input_of_type(strBool, "Randomise questions (True/False)")
+                self.randomise_questions = get_user_input_of_type(strBool, "Randomise questions ("
+                                                                  + Colour.true_or_false_styled() + ")")
 
             case "Randomise answer placement":
                 self.randomise_answer_placement = get_user_input_of_type(strBool,
-                                                                         "Randomise answer placement (True/False)")
+                                                                         "Randomise answer placement ("
+                                                                         + Colour.true_or_false_styled() + ")")
 
             case "Pick random question when run out of time":
-                self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (True/False)")
+                self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (" +
+                                                                   Colour.true_or_false_styled() + ")")
 
             case "Bot difficulty":
                 self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (%)", range(1, 101))

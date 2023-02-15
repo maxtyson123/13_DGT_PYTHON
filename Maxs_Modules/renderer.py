@@ -2,6 +2,7 @@
 
 
 import os
+
 from Maxs_Modules.tools import get_user_input_of_type
 
 # - - - - - - - Variables - - - - - - -#
@@ -23,12 +24,12 @@ def text_in_divider(item_to_print: str, auto_truncate: bool = True) -> str:
     @return: The text in the divider
     """
     # If the text is longer than the console width then truncate it
-    if len(item_to_print) > console_width and auto_truncate:
+    if len(Colour.clean_text(item_to_print)) > console_width and auto_truncate:
         # Truncate the text to fit the console width
         item_to_print = item_to_print[:console_width - 2]
 
     # The length of the text, minus console width, minus 2 for the border
-    width_left = console_width - len(item_to_print) - 2
+    width_left = console_width - len(Colour.clean_text(item_to_print)) - 2
     return divider_symbol + item_to_print + " " * width_left + divider_symbol
 
 
@@ -64,15 +65,15 @@ def show_menu_double(menu_items: list) -> None:
         # Truncate the text if it is too long
         allowed_width = int(console_width / 2)
 
-        if len(item_to_print_1) > allowed_width:
+        if len(Colour.clean_text(item_to_print_1)) > allowed_width:
             item_to_print_1 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
-        if len(item_to_print_2) > allowed_width:
+        if len(Colour.clean_text(item_to_print_2)) > allowed_width:
             item_to_print_2 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
         # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
         # The length of the text, minus console width, minus 2 for the border
-        width_left = console_width - len(item_to_print_1) - len(item_to_print_2) - 2
+        width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(Colour.clean_text(item_to_print_2)) - 2
         spacing = " " * width_left
 
         # Combine the two items
@@ -81,7 +82,94 @@ def show_menu_double(menu_items: list) -> None:
 
     print(divider)
 
+
 # - - - - - - - Classes - - - - - - -#
+
+
+class Colour:
+    """
+    A class that stores the colour codes for the different colours. Note: from https://en.wikipedia.org/wiki/ANSI_escape_code
+    """
+    # Colours
+    BLACK = "\033[30m"
+    RED = "\033[31m"
+    GREEN = "\033[32m"
+    YELLOW = "\033[33m"
+    BLUE = "\033[34m"
+    MAGENTA = "\033[35m"
+    CYAN = "\033[36m"
+    WHITE = "\033[37m"
+    GREY = "\033[90m"
+
+    colours_list = [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, GREY]
+    colours_names_list = ["Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White", "Grey"]
+
+    # Styles
+    BOLD = "\033[1m"
+    DIM = "\033[2m"
+    ITALIC = "\033[3m"
+    UNDERLINE = "\033[4m"
+    BLINK = "\033[5m"
+    INVERT = "\033[7m"
+    STRIKETHROUGH = "\033[9m"
+
+    styles_list = [BOLD, DIM, ITALIC, UNDERLINE, BLINK, INVERT, STRIKETHROUGH]
+    styles_names_list = ["Bold", "Dim", "Italic", "Underline", "Blink", "Invert", "Strikethrough"]
+
+    # Reset
+    RESET = "\033[0m"
+
+    # THEME
+    error = RED
+    info = BLUE
+    success = GREEN
+    warning = YELLOW
+
+    @staticmethod
+    def text_with_colour(text: str, colour: str) -> str:
+        """
+        Returns the text with the colour code before and after it
+
+        @param text: The text to colour
+        @param colour: The colour code
+        @return: The coloured text
+        """
+        return colour + text + Colour.RESET
+
+    @staticmethod
+    def clean_text(text: str) -> str:
+        """
+        Removes the colour codes from the text, useful when doing len() operations on the text
+
+
+        @param text: The text to remove the colour codes from
+        @return: The text without the colour codes (copy of original string)
+        """
+
+        uncoloured_text = text
+
+        # Loop through all the colours
+        for colour in Colour.colours_list:
+            uncoloured_text = uncoloured_text.replace(colour, "")
+
+        # Loop through all the styles
+        for style in Colour.styles_list:
+            uncoloured_text = uncoloured_text.replace(style, "")
+
+        # Remove the reset code
+        uncoloured_text = uncoloured_text.replace(Colour.RESET, "")
+
+        # Return the uncoloured text
+        return uncoloured_text
+
+    @staticmethod
+    def true_or_false_styled() -> str:
+        """
+        Returns a coloured true or false string
+        @return: "(green)True/(red)False"
+        """
+
+        return Colour.text_with_colour("True", Colour.success) + "/" + Colour.text_with_colour("False", Colour.error)
 
 
 class Menu:

@@ -1,7 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import json
 import os
-from Maxs_Modules.tools import debug, error
+from Maxs_Modules.debug import debug, error
 
 # - - - - - - - Variables - - - - - - -#
 

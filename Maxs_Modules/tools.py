@@ -1,19 +1,16 @@
 # - - - - - - - Imports - - - - - - -#
-import time
-
-# - - - - - - - Variables - - - - - - -#
-debug_ignore = []
+from Maxs_Modules.debug import error
 
 # - - - - - - - Functions - - - - - - -#
 
 
-def sort_multi_array(data: list, decsending: bool = False) -> list:
+def sort_multi_array(data: list, descending: bool = False) -> list:
     """
     Sorts a multi-dimensional array by the second value in each array using lambda shorthand, returns a copy of the list
     instead of sorting the original incase caller wants to keep the original list
 
     @param data: The list to be sorted
-    @param decsending: Weather to sort in decsending order or not. By default, this is False.
+    @param descending: Weather to sort in descending order or not. By default, this is False.
     @return: The sorted list (a copy of the original list)
     """
 
@@ -21,7 +18,7 @@ def sort_multi_array(data: list, decsending: bool = False) -> list:
     names, scores = data[0], data[1]
 
     # Sort the data by the scores
-    sorted_data = sorted(zip(names, scores), key=lambda x: x[1], reverse=decsending)
+    sorted_data = sorted(zip(names, scores), key=lambda x: x[1], reverse=descending)
 
     # Put the data back into the original format
     result = list(zip(*sorted_data))
@@ -109,22 +106,3 @@ def try_convert(variable: object, type_to_convert: object) -> object:
         error("Invalid input")
         return None
 
-
-def error(error_message: str) -> None:
-    """
-    Print an error message and then wait 2 seconds
-    @param error_message: The error message to print
-    """
-    print(error_message)
-    time.sleep(2)
-
-
-def debug(debug_message: str, log_type: str = "info") -> None:
-    """
-    Print a debug message if the log type is not in the debug_ignore array
-    @param debug_message: The debug message to print
-    @param log_type: The type of log to print
-    """
-
-    if log_type not in debug_ignore:
-        print("[DEBUG] : " + debug_message)

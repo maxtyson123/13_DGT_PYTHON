@@ -3,7 +3,9 @@ import os
 import sys
 
 from Maxs_Modules.files import SaveFile
-from Maxs_Modules.tools import get_user_input_of_type, try_convert, set_if_none, strBool, debug, error
+from Maxs_Modules.tools import get_user_input_of_type, try_convert, set_if_none, strBool
+from Maxs_Modules.debug import debug, error
+from Maxs_Modules.renderer import Colour
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -138,13 +140,14 @@ class UserData(SaveFile):
 
         # Get the user settings
         self.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ", ["CLI", "GUI"])
-        self.network = get_user_input_of_type(strBool, "Do you want to use the network? (True/False): ")
+        self.network = get_user_input_of_type(strBool, "Do you want to use the network? ("+Colour.true_or_false_styled()
+                                              + "): ")
 
         print("Note: Fixing the API involves removing parameters from the API call until it goes though, this can fix "
               "errors where there arent enough questions of that type in the database, however it can mean that the "
               "question types arent the same as the ones you selected.")
         self.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error occurs? "
-                                                            "(True/False): ")
+                                                            "(" + Colour.true_or_false_styled() + "): ")
 
         # Get the python executable command
         self.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command (e.g. python,"
@@ -154,7 +157,7 @@ class UserData(SaveFile):
         print("Note a python virtual environment can be buggy on WBHS computers and/or other admin restricted and is "
               "only recommended as a work around for certain users.")
         self.use_py_env = get_user_input_of_type(strBool, "Do you want to use a python virtual environment? "
-                                                          "(True/False): ")
+                                                          "(" + Colour.true_or_false_styled() + "): ")
 
         # User has now completed the setup
         self.setup_complete = True
