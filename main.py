@@ -1,10 +1,11 @@
 # - - - - - - - Imports - - - - - - -#
 import sys
 
-from Maxs_Modules.tools import debug
-from Maxs_Modules.renderer import Menu
+from Maxs_Modules.renderer import Menu, Colour
+from Maxs_Modules.debug import debug
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
+from Maxs_Modules.tools import get_user_input_of_type, strBool
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -109,21 +110,43 @@ def settings() -> None:
     """
     usersettings = UserData()
 
-    settings_options = ["Display Mode", "Network", "Back"]
-    settings_values = [str(usersettings.display_mode), str(usersettings.network), "Main Menu"]
+    settings_options = ["Display Mode", "Network", "Fix API", "Python EXE Command", "Back"]
+    settings_values = [str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
+                       str(usersettings.python_exe_command), "Main Menu"]
 
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
     settings_menu.show()
 
     match settings_menu.user_input:
         case "Display Mode":
-            settings()
+            usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
+                                                               ["CLI", "GUI"])
 
         case "Network":
-            settings()
+            usersettings.network = get_user_input_of_type(strBool,
+                                                          "Do you want to use the network? (" +
+                                                          Colour.true_or_false_styled() + "): ")
+
+        case "Fix API":
+            print("Note: Fixing the API involves removing parameters from the API call until it goes though, "
+                  "this can fix errors where there arent enough questions of that type in the database, however it "
+                  "can mean that the question types arent the same as the ones you selected.")
+
+            usersettings.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error "
+                                                                        "occurs? (" + Colour.true_or_false_styled() +
+                                                               "): ")
+
+        case "Python EXE Command":
+            usersettings.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command "
+                                                                          "(e.g. python, python3, py): ")
 
         case "Back":
             game_main_menu()
+
+    # Save and replay the menu if not going back
+    if settings_menu.user_input != "Back":
+        usersettings.save()
+        settings()
 
 
 def game_main_menu() -> None:
@@ -168,7 +191,7 @@ def main() -> None:
     setup.init_script()
 
     # Show the main menu
-    main_menu = Menu("Welcome to QUIZ", ["Quit", "Continue"])
+    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue"])
     main_menu.show()
 
     match main_menu.user_input:

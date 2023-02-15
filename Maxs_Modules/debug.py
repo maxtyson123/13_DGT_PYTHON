@@ -17,7 +17,7 @@ def debug(debug_message: str, log_type: str = "info") -> None:
     """
 
     if log_type not in debug_ignore:
-        print(Colour.warning + "[DEBUG]" + Colour.RESET + " : " + debug_message)
+        print(Colour.warning + "[DEBUG]" + log_type + Colour.RESET + " : " + debug_message)
 
 
 def error(error_message: str) -> None:

@@ -1,0 +1,1 @@
+When implementing the wrap function a came across a bug where the word wraping was unable to handle a word that was longer the width of the console. This cause sa recursion depth error as it keep calling it self with the same long word. To fix this I cut the word off at the console width and then ran the function again continuing from where I cut the word off

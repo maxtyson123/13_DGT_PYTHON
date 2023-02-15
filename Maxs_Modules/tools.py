@@ -47,18 +47,27 @@ def strBool(text: str) -> bool:
         raise ValueError()
 
 
-def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None) -> object:
+def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None,
+                           allow_these: list = None) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
      until they do.
 
     @param type_to_convert: The type to convert the input to
-    @param input_message: The message to display to the user
-    @param must_be_one_of_these: If the input must be one of these values then enter them here
+    @param input_message: The message to display to the user (then " > ") (By default: "")
+    @param must_be_one_of_these: If the input must be one of these values then enter them here (By default: None)
+    @param allow_these: Allow input of these items (Not type specific) (checked first so 'must_be_one_of_these' doesn't
+                         apply to these items) (By default: None)
     @return: The user input converted to the type specified
     """
     while True:
         user_input = input(input_message + " > ")
+
+        # Check if the user inputted an allowed string
+        if allow_these is not None:
+            if user_input in allow_these:
+                return user_input
+
         user_input = try_convert(user_input, type_to_convert)
 
         # If there is a type error then its returned as None, so now we check if the user input is in the alternative
@@ -71,7 +80,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                     error("Invalid input, please enter one of these: " + str(must_be_one_of_these))
             else:
                 return user_input
-
         # Side note: No need to error here as the error will be called in the try_convert function
 
 
@@ -89,12 +97,13 @@ def set_if_none(variable: object, value: object) -> object:
     return variable
 
 
-def try_convert(variable: object, type_to_convert: object) -> object:
+def try_convert(variable: object, type_to_convert: object, supress_errors: bool = False) -> object:
     """
     Try to convert a variable to a type, if it fails then return None
 
     @param variable: The variable to convert
     @param type_to_convert: The type to convert the variable to
+    @param supress_errors: Weather to supress errors or not (By default: False)
     @return: The converted variable or None if it failed
     """
     if variable is None:
@@ -103,6 +112,7 @@ def try_convert(variable: object, type_to_convert: object) -> object:
     try:
         return type_to_convert(variable)
     except ValueError:
-        error("Invalid input")
+        if not supress_errors:
+            error("Invalid input")
         return None
 
