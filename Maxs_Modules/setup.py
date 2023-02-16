@@ -4,7 +4,7 @@ import sys
 
 from Maxs_Modules.files import SaveFile
 from Maxs_Modules.tools import get_user_input_of_type, try_convert, set_if_none, strBool
-from Maxs_Modules.debug import debug, error
+from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Colour
 
 # - - - - - - - Variables - - - - - - -#
@@ -118,7 +118,7 @@ class UserData(SaveFile):
                 exit()
 
             exec_path = sys.executable
-            debug(exec_path, "setup")
+            debug_message(exec_path, "setup")
 
             # Check if the user has run the script with the python virtual environment (if needed)
             if not exec_path == self.py_env_py_path:

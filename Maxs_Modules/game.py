@@ -76,7 +76,7 @@ import random
 from Maxs_Modules.files import SaveFile, load_questions_from_file
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
-from Maxs_Modules.debug import debug, error
+from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Menu, divider, Colour
 
 # - - - - - - - Variables - - - - - - -#
@@ -128,7 +128,7 @@ def get_saved_games():
     """
     # Get a list of all the files in the data folder
     files = os.listdir(data_folder)
-    debug("Files in data folder: " + str(files), "Game")
+    debug_message("Files in data folder: " + str(files), "Game")
 
     # Remove all the files that are not .json files
     for file in files:
@@ -595,7 +595,7 @@ class Game(SaveFile):
 
             # Get colour
             colour_menu = Menu("Choose a colour for " + user.name, Colour.colours_names_list)
-            colour_menu.show()
+            colour_menu.get_input()
             user.colour = Colour.colours_list[Colour.colours_names_list.index(colour_menu.user_input)]
 
             if user.name == "Max":
@@ -641,7 +641,7 @@ class Game(SaveFile):
             # Load the question from the saved questions
             self.questions = load_questions_from_file()
 
-        debug("Questions: " + str(self.questions), "Game")
+        debug_message("Questions: " + str(self.questions), "Game")
 
         # Convert the data into a list of Question objects
         self.convert_questions()
@@ -737,9 +737,9 @@ class Game(SaveFile):
 
         # Sort the arrays based on the scores
         score_menu_multi = [score_menu_players, score_menu_scores]
-        debug("Score menu multi unsorted: " + str(score_menu_multi), "Game")
+        debug_message("Score menu multi unsorted: " + str(score_menu_multi), "Game")
         score_menu_multi = sort_multi_array(score_menu_multi, True)
-        debug("Score menu multi sorted: " + str(score_menu_multi), "Game")
+        debug_message("Score menu multi sorted: " + str(score_menu_multi), "Game")
 
         # Convert the scores to strings
         for x in range(len(score_menu_multi[1])):
@@ -755,7 +755,7 @@ class Game(SaveFile):
 
         # Show the menu
         score_menu = Menu("Scores", score_menu_multi, True)
-        score_menu.show()
+        score_menu.get_input()
 
         # If the user selected a user then show their stats
         if score_menu.user_input != "Next":
@@ -825,7 +825,7 @@ class Game(SaveFile):
 
         # Show the menu
         marking_menu = Menu("Question: " + question.question, [marking_menu_players, marking_menu_answers], True)
-        marking_menu.show()
+        marking_menu.get_input()
 
         # Note to self, because python is python with its syntax, the "_" is what default is
         match marking_menu.user_input:
@@ -883,7 +883,7 @@ class Game(SaveFile):
         # Get the current question
         question = self.questions[self.current_question]
 
-        debug(current_user.player_type + " " + current_user.name + " answered: " + user_input, "Game")
+        debug_message(current_user.player_type + " " + current_user.name + " answered: " + user_input, "Game")
 
         # Check if the answer is correct
         if user_input == question.correct_answer:
@@ -974,7 +974,7 @@ class Game(SaveFile):
         # Store the time and input
         time_limit = self.time_limit
         start_time = time.time()
-        t = threading.Thread(target=question_menu.show)
+        t = threading.Thread(target=question_menu.get_input)
         t.start()
         t.join(timeout=time_limit)
 
@@ -1009,7 +1009,7 @@ class Game(SaveFile):
 
         # Store the time data
         end_time = time.time() - start_time
-        debug("Time taken: " + str(end_time) + " seconds", "Game")
+        debug_message("Time taken: " + str(end_time) + " seconds", "Game")
         current_user.times.append(end_time)
 
         # Make the bots answer
@@ -1058,7 +1058,7 @@ class Game(SaveFile):
         @return: True if the game has finished
         """
 
-        debug("Checking if game has finished: " + str(self.current_question) + " of " + str(
+        debug_message("Checking if game has finished: " + str(self.current_question) + " of " + str(
             len(self.questions)) + " questions",
               "Game")
 
@@ -1090,7 +1090,7 @@ class Game(SaveFile):
 
         # Create the game end menu
         game_end_menu = Menu("Game Finished", ["Compare Scores", "Compare User Answers", "Finish"])
-        game_end_menu.show()
+        game_end_menu.get_input()
 
         # Check what the user selected
         match game_end_menu.user_input:
@@ -1171,7 +1171,7 @@ class Game(SaveFile):
             questions_menu_values.append("Wait for players")
 
         questions_menu = Menu("Game Settings: Questions", [questions_menu_options, questions_menu_values], True)
-        questions_menu.show()
+        questions_menu.get_input()
 
         match questions_menu.user_input:
             case "Question Amount":
@@ -1179,7 +1179,7 @@ class Game(SaveFile):
 
             case "Category":
                 category_menu = Menu("Category", quiz_categories)
-                category_menu.show()
+                category_menu.get_input()
                 self.quiz_category = category_menu.user_input
 
             case "Difficulty":
@@ -1207,7 +1207,7 @@ class Game(SaveFile):
         local_menu_options = ["How many players", "Next"]
         local_menu_values = [str(self.how_many_players), "Questions Settings"]
         single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
-        single_player_menu.show()
+        single_player_menu.get_input()
 
         match single_player_menu.user_input:
             case "How many players":
@@ -1230,7 +1230,7 @@ class Game(SaveFile):
                                   "Questions Settings"]
 
         networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
-        networking_menu.show()
+        networking_menu.get_input()
 
         match networking_menu.user_input:
 
@@ -1279,7 +1279,7 @@ class Game(SaveFile):
             game_play_menu_values.append("Local Settings")
 
         gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
-        gameplay_menu.show()
+        gameplay_menu.get_input()
 
         match gameplay_menu.user_input:
             case "Host a server":

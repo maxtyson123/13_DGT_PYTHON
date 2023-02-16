@@ -1,6 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
 from Maxs_Modules.setup import UserData
-from Maxs_Modules.debug import debug, error
+from Maxs_Modules.debug import debug_message, error
 
 # Get the setup data
 setup = UserData()
@@ -43,7 +43,7 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
         if category is not None and api_fix < 3:
             url += f"&category={category}"
 
-        debug(url, "API")
+        debug_message(url, "API")
 
         # Get the questions from the API
         response = requests.get(url)
@@ -54,7 +54,7 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
             return []
 
         # Debug
-        debug(str(response.json()), "API")
+        debug_message(str(response.json()), "API")
 
         # Check for errors
         match response.json()["response_code"]:

@@ -1,5 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
-from Maxs_Modules.debug import error
+from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -62,6 +63,15 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     """
     while True:
         user_input = input(input_message + " > ")
+
+        # Check if it is a debug command
+        if user_input == "debug":
+            command = user_input.split(" ")
+            if len(command) == 2:
+                command = command[1]
+
+            show_debug_menu(command)
+            continue
 
         # Check if the user inputted an allowed string
         if allow_these is not None:

@@ -3,8 +3,8 @@
 
 import os
 
-from Maxs_Modules.debug import debug, error
-from Maxs_Modules.tools import get_user_input_of_type, try_convert
+from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu
+from Maxs_Modules.tools import try_convert
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -13,6 +13,8 @@ console_width = 100
 divider_symbol = "#"
 divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
+menu_manager = None
+max_menu_items_per_page = 10
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -113,8 +115,8 @@ class Colour:
 
 
 class MenuManager:
-    menu_history = []
-    menu_input_history = []
+    menu_history_names = []
+    menu_history_input = []
     pre_input = []
 
 
@@ -134,6 +136,8 @@ class Menu:
     clear_screen = True
     multi_dimensional = None
     wrap_mode = WrapMode.WORD
+    page_number = 1
+    items_per_page = max_menu_items_per_page
 
     def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> None:
         """
@@ -146,14 +150,19 @@ class Menu:
         self.title = title
         self.items = items
         self.multi_dimensional = multi_dimensional
-        menu_manager.menu_history.append(title)
+        menu_manager.menu_history_names.append(title)
 
-    def show(self) -> None:
+    def get_input(self) -> None:
         """
         Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
         item in the user_input variable
         """
-        if  self.clear_screen:
+
+        # Store menu_items as a local variable as it can be changed if the menu is split into pages
+        menu_items = self.get_pages()
+
+        # Check if the screen should be cleared
+        if self.clear_screen:
             # Clear the screen
             os.system("cls")
 
@@ -161,23 +170,23 @@ class Menu:
         print(divider)
         text_in_divider(" " + self.title, self.wrap_mode)
         if self.multi_dimensional:
-            show_menu_double(self.items, self.wrap_mode)
+            show_menu_double(menu_items, self.wrap_mode)
         else:
-            show_menu(self.items, self.wrap_mode)
+            show_menu(menu_items, self.wrap_mode)
 
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
 
             # Check if the pre-input is a valid option index for this menu
-            if menu_manager.pre_input[0] < len(self.items):
+            if menu_manager.pre_input[0] < len(menu_items):
                 # Store the input
-                self.user_input = self.items[menu_manager.pre_input[0]]
+                self.user_input = menu_items[menu_manager.pre_input[0]]
 
                 # Remove the pre-input
                 menu_manager.pre_input.pop(0)
 
                 # Add the input to the input history
-                menu_manager.menu_input_history.append(self.user_input)
+                menu_manager.menu_history_input.append(self.user_input)
 
                 # Return
                 return
@@ -189,22 +198,30 @@ class Menu:
                 # Clear the pre-input
                 menu_manager.pre_input = []
 
-
         # Calculate the possible options
         if self.multi_dimensional:
 
-            input_items = self.items[0]
+            input_items = menu_items[0]
         else:
-            input_items = self.items
+            input_items = menu_items
 
         options = [*range(len(input_items))]
 
         # Get the user input and validate it, note cant use the get_user_input_of_type function as the menu also
-        # allows for "pre-input" and choseing an item index or item itself
+        # allows for "pre-input" and choosing an item index or the item itself
         user_input = ""
 
         while True:
             user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
+
+            # Check if it is a debug command
+            if user_input == "debug":
+                command = user_input.split(" ")
+                if len(command) == 2:
+                    command = command[1]
+
+                show_debug_menu(command)
+                continue
 
             # Check if the user is wanting to do pre-input (i.e a list of indexs "1,4,3,2")
             if "," in user_input:
@@ -220,13 +237,13 @@ class Menu:
                     menu_manager.pre_input = user_input
 
                     # Store the first input
-                    self.user_input = self.items[menu_manager.pre_input[0]]
+                    self.user_input = menu_items[menu_manager.pre_input[0]]
 
                     # Remove the first input from the pre-input
                     menu_manager.pre_input.pop(0)
 
                     # Add the input to the input history
-                    menu_manager.menu_input_history.append(self.user_input)
+                    menu_manager.menu_history_input.append(self.user_input)
 
                     # Return
                     return
@@ -244,17 +261,76 @@ class Menu:
 
             # If there is a type error then its returned as None otherwise it is the converted value
             if user_input is not None:
-                    if user_input in options:
-                        if self.multi_dimensional:
-                            self.user_input = self.items[0][user_input]
-                        else:
-                            self.user_input = self.items[user_input]
-                        break
+                if user_input in options:
+                    if self.multi_dimensional:
+                        self.user_input = menu_items[0][user_input]
                     else:
-                        error("Invalid input, please enter one of these: " + str(options))
+                        self.user_input = menu_items[user_input]
+                    break
+                else:
+                    error("Invalid input, please enter one of these: " + str(options))
 
+        menu_manager.menu_history_input.append(self.user_input)
 
-        menu_manager.menu_input_history.append(self.user_input)
+        # Handle the Next, Previous page options
+        if self.user_input == "Next Page":
+            self.page_number += 1
+            self.get_input()
+
+        elif self.user_input == "Previous Page":
+            self.page_number -= 1
+            self.get_input()
+
+    def get_pages(self) -> list:
+        """
+        Splits the menu items into pages if there are more than the max menu items in the list of items
+        @return: The current page of menu items (a list of 10 options, including previous and next page)
+        """
+        # Store menu_items as a local variable as dont want to change the original
+        menu_items = self.items
+
+        # Check if the items have to be split into pages
+        if len(menu_items) > self.items_per_page:
+            # Get the items for the current page
+            slice_start = (self.page_number - 1) * self.items_per_page
+            slice_end = (self.page_number * self.items_per_page)
+
+            # Check if the "Previous Page" option is going to be added, if so need to add 1 to the slice start
+            if self.page_number > 1:
+                slice_start += 1
+
+            # Check if the "Next Page" option is going to be added, if so need to minus 1 from the slice end
+            if len(menu_items) > slice_end:
+                slice_end -= 1
+
+            # If the menu is multi dimensional, then the items are stored in a list of lists and both arrays need to be
+            # sliced
+            if self.multi_dimensional:
+                menu_items[0] = menu_items[0][slice_start: slice_end]
+                menu_items[1] = menu_items[1][slice_start: slice_end]
+
+                # Check if there is a previous page and if so add the "Previous Page" option
+                if self.page_number > 1:
+                    menu_items[0].insert(0, "Previous Page")
+                    menu_items[1].insert(0, str(self.page_number - 1))
+
+                # Check if there is going to be another page and if so add the "Next Page" option
+                if len(menu_items[0]) == self.items_per_page - 1:
+                    menu_items[0].append("Next Page")
+                    menu_items[1].append(str(self.page_number + 1))
+
+            else:
+                menu_items = menu_items[slice_start: slice_end]
+
+                # Check if there is a previous page and if so add the "Previous Page" option
+                if self.page_number > 1:
+                    menu_items.insert(0, "Previous Page")
+
+                # Check if there is going to be another page and if so add the "Next Page" option
+                if len(menu_items) == self.items_per_page - 1:
+                    menu_items.append("Next Page")
+
+        return menu_items
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -414,4 +490,3 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
         print(final_item_to_print)
 
     print(divider)
-

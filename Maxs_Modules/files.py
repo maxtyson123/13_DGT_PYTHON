@@ -1,7 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import json
 import os
-from Maxs_Modules.debug import debug, error
+from Maxs_Modules.debug import debug_message, error
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -45,7 +45,7 @@ class SaveFile:
 
         # If the user wants to autoload the file then try run the load function
         if auto_load:
-            debug("Auto loading file", "save_file")
+            debug_message("Auto loading file", "save_file")
             self.load()
 
     def load(self) -> None:
@@ -53,12 +53,12 @@ class SaveFile:
         Loads the data from the save file into the save_data dictionary
         @return: None, this function will return if the file is corrupt or does not exist
         """
-        debug("Loading file from " + self.save_file, "save_file")
+        debug_message("Loading file from " + self.save_file, "save_file")
 
         # Try to load the data from the save file in read mode, if it fails then warn the user
         try:
             with open(self.save_file, "r") as file:
-                debug("File opened", "save_file")
+                debug_message("File opened", "save_file")
 
                 # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and
                 # close the file then delete the file
@@ -70,7 +70,7 @@ class SaveFile:
                     os.remove(self.save_file)
                     return
 
-                debug(str(self.save_data), "save_file")
+                debug_message(str(self.save_data), "save_file")
 
                 # Note: the subclass has to load the data from the save_data dictionary as there is no way for the
                 # super class to interact with the subclass
@@ -79,14 +79,14 @@ class SaveFile:
                 file.close()
 
         except FileNotFoundError:
-            debug("File not found", "save_file")
+            debug_message("File not found", "save_file")
             return
 
     def save(self) -> None:
         """
         Saves the data from the save_data dictionary to the save file
         """
-        debug("Saving file to " + self.save_file, "save_file")
+        debug_message("Saving file to " + self.save_file, "save_file")
 
         # Open the file and dump the object as a dictionary, then close the file
         with open(self.save_file, "w") as file:
@@ -98,7 +98,7 @@ class SaveFile:
             except KeyError:
                 print("KeyError: save_data")
 
-            debug("File data: " + str(save_dict), "save_file")
+            debug_message("File data: " + str(save_dict), "save_file")
 
             json.dump(save_dict, file)
             file.close()

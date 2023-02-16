@@ -2,7 +2,7 @@
 import sys
 
 from Maxs_Modules.renderer import Menu, Colour
-from Maxs_Modules.debug import debug
+from Maxs_Modules.debug import debug_message, init_debug
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import get_user_input_of_type, strBool
@@ -31,7 +31,7 @@ def game_finished(game: Game) -> None:
     @param game: The game object, used for resetting the game when replaying
     """
     game_finished_menu = Menu("Game Finished", ["Play Again", "Main Menu", "Quit"])
-    game_finished_menu.show()
+    game_finished_menu.get_input()
 
     match game_finished_menu.user_input:
         case "Play Again":
@@ -59,7 +59,7 @@ def continue_game() -> None:
     saves.append("Back")
 
     continue_menu = Menu("Continue Game", saves)
-    continue_menu.show()
+    continue_menu.get_input()
 
     # If the user selected back then return
     if continue_menu.user_input == "Back":
@@ -115,7 +115,7 @@ def settings() -> None:
                        str(usersettings.python_exe_command), "Main Menu"]
 
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
-    settings_menu.show()
+    settings_menu.get_input()
 
     match settings_menu.user_input:
         case "Display Mode":
@@ -158,12 +158,12 @@ def game_main_menu() -> None:
     usersettings = UserData()
     if usersettings.network is not None:
         if usersettings.network:
-            debug("Network is enabled", "network")
+            debug_message("Network is enabled", "network")
             game_menu.items.insert(2, "Join Game")
         else:
-            debug("Network is disabled", "network")
+            debug_message("Network is disabled", "network")
 
-    game_menu.show()
+    game_menu.get_input()
 
     match game_menu.user_input:
         case "Continue Game":
@@ -189,10 +189,11 @@ def main() -> None:
     # Set up the program
     setup = UserData()
     setup.init_script()
+    init_debug()
 
     # Show the main menu
-    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue"])
-    main_menu.show()
+    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue", *"abcdefghijklmnopqrstuvwxyz"])
+    main_menu.get_input()
 
     match main_menu.user_input:
         case "Quit":
