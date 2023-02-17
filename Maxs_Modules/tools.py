@@ -65,10 +65,12 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
         user_input = input(input_message + " > ")
 
         # Check if it is a debug command
-        if user_input == "debug":
+        if "debug" in user_input:
             command = user_input.split(" ")
-            if len(command) == 2:
-                command = command[1]
+
+            # Check if there is a command and if there is then remove the "debug" part and pass the rest to the
+            if len(command) > 1:
+                command.pop(0)
 
             show_debug_menu(command)
             continue

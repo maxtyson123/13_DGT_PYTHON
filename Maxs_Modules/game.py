@@ -959,14 +959,17 @@ class Game(SaveFile):
         if self.randomise_answer_placement:
             random.shuffle(options)
 
+        # Create the question menu
+        question_menu = Menu(question.question, options)
+
+        # Clear the screen
+        question_menu.clear()
+
         # Print some info
         print(divider)
         print("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
         print("User: " + current_user.styled_name())
         print("Time Limit: " + str(self.time_limit) + " seconds")
-
-        # Create the question menu
-        question_menu = Menu(question.question, options)
 
         # Don't clear the screen as information is printed before the menu
         question_menu.clear_screen = False
@@ -1005,7 +1008,9 @@ class Game(SaveFile):
             # Add missed question to the user
             current_user.questions_missed += 1
 
-            print("\nTime's up! Moving to next question.")
+            print("\nTime's up!")
+
+            # TODO: Kill the thread to prevent input error
 
         # Store the time data
         end_time = time.time() - start_time
@@ -1017,7 +1022,7 @@ class Game(SaveFile):
             # Get the bot to answer the question
             bot_answer = bot.answer(question)
 
-            # As the cant miss miss then just leave the preheader blank
+            # As the bot cant miss then just leave the preheader blank
             bot.answers.append("")
 
             # Mark the question
@@ -1029,6 +1034,7 @@ class Game(SaveFile):
         # Give user time to read the answer
         time.sleep(3)
 
+    
         # Move onto the next question
         self.next_question()
 

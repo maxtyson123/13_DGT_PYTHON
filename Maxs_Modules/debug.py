@@ -1,5 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
 import time
+
 # - - - - - - - Variables - - - - - - -#
 use_debug = True
 initialised_debug = False
@@ -14,6 +15,7 @@ def init_debug() -> None:
     """
     Initialise the debug system
     """
+
     global debugger
     global initialised_debug
 
@@ -31,11 +33,14 @@ def init_debug() -> None:
         save_logs_location = "ProgramData/Logs"
         individual_log_files = False  # Weather or not to save the logs in individual files
 
+        # Commands
+        commands = ["help", "logs", "errors"]
+        handlers = [None, None, None]
+
         def __init__(self) -> None:
             """
             Create a new Debug object, loaded from debug.json
             """
-
             # Load from file
             super().__init__("ProgramData/debug.json")
 
@@ -50,6 +55,9 @@ def init_debug() -> None:
 
             # Load the default values if the data is not found
             self.load_defaults()
+
+            # Load the handlers
+            self.handlers = [self.command_help, self.command_logs, self.command_errors]
 
         def load_defaults(self) -> None:
             """
@@ -77,54 +85,138 @@ def init_debug() -> None:
                 print(Colour.warning + "[DEBUG] (" + log_type + ")" + Colour.RESET + " : " + message)
                 session_message_log.append(message)
 
-        def handle(self, command) -> None:
+        def command_help(self, *args) -> None:
+            """
+            Shows a list of commands
+            """
+
+            # Default behaviour for no args
+            if len(args) == 0:
+                print("Some commands may support -h for more info")
+                print("Commands:")
+                for command in self.commands:
+                    print(" - " + command)
+
+            for arg in args:
+                if arg in self.commands:
+                    self.handlers[self.commands.index(arg)]("-h")
+                else:
+                    print("Unknown command: " + arg)
+
+        def command_logs(self, *args) -> None:
+            """
+            Allows the user to view the logs, and change the settings
+            """
+            from Maxs_Modules.tools import get_user_input_of_type, strBool
+            from Maxs_Modules.renderer import Colour
+
+            # Default behaviour for no args
+            if len(args) == 0:
+                args = ["-h"]
+
+            for arg in args:
+                match arg:
+                    case "-h":
+                        print("Params:")
+                        print(" -h: Shows this help message")
+                        print(" -ignore-add: Adds a log type to ignore")
+                        print(" -ignore-remove: Removes a log type to ignore")
+                        print(" -ignore-list: Lists the log types to ignore")
+                        print(" -ignore-clear: Clears the log types to ignore")
+                        print(" -list: Lists current the logs")
+                        print(" -list-full: List the full history of logs")
+                        print(" -store: Sets weather or not to store the logs")
+                        print(" -store-location: Sets the location to store the logs")
+                        print(" -store-individual: Sets weather or not to store the logs in individual files")
+                        print(" -store-max: Sets the maximum amount of logs to store")
+
+                    case "-ignore-add":
+                        self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
+
+                    case "-ignore-remove":
+                        item_to_remove = get_user_input_of_type(str, "Log type to remove: ")
+
+                    case "-ignore-list":
+                        print("Log types to ignore:")
+                        for log_type in self.log_ignore:
+                            print(" - " + log_type)
+
+                    case "-ignore-clear":
+                        self.log_ignore = []
+
+                    case "-list":
+                        print("Current logs:")
+                        for log in session_message_log:
+                            print(" - " + log)
+
+                    case "-list-full":
+                        print("Full logs:")
+                        for log in self.full_message_log:
+                            print(" - " + str(log))
+
+                    case "-store":
+                        self.store_logs = get_user_input_of_type(strBool, "Store the logs on file?  " +
+                                                                 Colour.true_or_false_styled())
+                    case "-store-location":
+                        self.save_logs_location = get_user_input_of_type(str, "Location to store the logs: ")
+
+                    case "-store-individual":
+                        self.individual_log_files = get_user_input_of_type(strBool, "Store the logs in individual files?  " +
+                                                                    Colour.true_or_false_styled())
+
+                    case "-store-max":
+                        self.max_log_history = get_user_input_of_type(int, "Maximum amount of logs to store: ")
+
+                    case _:
+                        print("Unknown command: " + arg)
+
+        def command_errors(self, *args) -> None:
+            # Default behaviour for no args
+            if len(args) == 0:
+                args = ["-h"]
+
+            for arg in args:
+                match arg:
+                    case "-h":
+                        print("Params:")
+                        print(" -h: Shows this help message")
+                        print(" -list: Lists current the errors")
+                        print(" -list-full: List the full history of errors")
+
+                    case "-list":
+                        print("Current errors:")
+                        for log_error in session_error_log:
+                            print(" - " + log_error)
+
+                    case "-list-full":
+                        print("Full errors:")
+                        for log_error in self.full_error_log:
+                            print(" - " + str(log_error))
+
+        def handle(self, user_input) -> None:
             """
             Shows a menu allowing the user to change the debug settings and see some values
             """
 
-            match command:
-                case "log_ignore_add":
-                    self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
+            # Get the first word of the command
+            command = user_input[0]
 
-                case "log_ignore_remove":
-                    item_to_remove = get_user_input_of_type(str, "Log type to remove: ")
-                    if item_to_remove in self.log_ignore:
-                        self.log_ignore.remove(item_to_remove)
+            # Get the reset of the words as the args
+            args = user_input[1:]
 
-                case "store_logs":
-                    from Maxs_Modules.renderer import Colour
-                    self.store_logs = get_user_input_of_type(strBool, "Store the logs on file?  " +
-                                                             Colour.true_or_false_styled())
-                case "log_history_max":
-                    self.max_log_history = get_user_input_of_type(int, "Max log history: ")
+            if command in self.commands:
+                # Get the index of the command
+                command_index = self.commands.index(command)
 
-                case "log_save_location":
-                    self.save_logs_location = get_user_input_of_type(str, "Log save location: ")
-
-                case "log_individual_files":
-                    self.individual_log_files = get_user_input_of_type(strBool, "Individual log files?  " +
-                                                                       Colour.true_or_false_styled())
-                case "logs":
-                    print(session_message_log)
-                    input("Enter to continue...")
-
-                case "errors":
-                    print(session_error_log)
-                    input("Enter to continue...")
-
-                case "logs_full":
-                    print(self.full_message_log)
-                    input("Enter to continue...")
-
-                case "errors_full":
-                    print(self.full_error_log)
-                    input("Enter to continue...")
+                # Run the handler for the command and pass the args
+                self.handlers[command_index](*args)
 
         def save(self) -> None:
             """
             Save the debug data to the save file
             """
             self.save_data = self.__dict__
+            self.save_data.pop("handlers")
 
             super().save()
 
@@ -146,8 +238,7 @@ def init_debug() -> None:
                 self.full_message_log.append(session_message_log)
                 self.full_error_log.append(session_error_log)
 
-                # TODO: Save the logs to a file
-
+                # TODO: Save the logs to a file if individual_log_files is true
             self.save()
 
     if use_debug:
@@ -157,12 +248,20 @@ def init_debug() -> None:
 
 # - - - - - - - Functions - - - - - - -#
 
-def show_debug_menu(command : str) -> None:
+def close_debug_session() -> None:
+    """
+    Save the logs and then save to the file.
+    """
+    if initialised_debug and debugger is not None:
+        debugger.close_debug_session()
+
+
+def show_debug_menu(command : list) -> None:
     """
     If the debugger is initialized and debug is enabled, show the debug menu
     """
     if initialised_debug and debugger is not None:
-        debugger.menu(command)
+        debugger.handle(command)
 
 
 def debug_message(message: str, log_type: str = "info") -> None:

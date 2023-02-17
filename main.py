@@ -2,7 +2,7 @@
 import sys
 
 from Maxs_Modules.renderer import Menu, Colour
-from Maxs_Modules.debug import debug_message, init_debug
+from Maxs_Modules.debug import debug_message, init_debug, close_debug_session
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import get_user_input_of_type, strBool
@@ -186,13 +186,10 @@ def main() -> None:
     """
     The main function, initialise the program and show the main menu
     """
-    # Set up the program
-    setup = UserData()
-    setup.init_script()
-    init_debug()
+
 
     # Show the main menu
-    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue", *"abcdefghijklmnopqrstuvwxyz"])
+    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue"])
     main_menu.get_input()
 
     match main_menu.user_input:
@@ -206,4 +203,15 @@ def main() -> None:
 
 if __name__ == "__main__":
     handle_args(sys.argv)
-    main()
+
+    # Set up the program
+    setup = UserData()
+    setup.init_script()
+    init_debug()
+
+    # Run the main program and catch the exit to stop the debug session
+    try:
+        main()
+    finally:
+        close_debug_session()
+

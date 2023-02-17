@@ -152,6 +152,12 @@ class Menu:
         self.multi_dimensional = multi_dimensional
         menu_manager.menu_history_names.append(title)
 
+    def clear(self) -> None:
+        """
+        Clears the screen
+        """
+        os.system("cls")
+
     def get_input(self) -> None:
         """
         Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
@@ -164,7 +170,7 @@ class Menu:
         # Check if the screen should be cleared
         if self.clear_screen:
             # Clear the screen
-            os.system("cls")
+            self.clear()
 
         # Print the menu
         print(divider)
@@ -215,10 +221,12 @@ class Menu:
             user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
 
             # Check if it is a debug command
-            if user_input == "debug":
+            if "debug" in user_input:
                 command = user_input.split(" ")
-                if len(command) == 2:
-                    command = command[1]
+
+                # Check if there is a command and if there is then remove the "debug" part and pass the rest to the
+                if len(command) > 1:
+                    command.pop(0)
 
                 show_debug_menu(command)
                 continue
