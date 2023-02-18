@@ -1,5 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
+import os
 import time
+from datetime import datetime
 
 # - - - - - - - Variables - - - - - - -#
 use_debug = True
@@ -13,7 +15,7 @@ session_error_log = []
 # - - - - - - - Classes - - - - - - -#
 def init_debug() -> None:
     """
-    Initialise the debug system
+    Sets the debugger variable to a instance of the Debug class if the use_debug variable is True
     """
 
     global debugger
@@ -76,7 +78,7 @@ def init_debug() -> None:
             from Maxs_Modules.renderer import Colour
 
             """
-            Print a debug message if the log type is not in the debug_ignore array
+            Print a debug message if the log type is not in the debug_ignore array and appends the message to the log
             @param debug_message: The debug message to print
             @param log_type: The type of log to print
             """
@@ -85,9 +87,10 @@ def init_debug() -> None:
                 print(Colour.warning + "[DEBUG] (" + log_type + ")" + Colour.RESET + " : " + message)
                 session_message_log.append(message)
 
-        def command_help(self, *args) -> None:
+        def command_help(self, *args: tuple) -> None:
             """
-            Shows a list of commands
+            Prints all the commands, if a command is given as an arg it will run the command with the -h arg
+            @param args: The commands to run
             """
 
             # Default behaviour for no args
@@ -103,16 +106,17 @@ def init_debug() -> None:
                 else:
                     print("Unknown command: " + arg)
 
-        def command_logs(self, *args) -> None:
+        def command_logs(self, *args: tuple) -> None:
             """
-            Allows the user to view the logs, and change the settings
+            Allows the user to view the logs, and change the settings. The default behaviour is to list the logs
+            @param args: The args to pass to the command 
             """
             from Maxs_Modules.tools import get_user_input_of_type, strBool
             from Maxs_Modules.renderer import Colour
 
             # Default behaviour for no args
             if len(args) == 0:
-                args = ["-h"]
+                args = ["-list"]
 
             for arg in args:
                 match arg:
@@ -125,6 +129,7 @@ def init_debug() -> None:
                         print(" -ignore-clear: Clears the log types to ignore")
                         print(" -list: Lists current the logs")
                         print(" -list-full: List the full history of logs")
+                        print(" -clear-history: Clears the full history of logs")
                         print(" -store: Sets weather or not to store the logs")
                         print(" -store-location: Sets the location to store the logs")
                         print(" -store-individual: Sets weather or not to store the logs in individual files")
@@ -161,16 +166,24 @@ def init_debug() -> None:
                         self.save_logs_location = get_user_input_of_type(str, "Location to store the logs: ")
 
                     case "-store-individual":
-                        self.individual_log_files = get_user_input_of_type(strBool, "Store the logs in individual files?  " +
-                                                                    Colour.true_or_false_styled())
+                        self.individual_log_files = get_user_input_of_type(strBool,
+                                                                           "Store the logs in individual files?  " +
+                                                                           Colour.true_or_false_styled())
 
                     case "-store-max":
                         self.max_log_history = get_user_input_of_type(int, "Maximum amount of logs to store: ")
 
+                    case "-clear-history":
+                        self.full_message_log = []
+
                     case _:
                         print("Unknown command: " + arg)
 
-        def command_errors(self, *args) -> None:
+        def command_errors(self, *args: tuple) -> None:
+            """
+            Allows the user to view/clear the errors (note: errors made by the error() funct, not the runtime errors)
+            @param args: The args to pass to the command, if none are given it will show the help message
+            """
             # Default behaviour for no args
             if len(args) == 0:
                 args = ["-h"]
@@ -182,6 +195,7 @@ def init_debug() -> None:
                         print(" -h: Shows this help message")
                         print(" -list: Lists current the errors")
                         print(" -list-full: List the full history of errors")
+                        print(" -clear-history: Clears the past errors")
 
                     case "-list":
                         print("Current errors:")
@@ -193,9 +207,15 @@ def init_debug() -> None:
                         for log_error in self.full_error_log:
                             print(" - " + str(log_error))
 
-        def handle(self, user_input) -> None:
+                    case "-clear-history":
+                        self.full_error_log = []
+
+                    case _:
+                        print("Unknown command: " + arg)
+
+        def handle(self, user_input: list) -> None:
             """
-            Shows a menu allowing the user to change the debug settings and see some values
+            Attempts to run the handler for the command, and passes the args to the handler (as a tuple)
             """
 
             # Get the first word of the command
@@ -226,19 +246,37 @@ def init_debug() -> None:
             """
             if self.store_logs:
 
-                # Check if the logs are full
-                if len(self.full_message_log) > self.max_log_history:
-                    # Remove the oldest log
-                    self.full_message_log.pop(0)
-                if len(self.full_error_log) > self.max_log_history:
-                    # Remove the oldest log
-                    self.full_error_log.pop(0)
+                # Check if the logs are to be saved to the main debug file or the individual files
 
-                # Add the session logs to the full logs
-                self.full_message_log.append(session_message_log)
-                self.full_error_log.append(session_error_log)
+                if self.individual_log_files:
 
-                # TODO: Save the logs to a file if individual_log_files is true
+                    # Check if the save location exists
+                    if not os.path.exists(self.save_logs_location):
+                        os.makedirs(self.save_logs_location)
+
+                    # Create the log name
+                    log_name = "/log_" + str(datetime.now()).replace(":", "-").replace(" ", "_") + ".txt"
+
+                    # Save the logs to the individual files
+                    with open(self.save_logs_location + log_name, "w") as file:
+                        file.write("Message log:\n"
+                                   + str(session_message_log)
+                                   + "\n\nError log:\n"
+                                   + str(session_error_log))
+
+                else:
+                    # Check if the logs are full
+                    if len(self.full_message_log) > self.max_log_history:
+                        # Remove the oldest log
+                        self.full_message_log.pop(0)
+                    if len(self.full_error_log) > self.max_log_history:
+                        # Remove the oldest log
+                        self.full_error_log.pop(0)
+
+                    # Add the session logs to the full logs
+                    self.full_message_log.append(session_message_log)
+                    self.full_error_log.append(session_error_log)
+
             self.save()
 
     if use_debug:
@@ -256,7 +294,7 @@ def close_debug_session() -> None:
         debugger.close_debug_session()
 
 
-def show_debug_menu(command : list) -> None:
+def show_debug_menu(command: list) -> None:
     """
     If the debugger is initialized and debug is enabled, show the debug menu
     """

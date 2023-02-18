@@ -1,3 +1,19 @@
+# TODOS:
+# [x] Base functionality: menus etc, file saving/loading
+# [x] Modules
+# [x] Base Game Setup: Settings, questions from API/Local, etc
+# [x] Clean Up
+# [x] Extended user experience: Colours, mulitpage menus
+# [x] Easier debugging
+# [ ] Multiplayer Base: Joining a game, creating a game, waiting for players
+# [ ] Multiplayer Game Logic: Scores sync questions sync
+# [ ] Multiplayer Extended: Chat, etc
+# [ ] Clean Up
+# [ ] GUI Base, port the current render to a simple GUI
+# [ ] GUI Extended, Buttons instead of based, css and other styling
+# [ ] Clean Up
+# [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
+
 # - - - - - - - Imports - - - - - - -#
 import sys
 
