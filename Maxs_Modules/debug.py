@@ -36,8 +36,8 @@ def init_debug() -> None:
         individual_log_files = False  # Weather or not to save the logs in individual files
 
         # Commands
-        commands = ["help", "logs", "errors"]
-        handlers = [None, None, None]
+        commands = ["help", "logs", "errors", "server"]
+        handlers = [None, None, None, None]
 
         def __init__(self) -> None:
             """
@@ -59,7 +59,7 @@ def init_debug() -> None:
             self.load_defaults()
 
             # Load the handlers
-            self.handlers = [self.command_help, self.command_logs, self.command_errors]
+            self.handlers = [self.command_help, self.command_logs, self.command_errors, self.command_server]
 
         def load_defaults(self) -> None:
             """
@@ -86,6 +86,34 @@ def init_debug() -> None:
             if log_type not in self.log_ignore:
                 print(Colour.warning + "[DEBUG] (" + log_type + ")" + Colour.RESET + " : " + message)
                 session_message_log.append(message)
+
+        def command_server(self, *args: tuple) -> None:
+
+            from Maxs_Modules.network import test_echo_server, test_echo_client, get_ip
+
+            if len(args) == 0:
+                args = ["-h"]
+
+            for arg in args:
+                match arg:
+                    case "-h":
+                        print("Params:")
+                        print(" -h: Shows this help message")
+                        print(" -ip: Gets this devices ip address")
+                        print(" -echo-server: Starts a test echo server")
+                        print(" -echo-client: Starts a test echo client")
+
+                    case "-ip":
+                        print("IP: " + get_ip())
+
+                    case "-echo-server":
+                        test_echo_server()
+
+                    case "-echo-client":
+                        test_echo_client()
+
+                    case _:
+                        print("Unknown arg: " + arg)
 
         def command_help(self, *args: tuple) -> None:
             """
