@@ -23,7 +23,6 @@ from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import get_user_input_of_type, strBool
 
-
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
 
@@ -170,7 +169,7 @@ def game_main_menu() -> None:
     """
     Show the user the main menu
     """
-    game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Settings", "Quit"])
+    game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Tutorial", "Settings", "Quit"])
 
     usersettings = UserData()
     if usersettings.network is not None:
@@ -192,11 +191,69 @@ def game_main_menu() -> None:
         case "Join Game":
             join_game()
 
+        case "Tutorial":
+            tutorial()
+
         case "Settings":
             settings()
 
         case "Quit":
             sys.exit()
+
+
+def tutorial() -> None:
+    tut_menu = Menu("Tutorial", [""])
+
+    # Intro
+    print("- Welcome to the tutorial!")
+    print("- This tutorial will show you how to play the game and how to use the menus")
+    print("- To continue press enter")
+    input()
+    tut_menu.clear()
+
+    # Game Settings Menu
+    print("- The first menu you will see when creating a game is the game settings menu, this menu allows you to "
+          "configure the game.")
+    print("- The current value of each setting is shown in brackets, to change the value of a setting choose the setting "
+          "and then you will be promted to enter a new value.")
+    print("- To continue press enter")
+    input()
+    tut_menu.clear()
+    print("- Here is an example of the game settings menu")
+    print("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
+          "the option")
+    tut_menu.multi_dimensional = True
+    tut_menu.items = [["Number of Questions", "Question Types", "Difficulty", "Time Limit", "..."],
+                      ["10", "All", "All", "No Time Limit", "..."]]
+    tut_menu.get_input()
+    print("-  You chose: " + tut_menu.user_input + ", here you would be able to change the value of the setting")
+    print("-  To continue press enter")
+    input()
+    tut_menu.clear()
+
+    # Play a game
+    print("- Now that you know how to configure the game you can play a game")
+    print("- The game will display the question and then you will be prompted to enter your answer, you have until the "
+          "time limit (default 10 seconds) to enter your answer and then if no answer is selected a option will be "
+          "automatically selected (if configured so)")
+    print("- After that the game will show you the correct answer (if configured so) and then move on to the next "
+          "question will be displayed or show the scores list depending on the game configuration")
+    print("- When in the scores menu you can choose a player to see their stats")
+    print("- To continue press enter")
+    input()
+    tut_menu.clear()
+
+    # Network
+    print(" No MULTIPLAYER YET so press enter to continue")
+    input()
+    tut_menu.clear()
+
+    # End
+    print("- That is the end of the tutorial, you can now play the game")
+    print("- To continue press enter")
+    input()
+    tut_menu.clear()
+    game_main_menu()
 
 
 def main() -> None:
@@ -230,4 +287,3 @@ if __name__ == "__main__":
         main()
     finally:
         close_debug_session()
-

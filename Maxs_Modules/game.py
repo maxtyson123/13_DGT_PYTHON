@@ -532,7 +532,7 @@ class Game(SaveFile):
         """
         Shows the user various menus related to settings, allowing them to change the settings
         """
-        self.settings_how_to()
+        self.settings_gameplay()
 
     def convert_users(self) -> None:
         """
@@ -1301,19 +1301,3 @@ class Game(SaveFile):
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
         if gameplay_menu.user_input != "Next":
             self.settings_gameplay()
-
-    def settings_how_to(self) -> None:
-        """
-        Shows a menu to explain how to use the game settings menu
-        """
-        os.system("cls")
-
-        print("Game Settings: How To")
-        time.sleep(1)
-
-        print(
-            "You will be shown menus relating to the game settings, you can change the settings by typing in the number"
-            "of the option you want to change, otherwise the default will be used")
-
-        input("Press enter to continue...")
-        self.settings_gameplay()
