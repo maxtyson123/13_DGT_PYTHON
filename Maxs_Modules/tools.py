@@ -1,5 +1,8 @@
 # - - - - - - - Imports - - - - - - -#
-from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu
+import time
+
+from Maxs_Modules.debug import error, show_debug_menu, in_ide
+
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -49,20 +52,54 @@ def strBool(text: str) -> bool:
 
 
 def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None,
-                           allow_these: list = None) -> object:
+                           allow_these: list = None, max_time: int = 0) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
      until they do.
+
 
     @param type_to_convert: The type to convert the input to
     @param input_message: The message to display to the user (then " > ") (By default: "")
     @param must_be_one_of_these: If the input must be one of these values then enter them here (By default: None)
     @param allow_these: Allow input of these items (Not type specific) (checked first so 'must_be_one_of_these' doesn't
                          apply to these items) (By default: None)
+    @param max_time: The maximum time the user has to enter input (in seconds) (0, for no limit) (By default: 0)
     @return: The user input converted to the type specified
     """
+
+    # Store the time and input
+
+    # Store the start time
+    start_time = time.time()
+
     while True:
-        user_input = input(input_message + " > ")
+
+        # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
+        # running in the IDE
+        if max_time != 0 and not in_ide:
+
+            from Maxs_Modules.setup import UserData
+
+            setup = UserData()
+            setup.get_packages(["inputimeout"])
+            from inputimeout import inputimeout, TimeoutOccurred
+
+            # Check if the time limit has been reached
+            if time.time() - start_time > max_time:
+                error("Time limit reached")
+                return None
+
+            # Calculate the time left
+            time_left = max_time - (time.time() - start_time)
+
+            # Get the user input
+            try:
+                user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
+            except TimeoutOccurred:
+                return None
+
+        else:
+            user_input = input(input_message + " > ")
 
         # Check if it is a debug command
         if "debug" in user_input:

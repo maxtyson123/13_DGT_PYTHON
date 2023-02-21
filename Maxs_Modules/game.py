@@ -68,7 +68,6 @@
 
 # - - - - - - - Imports - - - - - - -#
 import os
-import threading
 import time
 import html
 import random
@@ -974,15 +973,16 @@ class Game(SaveFile):
         # Don't clear the screen as information is printed before the menu
         question_menu.clear_screen = False
 
-        # Store the time and input
-        time_limit = self.time_limit
+        # Timings
         start_time = time.time()
-        t = threading.Thread(target=question_menu.get_input)
-        t.start()
-        t.join(timeout=time_limit)
 
-        if not t.is_alive():
-            # As the user didnt miss then just leave the preheader blank
+        # Show the question and get the user input
+        question_menu.show_menu()
+        question_menu.user_input = get_user_input_of_type(str, "Enter your answer", max_time=self.time_limit)
+
+        if question_menu.user_input is not None:
+
+            # As the user didn't miss then just leave the preheader blank
             current_user.answers.append("")
 
             # Mark the question
@@ -1162,49 +1162,6 @@ class Game(SaveFile):
 
     # __ MENUS __
 
-    def settings_questions(self) -> None:
-        """
-        Shows a menu to configure the questions for the game
-
-        """
-        questions_menu_options = ["Question Amount", "Category", "Difficulty", "Type", "Next"]
-        questions_menu_values = [str(self.question_amount), self.quiz_category, self.quiz_difficulty,
-                                 self.question_type]
-
-        if not self.online_enabled:
-            questions_menu_values.append("Set up players")
-        else:
-            questions_menu_values.append("Wait for players")
-
-        questions_menu = Menu("Game Settings: Questions", [questions_menu_options, questions_menu_values], True)
-        questions_menu.get_input()
-
-        match questions_menu.user_input:
-            case "Question Amount":
-                self.question_amount = get_user_input_of_type(int, "Question Amount", range(1, 51))
-
-            case "Category":
-                category_menu = Menu("Category", quiz_categories)
-                category_menu.get_input()
-                self.quiz_category = category_menu.user_input
-
-            case "Difficulty":
-                self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Any, Easy, Medium, Hard)",
-                                                              ["Any", "Easy", "Medium", "Hard"])
-
-            case "Type":
-                self.question_type = get_user_input_of_type(str, "Type (Any, Multiple, True/False)",
-                                                            ["Any", "Multiple", "True/False"])
-
-            case "Next":
-
-                # Set up the users if the user is not hosting a server
-                if not self.host_a_server:
-                    self.set_users()
-
-        # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if questions_menu.user_input != "Next":
-            self.settings_questions()
 
     def settings_local(self) -> None:
         """
@@ -1218,9 +1175,6 @@ class Game(SaveFile):
         match single_player_menu.user_input:
             case "How many players":
                 self.how_many_players = get_user_input_of_type(int, "How many players")
-
-            case "Next":
-                self.settings_questions()
 
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
         if single_player_menu.user_input != "Next":
@@ -1249,9 +1203,6 @@ class Game(SaveFile):
             case "Max Players":
                 self.max_players = get_user_input_of_type(int, "Max Players")
 
-            case "Next":
-                self.settings_questions()
-
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
         if networking_menu.user_input != "Next":
             self.settings_networking()
@@ -1260,8 +1211,8 @@ class Game(SaveFile):
         """
         Shows a menu to configure the gameplay settings for the game
         """
-        game_play_menu_options = ["Host a server", "Time limit", "Show score after Question/Game",
-                                  "Show correct answer after Question/Game",
+        game_play_menu_options = ["Host a server", "Time limit", "Question Amount", "Category", "Difficulty", "Type",
+                                  "Show score after Question/Game", "Show correct answer after Question/Game",
                                   "Points for correct answer", "Points for incorrect answer",
                                   "Points for no answer", "Points multiplier for a streak",
                                   "Compounding amount for a streak", "Randomise questions",
@@ -1269,7 +1220,8 @@ class Game(SaveFile):
                                   "Pick random question when run out of time",
                                   "Bot difficulty", "Number of bots", "Next"]
 
-        game_play_menu_values = [str(self.host_a_server), str(self.time_limit),
+        game_play_menu_values = [str(self.host_a_server), str(self.time_limit), str(self.question_amount),
+                                 str(self.quiz_category), str(self.quiz_difficulty), str(self.question_type),
                                  str(self.show_score_after_question_or_game),
                                  str(self.show_correct_answer_after_question_or_game),
                                  str(self.points_for_correct_answer), str(self.points_for_incorrect_answer),

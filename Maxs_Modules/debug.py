@@ -7,6 +7,7 @@ from datetime import datetime
 use_debug = True
 initialised_debug = False
 debugger = None
+in_ide = False
 
 session_message_log = []
 session_error_log = []

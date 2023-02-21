@@ -6,11 +6,6 @@ import types
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.debug import debug_message, error
 
-# Get the setup data
-setup = UserData()
-setup.get_packages(["requests"])
-
-import requests
 import socket
 import selectors
 
@@ -261,6 +256,13 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
     @param type: The type of the questions
     @return: A list of dictionaries containing the questions
     """
+
+    # Get the setup data
+    setup = UserData()
+    setup.get_packages(["requests"])
+
+    import requests
+
     redo = True
     api_fix = 0
 

@@ -138,6 +138,7 @@ class Menu:
     wrap_mode = WrapMode.WORD
     page_number = 1
     items_per_page = max_menu_items_per_page
+    time_limit = 0
 
     def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> None:
         """
@@ -158,12 +159,10 @@ class Menu:
         """
         os.system("cls")
 
-    def get_input(self) -> None:
+    def show_menu(self) -> list:
         """
-        Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
-        item in the user_input variable
+        Prints the menu to a clear screen
         """
-
         # Store menu_items as a local variable as it can be changed if the menu is split into pages
         menu_items = self.get_pages()
 
@@ -174,11 +173,21 @@ class Menu:
 
         # Print the menu
         print(divider)
-        text_in_divider(" " + self.title, self.wrap_mode)
+        text_in_divider(" [Page: " + str(self.page_number) + "] # " + self.title, self.wrap_mode)
         if self.multi_dimensional:
             show_menu_double(menu_items, self.wrap_mode)
         else:
             show_menu(menu_items, self.wrap_mode)
+
+        return menu_items
+
+    def get_input(self) -> None:
+        """
+        Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
+        item in the user_input variable
+        """
+
+        menu_items = self.show_menu()
 
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
@@ -294,11 +303,15 @@ class Menu:
         Splits the menu items into pages if there are more than the max menu items in the list of items
         @return: The current page of menu items (a list of 10 options, including previous and next page)
         """
+
         # Store menu_items as a local variable as dont want to change the original
-        menu_items = self.items
+        menu_items = self.items.copy()
+        menu_items_count = len(menu_items)
+        if self.multi_dimensional:
+            menu_items_count = len(menu_items[0])
 
         # Check if the items have to be split into pages
-        if len(menu_items) > self.items_per_page:
+        if menu_items_count > self.items_per_page:
             # Get the items for the current page
             slice_start = (self.page_number - 1) * self.items_per_page
             slice_end = (self.page_number * self.items_per_page)
@@ -308,7 +321,7 @@ class Menu:
                 slice_start += 1
 
             # Check if the "Next Page" option is going to be added, if so need to minus 1 from the slice end
-            if len(menu_items) > slice_end:
+            if menu_items_count > slice_end:
                 slice_end -= 1
 
             # If the menu is multi dimensional, then the items are stored in a list of lists and both arrays need to be
@@ -323,10 +336,9 @@ class Menu:
                     menu_items[1].insert(0, str(self.page_number - 1))
 
                 # Check if there is going to be another page and if so add the "Next Page" option
-                if len(menu_items[0]) == self.items_per_page - 1:
+                if len(menu_items[0]) == self.items_per_page - 1 and "Next" not in menu_items[0]:
                     menu_items[0].append("Next Page")
                     menu_items[1].append(str(self.page_number + 1))
-
             else:
                 menu_items = menu_items[slice_start: slice_end]
 

@@ -1,5 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
 import os
+import subprocess
 import sys
 
 from Maxs_Modules.files import SaveFile
@@ -67,7 +68,7 @@ class UserData(SaveFile):
         self.display_mode = set_if_none(self.display_mode, "CLI")
         self.network = set_if_none(self.network, False)
         self.auto_fix_api = set_if_none(self.auto_fix_api, True)
-        self.python_exe_command = set_if_none(self.python_exe_command, False)
+        self.python_exe_command = set_if_none(self.python_exe_command, "python")
         self.packages = set_if_none(self.packages, [])
         self.use_py_env = set_if_none(self.use_py_env, False)
         self.py_env_pip_path = set_if_none(self.py_env_pip_path, "")
@@ -92,9 +93,11 @@ class UserData(SaveFile):
             if package not in self.packages:
                 self.install_package(package)
                 self.packages.append(package)
+                self.save()
 
-        # Save the list of packages
-        self.save()
+                # Restart the script with the new packages
+                subprocess.call(sys.executable + ' "' + os.path.realpath(__file__) + '"')
+
 
     def init_script(self) -> None:
         """

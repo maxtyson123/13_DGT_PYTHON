@@ -23,6 +23,7 @@ from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import get_user_input_of_type, strBool
 
+
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
 
@@ -202,7 +203,6 @@ def main() -> None:
     """
     The main function, initialise the program and show the main menu
     """
-
 
     # Show the main menu
     main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue"])
