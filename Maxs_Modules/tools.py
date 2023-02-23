@@ -2,7 +2,8 @@
 import time
 
 from Maxs_Modules.debug import error, show_debug_menu, in_ide
-
+# - - - - - - - Variables - - - - - - -#
+imported_timeout = False
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -51,6 +52,28 @@ def strBool(text: str) -> bool:
         raise ValueError()
 
 
+def ipAdress(text: str) -> Exception or str:
+    """
+    A function to check for a valid IP address
+    @param text:  The text to check
+    @return: True if the text is a valid IP address, False if it isn't
+    """
+
+    # Check if the text is a valid IP address
+    if text.count(".") != 3:
+        raise ValueError()
+
+    # Check if the octets are valid
+    for part in text.split("."):
+        if not part.isdigit():
+            raise ValueError()
+
+        if not 0 <= int(part) <= 255:
+            raise ValueError()
+
+    return text
+
+
 def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None,
                            allow_these: list = None, max_time: int = 0) -> object:
     """
@@ -78,10 +101,15 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
         # running in the IDE
         if max_time != 0 and not in_ide:
 
-            from Maxs_Modules.setup import UserData
+            # Dont continuously import inputimeout, and there is no need to install it and import it if there is no
+            # need for it yet
+            global imported_timeout
+            if not imported_timeout:
+                imported_timeout = True
+                from Maxs_Modules.setup import UserData
+                setup = UserData()
+                setup.get_packages(["inputimeout"])
 
-            setup = UserData()
-            setup.get_packages(["inputimeout"])
             from inputimeout import inputimeout, TimeoutOccurred
 
             # Check if the time limit has been reached
@@ -97,7 +125,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
             except TimeoutOccurred:
                 return None
-
         else:
             user_input = input(input_message + " > ")
 
@@ -164,4 +191,3 @@ def try_convert(variable: object, type_to_convert: object, supress_errors: bool 
         if not supress_errors:
             error("Invalid input")
         return None
-

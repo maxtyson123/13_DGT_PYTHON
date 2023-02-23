@@ -3,7 +3,7 @@
 
 import os
 
-from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu
+from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message
 from Maxs_Modules.tools import try_convert
 
 # - - - - - - - Variables - - - - - - -#
@@ -173,7 +173,7 @@ class Menu:
 
         # Print the menu
         print(divider)
-        text_in_divider(" [Page: " + str(self.page_number) + "] # " + self.title, self.wrap_mode)
+        text_in_divider(" " + self.title, self.wrap_mode)
         if self.multi_dimensional:
             show_menu_double(menu_items, self.wrap_mode)
         else:
@@ -181,7 +181,7 @@ class Menu:
 
         return menu_items
 
-    def get_input(self) -> None:
+    def get_input(self, user_input: str = None) -> None:
         """
         Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
         item in the user_input variable
@@ -192,10 +192,22 @@ class Menu:
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
 
+            debug_message(f"Using pre-input ({menu_manager.pre_input[0]}) from {menu_manager.pre_input}")
+
+            valid = menu_manager.pre_input[0] < len(menu_items)
+
+            # Check if the pre-input is a valid option index for this menu (multi-dimensional)
+            if self.multi_dimensional:
+                valid = menu_manager.pre_input[0] < len(menu_items[0])
+
             # Check if the pre-input is a valid option index for this menu
-            if menu_manager.pre_input[0] < len(menu_items):
+            if valid:
+
                 # Store the input
-                self.user_input = menu_items[menu_manager.pre_input[0]]
+                if self.multi_dimensional:
+                    self.user_input = menu_items[0][menu_manager.pre_input[0]]
+                else:
+                    self.user_input = menu_items[menu_manager.pre_input[0]]
 
                 # Remove the pre-input
                 menu_manager.pre_input.pop(0)
@@ -208,7 +220,7 @@ class Menu:
 
             else:
                 # Print an error
-                error("The pre-input (" + str(menu_manager.pre_input[0]) + ") was not a valid option for this menu")
+                error("The pre-input (" + str(menu_manager.pre_input[0]) + ") was not a valid option for this menu ")
 
                 # Clear the pre-input
                 menu_manager.pre_input = []
@@ -224,10 +236,10 @@ class Menu:
 
         # Get the user input and validate it, note cant use the get_user_input_of_type function as the menu also
         # allows for "pre-input" and choosing an item index or the item itself
-        user_input = ""
 
         while True:
-            user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
+            if user_input is None:
+                user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
 
             # Check if it is a debug command
             if "debug" in user_input:
@@ -289,20 +301,14 @@ class Menu:
 
         menu_manager.menu_history_input.append(self.user_input)
 
-        # Handle the Next, Previous page options
-        if self.user_input == "Next Page":
-            self.page_number += 1
-            self.get_input()
-
-        elif self.user_input == "Previous Page":
-            self.page_number -= 1
-            self.get_input()
-
     def get_pages(self) -> list:
         """
         Splits the menu items into pages if there are more than the max menu items in the list of items
         @return: The current page of menu items (a list of 10 options, including previous and next page)
         """
+
+        # Will finish pages later if i have time but right now they are not working
+        return self.items
 
         # Store menu_items as a local variable as dont want to change the original
         menu_items = self.items.copy()
@@ -316,39 +322,36 @@ class Menu:
             slice_start = (self.page_number - 1) * self.items_per_page
             slice_end = (self.page_number * self.items_per_page)
 
-            # Check if the "Previous Page" option is going to be added, if so need to add 1 to the slice start
+            # Check if the "Previous Page" option is going to be added, if so need to remove one from the slice end
+            # to ensure the max items per page is not exceeded
             if self.page_number > 1:
-                slice_start += 1
+                slice_start -= 1
+
+                if self.multi_dimensional:
+                    menu_items[0].insert(slice_start, "Previous Page")
+                    menu_items[1].insert(slice_start, str(self.page_number - 1))
+                else:
+                    menu_items.insert(slice_start, "Previous Page")
+
+
 
             # Check if the "Next Page" option is going to be added, if so need to minus 1 from the slice end
             if menu_items_count > slice_end:
-                slice_end -= 1
+                if self.multi_dimensional:
+                    menu_items[0].insert(slice_end, "Next Page")
+                    menu_items[1].insert(slice_end, str(self.page_number + 1))
+                else:
+                    menu_items.insert(slice_end, "Next Page")
+
+                slice_end += 1
 
             # If the menu is multi dimensional, then the items are stored in a list of lists and both arrays need to be
             # sliced
             if self.multi_dimensional:
                 menu_items[0] = menu_items[0][slice_start: slice_end]
                 menu_items[1] = menu_items[1][slice_start: slice_end]
-
-                # Check if there is a previous page and if so add the "Previous Page" option
-                if self.page_number > 1:
-                    menu_items[0].insert(0, "Previous Page")
-                    menu_items[1].insert(0, str(self.page_number - 1))
-
-                # Check if there is going to be another page and if so add the "Next Page" option
-                if len(menu_items[0]) == self.items_per_page - 1 and "Next" not in menu_items[0]:
-                    menu_items[0].append("Next Page")
-                    menu_items[1].append(str(self.page_number + 1))
             else:
                 menu_items = menu_items[slice_start: slice_end]
-
-                # Check if there is a previous page and if so add the "Previous Page" option
-                if self.page_number > 1:
-                    menu_items.insert(0, "Previous Page")
-
-                # Check if there is going to be another page and if so add the "Next Page" option
-                if len(menu_items) == self.items_per_page - 1:
-                    menu_items.append("Next Page")
 
         return menu_items
 

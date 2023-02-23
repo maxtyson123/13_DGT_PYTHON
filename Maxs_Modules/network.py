@@ -129,32 +129,38 @@ class QuizServer:
         @param key: The key to the client
         @param mask: The mask to the client
         """
-        sock = key.fileobj
-        data = key.data
 
-        # If the socket has its read bit set
-        if mask & selectors.EVENT_READ:
+        try:
+            sock = key.fileobj
+            data = key.data
 
-            # Get the data
-            recv_data = sock.recv(4096)
+            # If the socket has its read bit set
+            if mask & selectors.EVENT_READ:
 
-            # If there is no data then the connection has been closed
-            if recv_data:
-                self.handle_data_received(sock, data, recv_data)
+                # Get the data
+                recv_data = sock.recv(4096)
 
-            else:
-                # Print the address
-                print(f"Closing connection on {data.addr}")
+                # If there is no data then the connection has been closed
+                if recv_data:
+                    self.handle_data_received(sock, data, recv_data)
 
-                # Close the connection
-                self.close_connection(sock)
+                else:
+                    # Print the address
+                    print(f"Closing connection on {data.addr}")
 
-        # If the socket has its write bit set
-        if mask & selectors.EVENT_WRITE:
+                    # Close the connection
+                    self.close_connection(sock)
 
-            # If there is data to send
-            if data.outb:
-                self.handle_data_send(sock, data, data.outb)
+            # If the socket has its write bit set
+            if mask & selectors.EVENT_WRITE:
+
+                # If there is data to send
+                if data.outb:
+                    self.handle_data_send(sock, data, data.outb)
+
+        except Exception as e:
+            error(f"Error in connection ({data.addr}) : {e}")
+            self.close_connection(sock)
 
     def handle_data_received(self, sock, key_data, recv_data: bytes):
         """
@@ -171,6 +177,18 @@ class QuizServer:
 
         @param send_data: The data sent
         """
+
+    def send_message(self, sock, message: str, message_type: str):
+        """
+        Send a message to the clients
+
+        @param message_type: The type of message to send
+        @param sock: The socket to send the message on
+        @param message: The message to send
+        """
+        message = QuizMessage(message, get_ip(), self.host, message_type)
+        debug_message(f"Sending {message}", "network_server")
+        sock.sendall(message.to_bytes())
 
 
 class QuizClient:
@@ -204,28 +222,48 @@ class QuizClient:
             events = self.selector.select(timeout=1)
 
             for key, mask in events:
-                sock = key.fileobj
-                data = key.data
 
-                # Check if there is a message to send
-                print(self.message_queue)
+                try:
+                    sock = key.fileobj
+                    data = key.data
 
-                # If the socket has its read bit set
-                if mask & selectors.EVENT_READ:
+                    # Check if there is a message to send
+                    print(self.message_queue)
 
-                    # Get the data
-                    recv_data = sock.recv(4096)
+                    # If the socket has its read bit set
+                    if mask & selectors.EVENT_READ:
 
-                    # If there is no data then the connection has been closed
-                    if recv_data:
-                        self.handle_response(sock, data, recv_data)
+                        # Get the data
+                        recv_data = sock.recv(4096)
 
-                # If the socket has its write bit set
-                if mask & selectors.EVENT_WRITE:
+                        # If there is no data then the connection has been closed
+                        if recv_data:
+                            self.handle_response(sock, data, recv_data)
 
-                    # If there is data to send
-                    if data.outb:
-                        self.handle_request(sock, data, data.outb)
+                    # If the socket has its write bit set
+                    if mask & selectors.EVENT_WRITE:
+
+                        # If there is data to send
+                        if data.outb:
+                            self.handle_request(sock, data, data.outb)
+
+                except Exception as e:
+                    error(f"Error in client: {e}")
+                    self.close_connection(sock)
+
+
+    def close_connection(self, sock):
+        """
+        Close a connection from a client
+
+        @param sock: The socket to close the connection from
+        """
+
+        # Unregister the socket from the selector
+        self.selector.unregister(sock)
+
+        # Close the socket
+        sock.close()
 
     def handle_response(self, sock, key_data, recv_data: bytes):
         pass
@@ -233,15 +271,46 @@ class QuizClient:
     def handle_request(self, sock, key_data, send_data: bytes):
         pass
 
-    def send_message(self, sock,  message: str, message_type: str):
+    def send_message(self, sock, message: str, message_type: str):
         """
         Send a message to the server
 
+        @param message_type: The type of message to send
+        @param sock: The socket to send the message on
         @param message: The message to send
         """
         message = QuizMessage(message, get_ip(), self.host, message_type)
         debug_message(f"Sending {message}", "network_client")
         sock.sendall(message.to_bytes())
+
+
+class QuizGameServer(QuizServer):
+
+    game = None
+
+    def handle_data_received(self, sock, key_data, recv_data: bytes):
+        """
+        Handle data received from a client
+
+        @param sock: The socket to handle the data from
+        @param key_data:
+        @param recv_data: The data received
+        """
+
+        # Convert the data to a message
+        message = QuizMessage(None, None, None, None)
+        message.from_bytes(recv_data)
+
+        # Handle the messasge
+        match message.message_type:
+            case "client_join":
+                print(f"Player {message.message} has joined the game")
+                self.game.users.append(message.message)
+                self.game.convert_users()
+            case _:
+                print(f"Unhandled message: {message.message}")
+
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -324,11 +393,16 @@ def connect_to_server(server_ip: str, port: int) -> socket.socket:
     @return: The socket object
     """
 
+
     # Create the socket. AF_INET is ipv4 and SOCK_STREAM is TCP
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Connect to the server
-    sock.connect((server_ip, port))
+    try:
+        # Connect to the server
+        sock.connect((server_ip, port))
+    except Exception as e:
+        error(f"Failed to connect to server: {e}")
+        return None
 
     # Return the socket
     return sock
@@ -459,6 +533,5 @@ def test_echo_client():
             break
 
         client.message_queue.append([message, "echo"])
-
 
 # Note to self: using https://realpython.com/python-sockets/
