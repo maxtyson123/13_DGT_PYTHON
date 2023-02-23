@@ -168,7 +168,11 @@ def init_debug() -> None:
                         self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
 
                     case "-ignore-remove":
-                        item_to_remove = get_user_input_of_type(str, "Log type to remove: ")
+                        # Remove the log type from the ignore list
+                        try:
+                            self.log_ignore.pop(self.log_ignore.index(get_user_input_of_type(str, "Log type to remove: ")))
+                        except ValueError:
+                            print("Log type not found")
 
                     case "-ignore-list":
                         print("Log types to ignore:")

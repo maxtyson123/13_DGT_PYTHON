@@ -18,12 +18,12 @@
 #  [x] Set Users : Sets the users for the game. (Single player mode only)
 #  [x] Get Questions : Gets the questions from the server (API).
 #  == (Networking functions) ==
-#  [ ] Connect : Connects to a server.
-#  [ ] Disconnect : Disconnects from a server.
-#  [ ] Send : Sends data to a server.
-#  [ ] Receive : Receives data from a server.
+#  [x] Connect : Connects to a server.
+#  [x] Disconnect : Disconnects from a server.
+#  [x] Send : Sends data to a server.
+#  [x] Receive : Receives data from a server.
 #  [ ] Sync : Syncs the game with the server.
-#  [ ] Host : Hosts a server.
+#  [x] Host : Hosts a server.
 #  [x] Get Quiz Data : Gets the quiz data from the server (API).
 #  == (Gameplay functions) ==
 #  [x] Display Options : Displays the options for the question.
@@ -51,7 +51,7 @@
 #  [x] Bot Difficulty : The difficulty of the bot (% chance of picking the right answer out of 100).
 #  == (Network Settings) ==
 #  [ ] Server Name : The name of the server.
-#  [ ] Server Port : The port of the server (1234 by default).
+#  [x] Server Port : The port of the server (1234 by default).
 #  [ ] Max Players : The maximum amount of players.
 #  == (Single Player Settings) ==
 #  [x] How many players : The amount of players.
@@ -74,7 +74,7 @@ import html
 import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file
-from Maxs_Modules.network import get_ip, QuizGameServer, QuizClient
+from Maxs_Modules.network import get_ip, QuizGameServer, QuizClient, QuizGameClient
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
@@ -553,10 +553,11 @@ class Game(SaveFile):
 
         # For each user in the list of users convert the dict to a User object using the load() function
         for x in range(len(self.users)):
-
             # Check if the user is already a User object
-            if type(self.users[0]) is User:
+            if type(self.users[x]) is User:
                 continue
+
+            print(f"Converting user {x} to a User object")
 
             # Load
             user_object = User()
@@ -1351,7 +1352,13 @@ class Game(SaveFile):
 
         while True:
             players = [f"Server IP: {get_ip()}:{self.server_port}"]
+
+            # Convert any users that have been added in
+            self.convert_users()
+
+            # Loop through all the users
             for user in self.users:
+                # Add them to the list
                 players.append(user.styled_name())
             players.append("Start game")
                 
@@ -1364,7 +1371,7 @@ class Game(SaveFile):
         Joins a game
         """
         # Create a socket
-        self.backend = QuizClient(ip, port)
+        self.backend = QuizGameClient(ip, port)
 
         # Thread the server
         self.server_thread = threading.Thread(target=self.backend.run)
@@ -1372,11 +1379,8 @@ class Game(SaveFile):
 
         self.set_users()
 
-        print("Connected to server on " + ip + ":" + str(port) + "!")
-        #self.save()
-
-        print(str(self.backend))
-        print("Sending hello message...")
+        debug_message("Connected to server on " + ip + ":" + str(port) + "!", "game_server")
+        self.joined_game = True
 
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__.copy()
@@ -1385,9 +1389,19 @@ class Game(SaveFile):
         for user_index in range(len(self.users)):
             self.save_data["users"][user_index] = self.users[user_index].__dict__
 
+
+        debug_message("Sending hello message...", "game_server")
         self.backend.send_message(self.backend.client, self.save_data["users"][0], "client_join")
 
-        while True:
+        # Wait for the server to start the game
+        os.system("cls")
+        print(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
+        print("Waiting for server to start the game...")
+        while not self.backend.game_started:
             pass
+
+# TODO: Start game, dont allow more than specified number of players, dont allow players to join after game has started
+# TODO: Sync Game when game starts, get users to send their own objects when answered, wait for players to answer,
+#  sync the answers on the score menu
 
 

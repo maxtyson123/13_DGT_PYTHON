@@ -70,8 +70,6 @@ class SaveFile:
                     os.remove(self.save_file)
                     return
 
-                debug_message(str(self.save_data), "save_file")
-
                 # Note: the subclass has to load the data from the save_data dictionary as there is no way for the
                 # super class to interact with the subclass
 

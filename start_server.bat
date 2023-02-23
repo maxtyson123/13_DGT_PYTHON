@@ -1,0 +1,1 @@
+main.py --pass_input "1,1,18,3"

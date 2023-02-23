@@ -306,10 +306,13 @@ class QuizGameServer(QuizServer):
             case "client_join":
                 print(f"Player {message.message} has joined the game")
                 self.game.users.append(message.message)
-                self.game.convert_users()
             case _:
                 print(f"Unhandled message: {message.message}")
 
+
+class QuizGameClient(QuizClient):
+    game = None
+    game_started = False
 
 
 # - - - - - - - Functions - - - - - - -#

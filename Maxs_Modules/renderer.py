@@ -250,6 +250,7 @@ class Menu:
                     command.pop(0)
 
                 show_debug_menu(command)
+                user_input = None
                 continue
 
             # Check if the user is wanting to do pre-input (i.e a list of indexs "1,4,3,2")
@@ -279,6 +280,7 @@ class Menu:
 
                 else:
                     error("Invalid pre-input, please enter a list of numbers separated by commas")
+                    user_input = None
                     continue
 
             # Check if the user inputted an allowed string
