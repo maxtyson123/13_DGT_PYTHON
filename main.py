@@ -5,9 +5,8 @@
 # [x] Clean Up
 # [x] Extended user experience: Colours, mulitpage menus
 # [x] Easier debugging
-# [ ] Multiplayer Base: Joining a game, creating a game, waiting for players
-# [ ] Multiplayer Game Logic: Scores sync questions sync
-# [ ] Multiplayer Extended: Chat, etc
+# [x] Multiplayer Base: Joining a game, creating a game, waiting for players
+# [.] Multiplayer Game Logic: Scores sync questions sync
 # [ ] Clean Up
 # [ ] GUI Base, port the current render to a simple GUI
 # [ ] GUI Extended, Buttons instead of based, css and other styling

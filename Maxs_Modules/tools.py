@@ -114,7 +114,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
 
             # Check if the time limit has been reached
             if time.time() - start_time > max_time:
-                error("Time limit reached")
                 return None
 
             # Calculate the time left

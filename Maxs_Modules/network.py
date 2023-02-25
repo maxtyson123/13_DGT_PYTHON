@@ -1,6 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import json
 import threading
+import time
 import types
 
 from Maxs_Modules.setup import UserData
@@ -109,6 +110,9 @@ class QuizServer:
         # Register the connection with the selector
         self.selector.register(connection, events, data=data)
 
+        # Add the connection to the list of clients
+        self.clients.append(connection)
+
     def close_connection(self, sock):
         """
         Close a connection from a client
@@ -159,8 +163,7 @@ class QuizServer:
                     self.handle_data_send(sock, data, data.outb)
 
         except Exception as e:
-            error(f"Error in connection ({data.addr}) : {e}")
-            self.close_connection(sock)
+            self.handle_error(sock, data, e)
 
     def handle_data_received(self, sock, key_data, recv_data: bytes):
         """
@@ -180,15 +183,30 @@ class QuizServer:
 
     def send_message(self, sock, message: str, message_type: str):
         """
-        Send a message to the clients
+        Send a message to the server
 
         @param message_type: The type of message to send
         @param sock: The socket to send the message on
         @param message: The message to send
         """
         message = QuizMessage(message, get_ip(), self.host, message_type)
-        debug_message(f"Sending {message}", "network_server")
+        debug_message(f"Sending...")
         sock.sendall(message.to_bytes())
+        debug_message(f"Sent {message}", "network_server")
+
+    def send_message_to_all(self, message: str, message_type: str):
+        """
+        Send a message to all clients
+
+        @param message_type: The type of message to send
+        @param message: The message to send
+        """
+        for client in self.clients:
+            self.send_message(client, message, message_type)
+
+    def handle_error(self, sock, key_data, error_response):
+        self.close_connection(sock)
+        error(f"Error in server: {error_response}")
 
 
 class QuizClient:
@@ -227,18 +245,29 @@ class QuizClient:
                     sock = key.fileobj
                     data = key.data
 
-                    # Check if there is a message to send
-                    print(self.message_queue)
-
                     # If the socket has its read bit set
                     if mask & selectors.EVENT_READ:
 
-                        # Get the data
-                        recv_data = sock.recv(4096)
+                        # Store all the data parts in a list
+                        fragments = []
+                        recv_data = b''
+
+                        # While there is data to read
+                        while True:
+                            data = sock.recv(4096)
+                            fragments.append(data)
+                            recv_data = b''.join(fragments)
+
+                            try:
+                                decoded = recv_data.decode()
+                                json.loads(decoded)
+                                break
+                            except ValueError:
+                                continue
 
                         # If there is no data then the connection has been closed
                         if recv_data:
-                            self.handle_response(sock, data, recv_data)
+                            self.handle_data_received(sock, data, recv_data)
 
                     # If the socket has its write bit set
                     if mask & selectors.EVENT_WRITE:
@@ -248,9 +277,7 @@ class QuizClient:
                             self.handle_request(sock, data, data.outb)
 
                 except Exception as e:
-                    error(f"Error in client: {e}")
-                    self.close_connection(sock)
-
+                    self.handle_error(sock, data, e)
 
     def close_connection(self, sock):
         """
@@ -258,18 +285,24 @@ class QuizClient:
 
         @param sock: The socket to close the connection from
         """
-
         # Unregister the socket from the selector
         self.selector.unregister(sock)
 
         # Close the socket
         sock.close()
 
-    def handle_response(self, sock, key_data, recv_data: bytes):
+        # Debug this
+        debug_message("Closed connection", "network_client")
+
+    def handle_data_received(self, sock, key_data, recv_data: bytes):
         pass
 
     def handle_request(self, sock, key_data, send_data: bytes):
         pass
+
+    def handle_error(self, sock, key_data, error_response):
+        self.close_connection(sock)
+        error(f"Error in client: {error_response}")
 
     def send_message(self, sock, message: str, message_type: str):
         """
@@ -285,8 +318,9 @@ class QuizClient:
 
 
 class QuizGameServer(QuizServer):
-
     game = None
+    running = False
+    error = None
 
     def handle_data_received(self, sock, key_data, recv_data: bytes):
         """
@@ -304,15 +338,127 @@ class QuizGameServer(QuizServer):
         # Handle the messasge
         match message.message_type:
             case "client_join":
-                print(f"Player {message.message} has joined the game")
+                # Check if the game has started
+                if self.game.game_started:
+                    self.send_message(sock, "Game has already started", "server_error")
+                    return
+
+                # Check if the game is full
+                if len(self.game.users) >= self.game.max_players:
+                    self.send_message(sock, "Game is full", "server_error")
+                    return
+
+                # Convert the user to a object
                 self.game.users.append(message.message)
+                temp_index = len(self.game.users) - 1
+                self.game.convert_users()
+
+                # Check if the username is taken, if so add a number to the end
+                for user_index in range(len(self.game.users)):
+                    # Ignore the user just added
+                    if user_index == temp_index:
+                        continue
+
+                    # If the username is taken
+                    user = self.game.users[user_index]
+                    if user.name == self.game.users[temp_index].name:
+                        # If the user is taken and connected then the name is taken so send an error
+                        if user.is_connected:
+                            self.send_message(sock, "Username is taken", "server_error")
+                            # Remove the user from the list
+                            self.game.users.pop(temp_index)
+                            return
+
+                        # Remove the user from the list as will use the old one
+                        self.game.users.pop(temp_index)
+                        return
+
+                        # This means the server is continuing a game so send the user their progress
+                        self.sync_game()
+                        # Wait for the game to be synced
+                        time.sleep(0.5)
+
+                # User is now connected
+                self.game.users[temp_index].is_connected = True
+                self.send_message(sock, "You have joined the game", "client_join")
+                print(f"Player {message.message} has joined the game")
+
             case _:
                 print(f"Unhandled message: {message.message}")
+
+    def sync_game(self):
+        # Ensure users have been converted, as timings can be off when networked
+        self.game.convert_users()
+
+        # Get the game data
+        self.game.prepare_save_data()
+        game_data = self.game.save_data
+
+        debug_message(f"Syncing game data: {game_data}", "network_server")
+
+        # Send the game data to all clients
+        self.send_message_to_all(game_data, "sync_game")
+
+    def handle_error(self, sock, key_data, error_response):
+        super().handle_error(sock, key_data, error_response)
+        self.running = False
 
 
 class QuizGameClient(QuizClient):
     game = None
-    game_started = False
+    running = False
+    error = None
+
+    def __init__(self, host: str, port: int):
+        super().__init__(host, port)
+
+    def handle_data_received(self, sock, key_data, recv_data: bytes):
+        """
+        Handle data received from a client
+
+        @param sock: The socket to handle the data from
+        @param key_data:
+        @param recv_data: The data received
+        """
+
+        # Convert the data to a message
+        message = QuizMessage(None, None, None, None)
+        message.from_bytes(recv_data)
+
+        # Handle the messasge
+        match message.message_type:
+            case "server_error":
+                debug_message("Closing connection", "network_client")
+                self.error = f"Server error: {message.message}"
+                self.close_connection(sock)
+                self.running = False
+
+            case "game_start":
+                self.game.game_started = True
+                debug_message("Game has started", "network_client")
+
+            case "sync_game":
+                self.game.save_data = message.message
+                # Load the save data into variables
+                self.game.load_from_saved()
+
+                # Set the default settings if the settings are none
+                self.game.set_settings_default()
+
+                # Convert the data
+                self.game.convert_users()
+                self.game.convert_bots()
+                self.game.convert_questions()
+
+                # Ensure that the joined_game flag is not lost
+                self.game.joined_game = True
+
+            case _:
+                print(f"Unhandled message: {message.message}")
+
+    def handle_error(self, sock, key_data, error_response):
+        super().handle_error(sock, key_data, error_response)
+        self.running = False
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -395,7 +541,6 @@ def connect_to_server(server_ip: str, port: int) -> socket.socket:
     @param port: The port of the server. Note: use any port higher than 1024 for privileged users
     @return: The socket object
     """
-
 
     # Create the socket. AF_INET is ipv4 and SOCK_STREAM is TCP
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

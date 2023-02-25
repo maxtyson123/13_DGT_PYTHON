@@ -153,8 +153,7 @@ class UserData(SaveFile):
                                                             "(" + Colour.true_or_false_styled() + "): ")
 
         # Get the python executable command
-        self.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command (e.g. python,"
-                                                         " python3, py): ")
+        self.python_exe_command = sys.executable
 
         # Check if the user wants to use a python virtual environment
         print("Note a python virtual environment can be buggy on WBHS computers and/or other admin restricted and is "

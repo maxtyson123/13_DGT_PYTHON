@@ -241,52 +241,57 @@ class Menu:
             if user_input is None:
                 user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
 
-            # Check if it is a debug command
-            if "debug" in user_input:
-                command = user_input.split(" ")
+            # Use try here as int doesnt use 'in'
+            try:
+                # Check if it is a debug command
+                if "debug" in user_input:
+                    command = user_input.split(" ")
 
-                # Check if there is a command and if there is then remove the "debug" part and pass the rest to the
-                if len(command) > 1:
-                    command.pop(0)
+                    # Check if there is a command and if there is then remove the "debug" part and pass the rest to the
+                    if len(command) > 1:
+                        command.pop(0)
 
-                show_debug_menu(command)
-                user_input = None
-                continue
-
-            # Check if the user is wanting to do pre-input (i.e a list of indexs "1,4,3,2")
-            if "," in user_input:
-                # Split the string into a list
-                user_input = user_input.split(",")
-
-                # Convert the list to ints
-                user_input = [try_convert(item, int, True) for item in user_input]
-
-                # Check if the list is valid
-                if None not in user_input:
-                    # Store the pre-input
-                    menu_manager.pre_input = user_input
-
-                    # Store the first input
-                    self.user_input = menu_items[menu_manager.pre_input[0]]
-
-                    # Remove the first input from the pre-input
-                    menu_manager.pre_input.pop(0)
-
-                    # Add the input to the input history
-                    menu_manager.menu_history_input.append(self.user_input)
-
-                    # Return
-                    return
-
-                else:
-                    error("Invalid pre-input, please enter a list of numbers separated by commas")
+                    show_debug_menu(command)
                     user_input = None
                     continue
 
-            # Check if the user inputted an allowed string
-            if user_input in input_items:
-                self.user_input = user_input
-                break
+                # Check if the user is wanting to do pre-input (i.e a list of indexs "1,4,3,2")
+                if "," in user_input:
+                    # Split the string into a list
+                    user_input = user_input.split(",")
+
+                    # Convert the list to ints
+                    user_input = [try_convert(item, int, True) for item in user_input]
+
+                    # Check if the list is valid
+                    if None not in user_input:
+                        # Store the pre-input
+                        menu_manager.pre_input = user_input
+
+                        # Store the first input
+                        self.user_input = menu_items[menu_manager.pre_input[0]]
+
+                        # Remove the first input from the pre-input
+                        menu_manager.pre_input.pop(0)
+
+                        # Add the input to the input history
+                        menu_manager.menu_history_input.append(self.user_input)
+
+                        # Return
+                        return
+
+                    else:
+                        error("Invalid pre-input, please enter a list of numbers separated by commas")
+                        user_input = None
+                        continue
+
+                # Check if the user inputted an allowed string
+                if user_input in input_items:
+                    self.user_input = user_input
+                    break
+
+            except Exception as e:
+                debug_message("Error in menu input: " + str(e))
 
             user_input = try_convert(user_input, int)
 
@@ -300,7 +305,7 @@ class Menu:
                     break
                 else:
                     error("Invalid input, please enter one of these: " + str(options))
-
+                    user_input = None
         menu_manager.menu_history_input.append(self.user_input)
 
     def get_pages(self) -> list:

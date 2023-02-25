@@ -90,6 +90,7 @@ quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Th
                    "Japanese Anime & Manga", "Cartoon & Animations"]
 host_a_server_by_default = True
 
+
 # - - - - - - - Functions - - - - - - -#
 
 
@@ -194,6 +195,11 @@ class User:
     average_time_missed = 0
     accuracy = 0
 
+    # States
+    is_host = False
+    is_connected = False
+    has_answered = False
+
     def __int__(self, name: str, colour: str, icon: str) -> None:
         """
         Creates a new user
@@ -243,10 +249,14 @@ class User:
 
         # Simple stats
         self.questions_answered = self.correct + self.incorrect
-        self.accuracy = self.correct / self.questions_answered
+
+        # Dont divide by 0
+        if self.questions_answered != 0:
+            self.accuracy = self.correct / self.questions_answered
 
         # Add all the times together and then divide by the length to get the mean
-        self.average_time = sum(self.times) / len(self.times)
+        if len(self.times) != 0:
+            self.average_time = sum(self.times) / len(self.times)
 
         # Loop through the answers and times and calculate the average time for correct and incorrect answers
         time_correct = []
@@ -413,6 +423,7 @@ class Game(SaveFile):
     online_enabled = None
     game_finished = None
     joined_game = None
+    game_started = False
 
     # API Conversion
     api_category = None
@@ -445,6 +456,21 @@ class Game(SaveFile):
         usersettings = UserData()
         self.online_enabled = usersettings.network
 
+        # Load the save data into variables
+        self.load_from_saved()
+
+        # Set the default settings if the settings are none
+        self.set_settings_default()
+
+        # Convert the data
+        self.convert_users()
+        self.convert_bots()
+        self.convert_questions()
+
+    def load_from_saved(self) -> None:
+        """
+        Loads the game's variables from the saved data (self.save_data)
+        """
         # Load User Settings
         self.host_a_server = try_convert(self.save_data.get("host_a_server"), str)
         self.time_limit = try_convert(self.save_data.get("time_limit"), int)
@@ -483,14 +509,6 @@ class Game(SaveFile):
         self.users = try_convert(self.save_data.get("users"), list)
         self.questions = try_convert(self.save_data.get("questions"), list)
         self.bots = try_convert(self.save_data.get("bots"), list)
-
-        # Set the default settings if the settings are none
-        self.set_settings_default()
-
-        # Convert the data
-        self.convert_users()
-        self.convert_bots()
-        self.convert_questions()
 
     def set_settings_default(self) -> None:
         """
@@ -719,7 +737,6 @@ class Game(SaveFile):
         if len(self.questions) == 0:
             self.get_questions()
 
-        print(f"Should the game host a server {self.host_a_server}")
         if self.host_a_server:
             self.wait_for_players()
 
@@ -1077,7 +1094,7 @@ class Game(SaveFile):
 
         debug_message("Checking if game has finished: " + str(self.current_question) + " of " + str(
             len(self.questions)) + " questions",
-              "Game")
+                      "Game")
 
         # Check if the game has finished
         if self.current_question == len(self.questions):
@@ -1143,25 +1160,32 @@ class Game(SaveFile):
         # Save the game
         self.save()
 
-    def save(self) -> None:
+    def prepare_save_data(self) -> None:
         """
-        Saves the game data to the file. Converts the user and question objects to dicts before saving and then
-        converts them back once written to the JSON file
+        Prepares the save data for the game by converting the classes to dicts and removing the socket and thread
         """
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__.copy()
 
         # Convert the user class to a dict
         for user_index in range(len(self.users)):
-            self.save_data["users"][user_index] = self.users[user_index].__dict__
+            # Check if the user is not already a dict (have to use isinstance as if it is a dict then user_index wont
+            # work)
+            if isinstance(self.users[user_index], User):
+                # Convert the user to a dict
+                self.users[user_index] = self.users[user_index].__dict__
 
         # Convert the question class to a dict
         for question_index in range(len(self.questions)):
-            self.save_data["questions"][question_index] = self.questions[question_index].__dict__
+            # Check if the question is a class
+            if type(self.questions[question_index]) == Question:
+                self.save_data["questions"][question_index] = self.questions[question_index].__dict__
 
         # Conver the bots to a dict
         for bot_index in range(len(self.bots)):
-            self.save_data["bots"][bot_index] = self.bots[bot_index].__dict__
+            # Check if the bot is a class
+            if type(self.bots[bot_index]) == Bot:
+                self.save_data["bots"][bot_index] = self.bots[bot_index].__dict__
 
         # Remove the thread and socket
         try:
@@ -1173,6 +1197,13 @@ class Game(SaveFile):
             del self.save_data["server_thread"]
         except KeyError:
             pass
+
+    def save(self) -> None:
+        """
+        Saves the game data to the file. Converts the user and question objects to dicts before saving and then
+        converts them back once written to the JSON file
+        """
+        self.prepare_save_data()
 
         # Call the super class save function
         super().save()
@@ -1202,7 +1233,6 @@ class Game(SaveFile):
             self.settings_local()
         else:
             self.set_users()
-
 
     def settings_networking(self) -> None:
         """
@@ -1331,6 +1361,12 @@ class Game(SaveFile):
         Waits for players to join the server
         """
 
+        # Set up the host (if there isnt one already)
+        if len(self.users) == 0:
+            self.set_users()
+            self.users[0].is_host = True
+            self.users[0].is_connected = True
+
         # Create a socket
         try:
             self.backend = QuizGameServer(get_ip(), self.server_port)
@@ -1345,13 +1381,12 @@ class Game(SaveFile):
 
         debug_message("Server started on " + get_ip() + ":" + str(self.server_port) + "!", "game_server")
 
-        # Set up this player
-        self.set_users()
-
-        self.save()
-
+        # Wait for players to join
+        self.game_started = False
+        self.backend.running = True
         while True:
-            players = [f"Server IP: {get_ip()}:{self.server_port}"]
+            ip_text = f"Server IP: {get_ip()}:{self.server_port}"
+            players = [ip_text]
 
             # Convert any users that have been added in
             self.convert_users()
@@ -1361,10 +1396,37 @@ class Game(SaveFile):
                 # Add them to the list
                 players.append(user.styled_name())
             players.append("Start game")
-                
+
             players_menu = Menu("Players", players)
             players_menu.show_menu()
-            get_user_input_of_type(str, "Select an option", max_time=1)
+            players_menu.user_input = get_user_input_of_type(int, "Select an option", max_time=3)
+
+            if players_menu.user_input == len(players) - 1:
+                if len(self.users) > 1:
+                    break
+                else:
+                    error("You need at least 2 players to start a game!")
+
+        # Wait loop has broken so therefore the game has started
+        self.game_started = True
+
+        # Sync the game
+        self.backend.sync_game()
+
+        # Send the start game message after syncing
+        time.sleep(0.5)
+        self.backend.send_message_to_all("synced so start game", "game_start")
+
+        if self.check_server_error(): return
+
+        # Start the game, check if the game has finished or play the game
+        if self.check_game_finished():
+            # If the game has finished then show the results
+            self.game_end()
+        else:
+            self.play()
+
+        if self.check_server_error(): return
 
     def join_game(self, ip, port):
         """
@@ -1372,36 +1434,52 @@ class Game(SaveFile):
         """
         # Create a socket
         self.backend = QuizGameClient(ip, port)
+        self.backend.game = self
 
         # Thread the server
         self.server_thread = threading.Thread(target=self.backend.run)
         self.server_thread.start()
 
+        # Set up the user and set it to connected and then convert to a dict
         self.set_users()
+        self.prepare_save_data()
 
         debug_message("Connected to server on " + ip + ":" + str(port) + "!", "game_server")
         self.joined_game = True
+        self.backend.running = True
 
-        # Create the save data for the UserSettings object
-        self.save_data = self.__dict__.copy()
-
-        # Convert the user class to a dict
-        for user_index in range(len(self.users)):
-            self.save_data["users"][user_index] = self.users[user_index].__dict__
-
-
-        debug_message("Sending hello message...", "game_server")
         self.backend.send_message(self.backend.client, self.save_data["users"][0], "client_join")
+
+        # Wait for send and response
+        time.sleep(1)
+
+        if self.check_server_error(): return
 
         # Wait for the server to start the game
         os.system("cls")
         print(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
         print("Waiting for server to start the game...")
-        while not self.backend.game_started:
+
+        # Wait for the server to start the game or socket to close
+        while not self.game_started and self.backend.running:
             pass
 
-# TODO: Start game, dont allow more than specified number of players, dont allow players to join after game has started
-# TODO: Sync Game when game starts, get users to send their own objects when answered, wait for players to answer,
-#  sync the answers on the score menu
+        if self.check_server_error(): return
 
+        # Play the game
+        self.play()
 
+        if self.check_server_error(): return
+
+    def check_server_error(self) -> bool:
+        # If the socket has closed then return and print any errors
+        if not self.backend.running:
+            if self.backend.error is not None:
+                os.system("cls")
+                error(self.backend.error)
+                input("Press enter to continue...")
+            return True
+        return False
+
+# TODO: get users to send their own objects when answered, wait for players to answer,
+#  sync the answers on the score menu, More error handling
