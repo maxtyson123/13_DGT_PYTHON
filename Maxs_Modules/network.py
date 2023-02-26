@@ -126,6 +126,9 @@ class QuizServer:
         # Close the socket
         sock.close()
 
+        # Remove the socket from the list of clients
+        self.clients.remove(sock)
+
     def service_connection(self, key, mask):
         """
         Service a connection from a client
@@ -369,19 +372,39 @@ class QuizGameServer(QuizServer):
                             self.game.users.pop(temp_index)
                             return
 
+                        debug_message(f"Removing index {temp_index}", "network_server")
+
                         # Remove the user from the list as will use the old one
                         self.game.users.pop(temp_index)
-                        return
+                        temp_index = user_index
 
                         # This means the server is continuing a game so send the user their progress
                         self.sync_game()
-                        # Wait for the game to be synced
                         time.sleep(0.5)
 
+                        break
+
+                self.game.convert_users()
                 # User is now connected
                 self.game.users[temp_index].is_connected = True
                 self.send_message(sock, "You have joined the game", "client_join")
                 print(f"Player {message.message} has joined the game")
+
+            case "sync_player":
+                user = message.message
+
+                index = 0
+
+                # Find the user to update
+                for user_index in range(len(self.game.users)):
+                    if self.game.users[user_index].name == user["name"]:
+                        self.game.users[user_index] = user
+                        index = user_index
+                        break
+
+                # Convert the users to objects
+                self.game.convert_users()
+                debug_message(f"Player: {self.game.users[index].name} has synced", "network_server")
 
             case _:
                 print(f"Unhandled message: {message.message}")
@@ -399,6 +422,41 @@ class QuizGameServer(QuizServer):
         # Send the game data to all clients
         self.send_message_to_all(game_data, "sync_game")
 
+        # Convert everything back
+        self.game.convert_all_from_save_data()
+
+    def sync_players(self):
+        # Ensure users have been converted, as timings can be off when networked
+        self.game.convert_users()
+
+        # Get the game data
+        self.game.prepare_save_data()
+        players = self.game.save_data["users"]
+
+        debug_message(f"Syncing player data: {players}", "network_server")
+
+        # Send the game data to all clients
+        self.send_message_to_all(players, "sync_players")
+
+        # Convert everything back
+        self.game.convert_all_from_save_data()
+
+    def sync_bots(self):
+        # Ensure bots have been converted, as timings can be off when networked
+        self.game.convert_bots()
+
+        # Get the game data
+        self.game.prepare_save_data()
+        bots = self.game.save_data["bots"]
+
+        debug_message(f"Syncing bot data: {bots}", "network_server")
+
+        # Send the game data to all clients
+        self.send_message_to_all(bots, "sync_bots")
+
+        # Convert everything back
+        self.game.convert_all_from_save_data()
+
     def handle_error(self, sock, key_data, error_response):
         super().handle_error(sock, key_data, error_response)
         self.running = False
@@ -408,6 +466,8 @@ class QuizGameClient(QuizClient):
     game = None
     running = False
     error = None
+    server = None
+    move_on = False
 
     def __init__(self, host: str, port: int):
         super().__init__(host, port)
@@ -420,6 +480,8 @@ class QuizGameClient(QuizClient):
         @param key_data:
         @param recv_data: The data received
         """
+        # TODO: Find a better way to get the server socket for sending messages
+        self.server = sock
 
         # Convert the data to a message
         message = QuizMessage(None, None, None, None)
@@ -433,9 +495,8 @@ class QuizGameClient(QuizClient):
                 self.close_connection(sock)
                 self.running = False
 
-            case "game_start":
-                self.game.game_started = True
-                debug_message("Game has started", "network_client")
+            case "move_on":
+                self.move_on = True
 
             case "sync_game":
                 self.game.save_data = message.message
@@ -445,13 +506,26 @@ class QuizGameClient(QuizClient):
                 # Set the default settings if the settings are none
                 self.game.set_settings_default()
 
-                # Convert the data
-                self.game.convert_users()
-                self.game.convert_bots()
-                self.game.convert_questions()
+                # Convert everything back
+                self.game.convert_all_from_save_data()
 
                 # Ensure that the joined_game flag is not lost
                 self.game.joined_game = True
+
+            case "sync_players":
+                synced_users = message.message
+                for user_index in range(len(synced_users)):
+                    self.game.users[user_index] = synced_users[user_index]
+
+                self.game.convert_users()
+                for user in self.game.users:
+                    print(f"Player: {user.name} has synced with a score of {user.points}")
+
+            case "sync_bots":
+                synced_bots = message.message
+                for bot_index in range(len(synced_bots)):
+                    self.game.bots[bot_index] = synced_bots[bot_index]
+                self.game.convert_bots()
 
             case _:
                 print(f"Unhandled message: {message.message}")
@@ -460,6 +534,23 @@ class QuizGameClient(QuizClient):
         super().handle_error(sock, key_data, error_response)
         self.running = False
 
+    def send_self(self):
+        # Convert the users to a dict
+        self.game.prepare_save_data()
+
+        # Get the user data
+        user_data = self.game.save_data["users"][self.game.current_user_playing]
+
+        # Send the user data to the server
+        self.send_message(self.server, user_data, "sync_player")
+
+        # Convert everything back
+        self.game.convert_all_from_save_data()
+
+    def wait_for_move_on(self):
+        self.move_on = False
+        while not self.move_on and self.running:
+            pass
 
 # - - - - - - - Functions - - - - - - -#
 

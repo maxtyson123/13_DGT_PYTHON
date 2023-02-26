@@ -212,6 +212,7 @@ class User:
         self.icon = icon
 
     def load(self, data: dict) -> None:
+        # Game Variables
         self.name = data.get("name")
         self.colour = data.get("colour")
         self.icon = data.get("icon")
@@ -223,6 +224,10 @@ class User:
         self.questions_missed = data.get("questions_missed")
         self.answers = data.get("answers")
         self.times = data.get("times")
+
+        # States
+        self.has_answered = data.get("has_answered")
+
         self.load_defaults()
 
     def load_defaults(self) -> None:
@@ -240,6 +245,9 @@ class User:
         self.questions_missed = set_if_none(self.questions_missed, 0)
         self.answers = set_if_none(self.answers, [])
         self.times = set_if_none(self.times, [])
+
+        # States
+        self.has_answered = set_if_none(self.has_answered, False)
 
     def calculate_stats(self) -> None:
         """
@@ -420,6 +428,7 @@ class Game(SaveFile):
     # State Settings
     current_question = None
     current_user_playing = None
+    current_user_playing_net_name = None
     online_enabled = None
     game_finished = None
     joined_game = None
@@ -462,10 +471,8 @@ class Game(SaveFile):
         # Set the default settings if the settings are none
         self.set_settings_default()
 
-        # Convert the data
-        self.convert_users()
-        self.convert_bots()
-        self.convert_questions()
+        # Convert everything back
+        self.convert_all_from_save_data()
 
     def load_from_saved(self) -> None:
         """
@@ -972,13 +979,18 @@ class Game(SaveFile):
         thread for the user input. Then it marks the question and calculates the score for the player. Afterwards it
         runs the next question
         """
+        # If its a networked game then get the local player as the sync overrides it
+        if self.joined_game:
+            # Loop through the users trying to find the saved name
+            for user_index in range(len(self.users)):
+                if self.users[user_index].name == self.current_user_playing_net_name:
+                    self.current_user_playing = user_index
+
         # Save the users progress
         self.save()
 
-        # Get the current question
+        # Get the current question & user
         question = self.questions[self.current_question]
-
-        # Get the current user
         current_user = self.users[self.current_user_playing]
 
         # Create options
@@ -1073,6 +1085,51 @@ class Game(SaveFile):
         # Move onto the next question
         self.current_question += 1
 
+        # Question is answered
+        self.users[self.current_user_playing].has_answered = True
+
+        # Check if backed is a server object
+        is_server = isinstance(self.backend, QuizGameServer)
+        is_client = isinstance(self.backend, QuizGameClient)
+
+        # If this is the server then sync the game
+        if is_server:
+            print("Waiting for all players to answer...")
+
+
+
+            # Wait for all players to answer
+            while True:
+                waiting = False
+
+                # Loop through the users until one is found that hasn't answered
+                for user in self.users:
+                    if user.has_answered is False:
+                        waiting = True
+
+                if not waiting:
+                    break
+                else:
+                    time.sleep(.5)
+
+            debug_message("All players have answered", "Game")
+
+            # Sync the players and bots (.5 seconds so the messages are separate)
+            self.backend.sync_players()
+            time.sleep(.5)
+            self.backend.sync_bots()
+            time.sleep(.5)
+            self.backend.send_message_to_all("Move on to: game finished / show scores / next question", "move_on")
+
+        # If this is a client then wait for the server to sync and all players to answer
+        elif is_client:
+            # Send the users answer to the server
+            self.backend.send_self()
+
+            print("Waiting for server to move on...")
+            # Wait for all players to answer
+            self.backend.wait_for_move_on()
+
         # Check if the game has finished
         if self.check_game_finished():
             # If the game has finished then show the results
@@ -1084,6 +1141,9 @@ class Game(SaveFile):
             self.show_scores()
 
         # Move onto the question
+        self.users[self.current_user_playing].has_answered = False
+        if is_client:
+            self.backend.send_self()
         self.play()
 
     def check_game_finished(self) -> bool:
@@ -1208,7 +1268,10 @@ class Game(SaveFile):
         # Call the super class save function
         super().save()
 
-        # Convert the data back to the original format
+        # Convert everything back
+        self.convert_all_from_save_data()
+
+    def convert_all_from_save_data(self) -> None:
         self.convert_users()
         self.convert_questions()
         self.convert_bots()
@@ -1361,11 +1424,11 @@ class Game(SaveFile):
         Waits for players to join the server
         """
 
-        # Set up the host (if there isnt one already)
+        # Set up the host (if there isn't one already) (host is always the first user in the list)
         if len(self.users) == 0:
             self.set_users()
-            self.users[0].is_host = True
-            self.users[0].is_connected = True
+        self.users[0].is_host = True
+        self.users[0].is_connected = True
 
         # Create a socket
         try:
@@ -1410,12 +1473,17 @@ class Game(SaveFile):
         # Wait loop has broken so therefore the game has started
         self.game_started = True
 
+        # Removed any unconnected users
+        for user in self.users:
+            if not user.is_connected:
+                self.users.remove(user)
+
         # Sync the game
         self.backend.sync_game()
 
         # Send the start game message after syncing
         time.sleep(0.5)
-        self.backend.send_message_to_all("synced so start game", "game_start")
+        self.backend.send_message_to_all("synced so start game", "move_on")
 
         if self.check_server_error(): return
 
@@ -1440,10 +1508,12 @@ class Game(SaveFile):
         self.server_thread = threading.Thread(target=self.backend.run)
         self.server_thread.start()
 
-        # Set up the user and set it to connected and then convert to a dict
+        # Set up the user
         self.set_users()
+        self.current_user_playing_net_name = self.users[0].name
         self.prepare_save_data()
 
+        # Setup States
         debug_message("Connected to server on " + ip + ":" + str(port) + "!", "game_server")
         self.joined_game = True
         self.backend.running = True
@@ -1461,14 +1531,11 @@ class Game(SaveFile):
         print("Waiting for server to start the game...")
 
         # Wait for the server to start the game or socket to close
-        while not self.game_started and self.backend.running:
-            pass
-
-        if self.check_server_error(): return
+        self.backend.wait_for_move_on()
 
         # Play the game
+        if self.check_server_error(): return
         self.play()
-
         if self.check_server_error(): return
 
     def check_server_error(self) -> bool:
@@ -1481,5 +1548,4 @@ class Game(SaveFile):
             return True
         return False
 
-# TODO: get users to send their own objects when answered, wait for players to answer,
-#  sync the answers on the score menu, More error handling
+# TODO: Wait for server to move on from score menu and then force all users to, handle game over, handle client quitting, More error handling

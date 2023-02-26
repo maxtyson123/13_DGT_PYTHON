@@ -7,6 +7,7 @@
 # [x] Easier debugging
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
 # [.] Multiplayer Game Logic: Scores sync questions sync
+# [ ] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser??, static server hosting
 # [ ] Clean Up
 # [ ] GUI Base, port the current render to a simple GUI
 # [ ] GUI Extended, Buttons instead of based, css and other styling
