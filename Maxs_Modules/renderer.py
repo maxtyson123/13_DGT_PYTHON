@@ -2,8 +2,9 @@
 
 
 import os
+import time
 
-from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message
+from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message, in_ide
 from Maxs_Modules.tools import try_convert
 
 # - - - - - - - Variables - - - - - - -#
@@ -15,6 +16,7 @@ divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
 max_menu_items_per_page = 10
+imported_timeout = False
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -189,6 +191,9 @@ class Menu:
 
         menu_items = self.show_menu()
 
+        # Store the start time
+        start_time = time.time()
+
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
 
@@ -238,10 +243,43 @@ class Menu:
         # allows for "pre-input" and choosing an item index or the item itself
 
         while True:
-            if user_input is None:
-                user_input = input("Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > ")
 
-            # Use try here as int doesnt use 'in'
+            if user_input is None:
+                input_promt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
+
+                # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
+                # running in the IDE
+                if self.time_limit != 0 and not in_ide:
+
+                    # Dont continuously import inputimeout, and there is no need to install it and import it if there is no
+                    # need for it yet
+                    global imported_timeout
+                    if not imported_timeout:
+                        imported_timeout = True
+                        from Maxs_Modules.setup import UserData
+                        setup = UserData()
+                        setup.get_packages(["inputimeout"])
+
+                    from inputimeout import inputimeout, TimeoutOccurred
+
+                    # Check if the time limit has been reached
+                    if time.time() - start_time > self.time_limit:
+                        self.user_input = None
+                        return
+
+                    # Calculate the time left
+                    time_left = self.time_limit - (time.time() - start_time)
+
+                    # Get the user input
+                    try:
+                        user_input = inputimeout(prompt=input_promt, timeout=time_left)
+                    except TimeoutOccurred:
+                        self.user_input = None
+                        return
+                else:
+                    user_input = input(input_promt)
+
+            # Use try here as int doesn't use 'in'
             try:
                 # Check if it is a debug command
                 if "debug" in user_input:

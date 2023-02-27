@@ -120,6 +120,8 @@ class QuizServer:
         @param sock: The socket to close the connection from
         """
 
+        debug_message(f"Closing connection on {sock}", "network_server")
+
         # Unregister the socket from the selector
         self.selector.unregister(sock)
 
@@ -127,7 +129,8 @@ class QuizServer:
         sock.close()
 
         # Remove the socket from the list of clients
-        self.clients.remove(sock)
+        if sock in self.clients:
+            self.clients.remove(sock)
 
     def service_connection(self, key, mask):
         """
@@ -206,6 +209,18 @@ class QuizServer:
         """
         for client in self.clients:
             self.send_message(client, message, message_type)
+
+    def kill(self):
+        """
+        Kill the server
+        """
+        # Close the clients
+        for client in self.clients:
+            self.close_connection(client)
+
+        # Close the server
+        self.close_connection(self.server)
+
 
     def handle_error(self, sock, key_data, error_response):
         self.close_connection(sock)
@@ -462,6 +477,7 @@ class QuizGameServer(QuizServer):
         self.running = False
 
 
+
 class QuizGameClient(QuizClient):
     game = None
     running = False
@@ -614,6 +630,7 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
             case 1:
                 error("No results found")
                 if user_data.auto_fix_api:
+                    print("Auto fixing API error...")
                     api_fix += 1
                     continue
 

@@ -90,8 +90,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     @return: The user input converted to the type specified
     """
 
-    # Store the time and input
-
     # Store the start time
     start_time = time.time()
 

@@ -680,10 +680,6 @@ class Game(SaveFile):
         # Convert the data into a list of Question objects
         self.convert_questions()
 
-        # Shuffle the questions if the user wants to
-        if self.randomise_questions:
-            random.shuffle(self.questions)
-
         # Save the questions to the file
         self.save()
 
@@ -708,7 +704,7 @@ class Game(SaveFile):
             match self.question_type:
                 case "Multiple Choice":
                     self.api_type = "multiple"
-                case "True or False":
+                case "True/False":
                     self.api_type = "boolean"
 
     def convert_questions(self) -> None:
@@ -744,7 +740,13 @@ class Game(SaveFile):
         if len(self.questions) == 0:
             self.get_questions()
 
-        if self.host_a_server:
+        # Shuffle the questions if the user wants to
+        if self.randomise_questions:
+            random.shuffle(self.questions)
+
+        print(f" Host a server value ({self.host_a_server}) is True: {self.host_a_server is True}")
+        if self.host_a_server is True:
+            print(self.host_a_server)
             self.wait_for_players()
 
         # Start the game, check if the game has finished or play the game
@@ -1020,11 +1022,10 @@ class Game(SaveFile):
         start_time = time.time()
 
         # Show the question and get the user input
-        question_menu.show_menu()
-        question_menu.user_input = get_user_input_of_type(str, "Enter your answer", max_time=self.time_limit)
+        question_menu.time_limit = self.time_limit
+        question_menu.get_input()
 
         if question_menu.user_input is not None:
-
             # As the user didn't miss then just leave the preheader blank
             current_user.answers.append("")
 
@@ -1032,7 +1033,6 @@ class Game(SaveFile):
             self.mark_question(question_menu.user_input, current_user)
 
         else:
-
             # If the game should pick a random question when the time runs out
             if self.pick_random_question:
                 # Add the Missed part to the user
@@ -1114,6 +1114,9 @@ class Game(SaveFile):
 
             debug_message("All players have answered", "Game")
 
+            # Moved on so reset question state
+            self.users[self.current_user_playing].has_answered = False
+
             # Sync the players and bots (.5 seconds so the messages are separate)
             self.backend.sync_players()
             time.sleep(.5)
@@ -1130,6 +1133,11 @@ class Game(SaveFile):
             # Wait for all players to answer
             self.backend.wait_for_move_on()
 
+            # Moved on so reset question state
+            self.users[self.current_user_playing].has_answered = False
+            if is_client:
+                self.backend.send_self()
+
         # Check if the game has finished
         if self.check_game_finished():
             # If the game has finished then show the results
@@ -1141,9 +1149,6 @@ class Game(SaveFile):
             self.show_scores()
 
         # Move onto the question
-        self.users[self.current_user_playing].has_answered = False
-        if is_client:
-            self.backend.send_self()
         self.play()
 
     def check_game_finished(self) -> bool:
@@ -1159,8 +1164,8 @@ class Game(SaveFile):
         # Check if the game has finished
         if self.current_question == len(self.questions):
 
-            # Check if it is another user's turn
-            if self.current_user_playing < len(self.users) - 1:
+            # Check if it is another user's turn (only if there is not a multiplayer game)
+            if self.current_user_playing < len(self.users) - 1 and self.backend is None:
                 # If it is another user's turn then move onto the next user
                 self.current_user_playing += 1
                 self.current_question = 0
@@ -1364,6 +1369,22 @@ class Game(SaveFile):
             case "Time limit":
                 self.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
 
+            case "Question Amount":
+                self.question_amount = get_user_input_of_type(int, "Question Amount (1-50)", range(1, 51))
+
+            case "Category":
+                category_menu = Menu("Category", quiz_categories)
+                category_menu.get_input()
+                self.quiz_category = category_menu.user_input
+
+            case "Difficulty":
+                self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Easy, Medium, Hard)", ["Easy", "Medium",
+                                                                                                       "Hard"])
+
+            case "Type":
+                self.question_type = get_user_input_of_type(str, "Type (Multiple, True/False)", ["Multiple",
+                                                                                                 "True/False"])
+
             case "Show score after Question/Game":
                 self.show_score_after_question_or_game = get_user_input_of_type(str,
                                                                                 "Show score after: (Question/Game)",
@@ -1461,10 +1482,10 @@ class Game(SaveFile):
             players.append("Start game")
 
             players_menu = Menu("Players", players)
-            players_menu.show_menu()
-            players_menu.user_input = get_user_input_of_type(int, "Select an option", max_time=3)
+            players_menu.time_limit = 3
+            players_menu.get_input()
 
-            if players_menu.user_input == len(players) - 1:
+            if players_menu.user_input == "Start game":
                 if len(self.users) > 1:
                     break
                 else:
@@ -1495,6 +1516,9 @@ class Game(SaveFile):
             self.play()
 
         if self.check_server_error(): return
+
+        # Kill the server
+        self.backend.kill()
 
     def join_game(self, ip, port):
         """
@@ -1538,6 +1562,9 @@ class Game(SaveFile):
         self.play()
         if self.check_server_error(): return
 
+        # Close the socket
+        self.backend.close_connection(self.backend.client)
+
     def check_server_error(self) -> bool:
         # If the socket has closed then return and print any errors
         if not self.backend.running:
@@ -1548,4 +1575,4 @@ class Game(SaveFile):
             return True
         return False
 
-# TODO: Wait for server to move on from score menu and then force all users to, handle game over, handle client quitting, More error handling
+# TODO: handle client quitting, loading bools from file dont work, More error handling
