@@ -7,7 +7,7 @@
 # [x] Easier debugging
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
 # [.] Multiplayer Game Logic: Scores sync questions sync
-# [ ] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser??, static server hosting
+# [ ] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
 # [ ] Clean Up and ake more efficient and correct commenting
 # [ ] GUI Base, port the current render to a simple GUI
 # [ ] GUI Extended, Buttons instead of based, css and other styling
@@ -31,7 +31,7 @@ program_args = sys.argv[1:]
 
 # - - - - - - - Functions - - - - - - -#
 
-def handle_arg(arg: str, get_value: bool = False) -> str:
+def handle_arg(arg: str, get_value: bool = False) -> str or None:
     for index in range(len(program_args)):
         if arg == program_args[index]:
             if get_value:

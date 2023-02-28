@@ -479,7 +479,7 @@ class Game(SaveFile):
         Loads the game's variables from the saved data (self.save_data)
         """
         # Load User Settings
-        self.host_a_server = try_convert(self.save_data.get("host_a_server"), str)
+        self.host_a_server = try_convert(self.save_data.get("host_a_server"), bool)
         self.time_limit = try_convert(self.save_data.get("time_limit"), int)
         self.show_score_after_question_or_game = try_convert(self.save_data.get("show_score_after_question_or_game"),
                                                              str)
@@ -744,9 +744,7 @@ class Game(SaveFile):
         if self.randomise_questions:
             random.shuffle(self.questions)
 
-        print(f" Host a server value ({self.host_a_server}) is True: {self.host_a_server is True}")
-        if self.host_a_server is True:
-            print(self.host_a_server)
+        if self.host_a_server:
             self.wait_for_players()
 
         # Start the game, check if the game has finished or play the game
@@ -1575,4 +1573,4 @@ class Game(SaveFile):
             return True
         return False
 
-# TODO: handle client quitting, loading bools from file dont work, More error handling
+# TODO: handle client quitting, More error handling
