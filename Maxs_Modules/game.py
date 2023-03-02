@@ -1094,8 +1094,6 @@ class Game(SaveFile):
         if is_server:
             print("Waiting for all players to answer...")
 
-
-
             # Wait for all players to answer
             while True:
                 waiting = False
@@ -1104,6 +1102,7 @@ class Game(SaveFile):
                 for user in self.users:
                     if user.has_answered is False:
                         waiting = True
+                        print(f"Waiting for {user.name} to answer...")
 
                 if not waiting:
                     break
@@ -1456,6 +1455,7 @@ class Game(SaveFile):
         except OSError:
             error("Could not create a socket. Please try again.")
             self.settings_networking()
+            return
 
         # Thread the server
         self.server_thread = threading.Thread(target=self.backend.run)
@@ -1523,8 +1523,12 @@ class Game(SaveFile):
         Joins a game
         """
         # Create a socket
-        self.backend = QuizGameClient(ip, port)
-        self.backend.game = self
+        try:
+            self.backend = QuizGameClient(ip, port)
+            self.backend.game = self
+        except OSError:
+            error("Could not create a socket. Please try again.")
+            return
 
         # Thread the server
         self.server_thread = threading.Thread(target=self.backend.run)
@@ -1573,4 +1577,4 @@ class Game(SaveFile):
             return True
         return False
 
-# TODO: handle client quitting, More error handling
+# TODO: Fix user progress loading. handle client quitting, More error handling

@@ -69,6 +69,7 @@ class QuizServer:
 
         self.selector = selectors.DefaultSelector()
         self.clients = []
+        self.client_names = []
 
         self.server = setup_tcp_server(self.port)
 
@@ -112,6 +113,7 @@ class QuizServer:
 
         # Add the connection to the list of clients
         self.clients.append(connection)
+        self.client_names.append(address)
 
     def close_connection(self, sock):
         """
@@ -129,8 +131,13 @@ class QuizServer:
         sock.close()
 
         # Remove the socket from the list of clients
-        if sock in self.clients:
-            self.clients.remove(sock)
+        for sock_index in range(len(self.clients)):
+            if self.clients[sock_index] == sock:
+                # Remove the client and name
+                self.clients.pop(sock_index)
+                self.client_names.pop(sock_index)
+                break
+
 
     def service_connection(self, key, mask):
         """
@@ -414,6 +421,7 @@ class QuizGameServer(QuizServer):
                 for user_index in range(len(self.game.users)):
                     if self.game.users[user_index].name == user["name"]:
                         self.game.users[user_index] = user
+                        self.game.users[user_index]["is_connected"] = True
                         index = user_index
                         break
 
@@ -476,6 +484,37 @@ class QuizGameServer(QuizServer):
         super().handle_error(sock, key_data, error_response)
         self.running = False
 
+    def close_connection(self, sock):
+        """
+        Close a connection from a client
+
+        @param sock: The socket to close the connection from
+        """
+
+        debug_message(f"Closing connection on {sock}", "network_server")
+
+        # Unregister the socket from the selector
+        self.selector.unregister(sock)
+
+        # Close the socket
+        sock.close()
+
+        # Remove the socket from the list of clients
+        for sock_index in range(len(self.clients)):
+            if self.clients[sock_index] == sock:
+
+                # Remove the player from the game
+                for user_index in range(len(self.game.users)):
+                    if self.game.users[user_index].name == self.client_names[sock_index]:
+                        # remove
+                        print(f"Player {self.game.users[user_index].name} has left the game")
+                        self.game.users.pop(user_index)
+                        break
+
+                # Remove the client and name
+                self.clients.pop(sock_index)
+                self.client_names.pop(sock_index)
+                break
 
 
 class QuizGameClient(QuizClient):
