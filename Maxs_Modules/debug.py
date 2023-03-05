@@ -1,13 +1,13 @@
 # - - - - - - - Imports - - - - - - -#
 import os
+import sys
 import time
 from datetime import datetime
 
 # - - - - - - - Variables - - - - - - -#
-use_debug = False
+
 initialised_debug = False
 debugger = None
-in_ide = False
 
 session_message_log = []
 session_error_log = []
@@ -19,8 +19,7 @@ def init_debug() -> None:
     Sets the debugger variable to a instance of the Debug class if the use_debug variable is True
     """
 
-    global debugger
-    global initialised_debug
+    global debugger, initialised_debug, in_ide, use_debug
 
     from Maxs_Modules.tools import try_convert, set_if_none
     from Maxs_Modules.files import SaveFile
@@ -35,10 +34,11 @@ def init_debug() -> None:
         max_log_history = 100  # The maximum amount of logs to store
         save_logs_location = "ProgramData/Logs"
         individual_log_files = False  # Weather or not to save the logs in individual files
+        local_db = False
 
         # Commands
-        commands = ["help", "logs", "errors", "server"]
-        handlers = [None, None, None, None]
+        commands = ["help", "logs", "errors", "server", "database"]
+        handlers = [None, None, None, None, None]
 
         def __init__(self) -> None:
             """
@@ -55,12 +55,14 @@ def init_debug() -> None:
             self.max_log_history = try_convert(self.save_data.get("max_log_history"), int)
             self.save_logs_location = try_convert(self.save_data.get("save_logs_location"), str)
             self.individual_log_files = try_convert(self.save_data.get("individual_log_files"), bool)
+            self.local_db = try_convert(self.save_data.get("local_db"), bool)
 
             # Load the default values if the data is not found
             self.load_defaults()
 
             # Load the handlers
-            self.handlers = [self.command_help, self.command_logs, self.command_errors, self.command_server]
+            self.handlers = [self.command_help, self.command_logs, self.command_errors, self.command_server,
+                             self.command_database]
 
         def load_defaults(self) -> None:
             """
@@ -87,6 +89,20 @@ def init_debug() -> None:
             if log_type not in self.log_ignore:
                 print(Colour.warning + "[DEBUG] (" + log_type + ")" + Colour.RESET + " : " + message)
                 session_message_log.append(message)
+
+        def command_database(self, *args: tuple) -> None:
+
+            if len(args) == 0:
+                args = ["-h"]
+
+            for arg in args:
+                match arg:
+                    case "-h":
+                        print("Params:")
+                        print(" -h: Shows this help message")
+                        print(" -store: Store the API data in a local database?")
+                        print(" -use: Use the local database?")
+                        print(" -clear: Clear the local database?")
 
         def command_server(self, *args: tuple) -> None:
 
@@ -170,7 +186,8 @@ def init_debug() -> None:
                     case "-ignore-remove":
                         # Remove the log type from the ignore list
                         try:
-                            self.log_ignore.pop(self.log_ignore.index(get_user_input_of_type(str, "Log type to remove: ")))
+                            self.log_ignore.pop(
+                                self.log_ignore.index(get_user_input_of_type(str, "Log type to remove: ")))
                         except ValueError:
                             print("Log type not found")
 
@@ -357,3 +374,23 @@ def error(error_message: str) -> None:
         session_error_log.append(error_message)
 
     time.sleep(2)
+
+
+def handle_arg(arg: str, get_value: bool = False) -> str or None:
+    program_args = sys.argv[1:]
+    for index in range(len(program_args)):
+        if arg == program_args[index]:
+            if get_value:
+                # Check if there is a value after this arg
+                if index != len(program_args):
+                    return program_args[index + 1]
+                else:
+                    return None
+
+            return arg
+
+    return None
+
+
+in_ide = (handle_arg("--ide") == "--ide")
+use_debug = (handle_arg("--debug") == "--debug")

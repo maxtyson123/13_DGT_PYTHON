@@ -433,6 +433,7 @@ class Game(SaveFile):
     game_finished = None
     joined_game = None
     game_started = False
+    game_loaded = False
 
     # API Conversion
     api_category = None
@@ -458,6 +459,7 @@ class Game(SaveFile):
         # generate a new save file
         if quiz_save is not None:
             super().__init__(data_folder + quiz_save)
+            self.game_loaded = True
         else:
             super().__init__(data_folder + generate_new_save_file())
 
@@ -611,6 +613,10 @@ class Game(SaveFile):
         """
         Gets the user to enter the names and colours for each user and then creates each bot
         """
+        # Clear the users and bots lists
+        self.users = []
+        self.bots = []
+
         user_id = 0
         while user_id != self.how_many_players:
 
@@ -636,13 +642,13 @@ class Game(SaveFile):
             # Add to list of users
             self.users.append(user)
 
-            # Create the bots
-            for x in range(self.how_many_bots):
-                bot = Bot()
-                bot.name = "Bot " + str(x + 1)
-                bot.colour = Colour.GREY + Colour.ITALIC
-                bot.accuracy = self.bot_difficulty / 100
-                self.bots.append(bot)
+        # Create the bots
+        for x in range(self.how_many_bots):
+            bot = Bot()
+            bot.name = "Bot " + str(x + 1)
+            bot.colour = Colour.GREY + Colour.ITALIC
+            bot.accuracy = self.bot_difficulty / 100
+            self.bots.append(bot)
 
     def get_questions(self) -> None:
         """
@@ -677,9 +683,6 @@ class Game(SaveFile):
 
         # Convert the data into a list of Question objects
         self.convert_questions()
-
-        # Save the questions to the file
-        self.save()
 
     def convert_question_settings_to_api(self) -> None:
         """
@@ -739,17 +742,19 @@ class Game(SaveFile):
             self.get_questions()
 
         # Shuffle the questions if the user wants to
-        if self.randomise_questions:
+        if self.randomise_questions and not self.game_loaded:
             random.shuffle(self.questions)
 
         if self.host_a_server:
             self.wait_for_players()
+            return
 
         # Start the game, check if the game has finished or play the game
         if self.check_game_finished():
             # If the game has finished then show the results
             self.game_end()
         else:
+            self.game_started = True
             self.play()
 
     def show_scores(self) -> None:
@@ -1101,7 +1106,8 @@ class Game(SaveFile):
                 if not waiting:
                     break
                 else:
-                    print_text_on_same_line("Waiting for: " + ", ".join(users_waiting) + "to answer" + "."*loading_amount)
+                    print_text_on_same_line(
+                        "Waiting for: " + ", ".join(users_waiting) + " to answer" + "." * loading_amount)
                     loading_amount += 1
                     if loading_amount > 3:
                         loading_amount = 1
@@ -1145,6 +1151,11 @@ class Game(SaveFile):
         if self.show_score_after_question_or_game == "Question":
             # Show the score
             self.show_scores()
+
+        # Check that the server hasnt closed
+        if is_client:
+            if self.check_server_error(): return
+
 
         # Move onto the question
         self.play()
@@ -1209,16 +1220,16 @@ class Game(SaveFile):
 
         # Reset the current question
         self.current_question = 0
-
-        # Reset the current user playing
         self.current_user_playing = 0
-
-        # Reset the game finished variable
         self.game_finished = False
 
         # Reset the users
         for user in self.users:
             user.reset()
+
+        # Shuffle the questions
+        if self.randomise_questions:
+            random.shuffle(self.questions)
 
         # Save the game
         self.save()
@@ -1285,29 +1296,31 @@ class Game(SaveFile):
         """
         Shows a menu to configure the settings for a local hosted game
         """
-        local_menu_options = ["How many players", "Next"]
-        local_menu_values = [str(self.how_many_players), "Questions Settings"]
+        local_menu_options = ["How many players", "Next", "Back"]
+        local_menu_values = [str(self.how_many_players), "Play Game", "Gameplay Settings"]
         single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
         single_player_menu.get_input()
 
         match single_player_menu.user_input:
             case "How many players":
                 self.how_many_players = get_user_input_of_type(int, "How many players")
+            case "Next":
+                self.set_users()
+            case "Back":
+                self.settings_gameplay()
 
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if single_player_menu.user_input != "Next":
+        if single_player_menu.user_input != "Next" and single_player_menu.user_input != "Back":
             self.settings_local()
-        else:
-            self.set_users()
 
     def settings_networking(self) -> None:
         """
         Shows a menu to configure the networking settings for the game
 
         """
-        networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next"]
+        networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next", "Back"]
         networking_menu_values = [str(self.server_name), str(self.server_port), str(self.max_players),
-                                  "Questions Settings"]
+                                  "Waiting for players", "Gameplay Settings"]
 
         networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
         networking_menu.get_input()
@@ -1323,8 +1336,14 @@ class Game(SaveFile):
             case "Max Players":
                 self.max_players = get_user_input_of_type(int, "Max Players")
 
+            case "Next":
+                pass
+
+            case "Back":
+                self.settings_gameplay()
+
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if networking_menu.user_input != "Next":
+        if networking_menu.user_input != "Next" and networking_menu.user_input != "Back":
             self.settings_networking()
 
     def settings_gameplay(self) -> None:
@@ -1338,7 +1357,7 @@ class Game(SaveFile):
                                   "Compounding amount for a streak", "Randomise questions",
                                   "Randomise answer placement",
                                   "Pick random question when run out of time",
-                                  "Bot difficulty", "Number of bots", "Next"]
+                                  "Bot difficulty", "Number of bots", "Next", "Back"]
 
         game_play_menu_values = [str(self.host_a_server), str(self.time_limit), str(self.question_amount),
                                  str(self.quiz_category), str(self.quiz_difficulty), str(self.question_type),
@@ -1351,10 +1370,14 @@ class Game(SaveFile):
                                  str(self.pick_random_question),
                                  str(self.bot_difficulty), str(self.how_many_bots)]
 
+        # Add the "Next" Value
         if self.host_a_server:
             game_play_menu_values.append("Networking Settings")
         elif not self.host_a_server:
             game_play_menu_values.append("Local Settings")
+
+        # Add the "Back" Value
+        game_play_menu_values.append("Main Menu")
 
         gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
         gameplay_menu.get_input()
@@ -1443,6 +1466,8 @@ class Game(SaveFile):
         Waits for players to join the server
         """
 
+        print(self.game_loaded)
+
         # Set up the host (if there isn't one already) (host is always the first user in the list)
         if len(self.users) == 0:
             self.set_users()
@@ -1479,19 +1504,27 @@ class Game(SaveFile):
                 # Add them to the list
                 players.append(user.styled_name())
             players.append("Start game")
+            players.append("Back")
 
             players_menu = Menu("Players", players)
             players_menu.time_limit = 3
             players_menu.get_input()
 
-            if players_menu.user_input == "Start game":
-                if len(self.users) > 1:
-                    break
-                else:
-                    error("You need at least 2 players to start a game!")
+            match players_menu.user_input:
+                case "Start game":
+                    if len(self.users) > 1:
+                        break
+                    else:
+                        error("You need at least 2 players to start a game!")
 
-        # Wait loop has broken so therefore the game has started
+                case "Back":
+                    # Kill the server
+                    self.backend.kill()
+                    return
+
+        # Wait loop has broken so the game has started
         self.game_started = True
+        self.users[0].is_connected = True
 
         # Removed any unconnected users
         for user in self.users:
@@ -1562,7 +1595,12 @@ class Game(SaveFile):
 
         # Play the game
         if self.check_server_error(): return
-        self.play()
+        # Start the game, check if the game has finished or play the game
+        if self.check_game_finished():
+            # If the game has finished then show the results
+            self.game_end()
+        else:
+            self.play()
         if self.check_server_error(): return
 
         # Close the socket
@@ -1579,4 +1617,4 @@ class Game(SaveFile):
             return True
         return False
 
-# TODO: Fix user progress loading. More Doxy. Testing.
+# TODO: Error handling, More Doxy. Testing.

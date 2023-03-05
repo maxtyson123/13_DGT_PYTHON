@@ -2,6 +2,7 @@
 import time
 
 from Maxs_Modules.debug import error, show_debug_menu, in_ide
+
 # - - - - - - - Variables - - - - - - -#
 imported_timeout = False
 
@@ -188,3 +189,5 @@ def try_convert(variable: object, type_to_convert: object, supress_errors: bool 
         if not supress_errors:
             error("Invalid input")
         return None
+
+

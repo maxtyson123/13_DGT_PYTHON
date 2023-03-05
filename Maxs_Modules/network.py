@@ -377,11 +377,10 @@ class QuizGameServer(QuizServer):
                 temp_index = len(self.game.users) - 1
                 self.game.convert_users()
 
-                # Check if the username is taken, if so add a number to the end
-                for user_index in range(len(self.game.users)):
-                    # Ignore the user just added
-                    if user_index == temp_index:
-                        continue
+                is_new_player = True
+
+                # Check if the username is taken
+                for user_index in range(len(self.game.users) - 1):
 
                     # If the username is taken
                     user = self.game.users[user_index]
@@ -400,10 +399,20 @@ class QuizGameServer(QuizServer):
                         temp_index = user_index
 
                         # This means the server is continuing a game so send the user their progress
+                        is_new_player = False
                         self.sync_game()
                         time.sleep(0.5)
 
                         break
+
+                # If this server is continuing a game then dont allow new players to join
+                print(f"Is new player: {is_new_player}. Game loaded: {self.game.game_loaded}")
+                if is_new_player and self.game.game_loaded:
+                    self.send_message(sock, "Server is continuing game, must rejoin using same name. New players arent allowed", "server_error")
+                    # Remove the user from the list
+                    self.game.users.pop(temp_index)
+                    return
+
 
                 self.game.convert_users()
 

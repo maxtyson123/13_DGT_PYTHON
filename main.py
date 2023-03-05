@@ -15,7 +15,7 @@
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 
 
-# TODO: Finish Networked game, More Error Handling and unxepected input, Clean up code and comments. Testing
+# TODO: Finish Networked game, Remove Setup Wizard, Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing
 
 import os
 # - - - - - - - Imports - - - - - - -#
@@ -23,31 +23,13 @@ import sys
 
 from Maxs_Modules.network import get_ip
 from Maxs_Modules.renderer import Menu, Colour
-from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error
+from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import get_user_input_of_type, strBool, ipAdress
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
-program_args = sys.argv[1:]
-
-
-# - - - - - - - Functions - - - - - - -#
-
-def handle_arg(arg: str, get_value: bool = False) -> str or None:
-    for index in range(len(program_args)):
-        if arg == program_args[index]:
-            if get_value:
-                # Check if there is a value after this arg
-                if index != len(program_args):
-                    return program_args[index + 1]
-                else:
-                    return None
-
-            return arg
-
-    return None
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -61,8 +43,13 @@ def game_finished(game: Game) -> None:
 
     @param game: The game object, used for resetting the game when replaying
     """
-    game_finished_menu = Menu("Game Finished", ["Play Again", "Main Menu", "Quit"])
-    game_finished_menu.get_input()
+
+    game_finished_menu = Menu("Game Finished", ["Play Again", "Main Menu"])
+    game_finished_menu.user_input = "Main Menu"
+
+    # Only allow for playing again if the game was completed
+    if game.game_finished:
+        game_finished_menu.get_input()
 
     match game_finished_menu.user_input:
         case "Play Again":
@@ -75,10 +62,11 @@ def game_finished(game: Game) -> None:
             game_finished(game)
 
         case "Main Menu":
+            # Delete the game save if it exists
+            if os.path.exists(game.save_file) and game.game_finished:
+                debug_message("Deleting save file", "game_finished")
+                os.remove(game.save_file)
             game_main_menu()
-
-        case "Quit":
-            sys.exit()
 
 
 def continue_game() -> None:
@@ -136,9 +124,6 @@ def new_game() -> None:
     # Get the user to configure the game
     quiz.set_settings()
 
-    # Save the game object
-    quiz.save()
-
     # Start the game
     quiz.begin()
 
@@ -182,7 +167,6 @@ def join_game() -> None:
                     # Create a new game object
                     quiz = Game()
                     quiz.join_game(ip, port)
-
             case "Back":
                 break
 
