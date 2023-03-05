@@ -78,7 +78,7 @@ from Maxs_Modules.network import get_ip, QuizGameServer, QuizClient, QuizGameCli
 from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
-from Maxs_Modules.renderer import Menu, divider, Colour
+from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -582,8 +582,6 @@ class Game(SaveFile):
             if type(self.users[x]) is User:
                 continue
 
-            print(f"Converting user {x} to a User object")
-
             # Load
             user_object = User()
             user_object.load(self.users[x])
@@ -979,12 +977,6 @@ class Game(SaveFile):
         thread for the user input. Then it marks the question and calculates the score for the player. Afterwards it
         runs the next question
         """
-        # If its a networked game then get the local player as the sync overrides it
-        if self.joined_game:
-            # Loop through the users trying to find the saved name
-            for user_index in range(len(self.users)):
-                if self.users[user_index].name == self.current_user_playing_net_name:
-                    self.current_user_playing = user_index
 
         # Save the users progress
         self.save()
@@ -1095,18 +1087,24 @@ class Game(SaveFile):
             print("Waiting for all players to answer...")
 
             # Wait for all players to answer
+            loading_amount = 1
             while True:
                 waiting = False
+                users_waiting = []
 
                 # Loop through the users until one is found that hasn't answered
                 for user in self.users:
                     if user.has_answered is False:
                         waiting = True
-                        print(f"Waiting for {user.name} to answer...")
+                        users_waiting.append(user.name)
 
                 if not waiting:
                     break
                 else:
+                    print_text_on_same_line("Waiting for: " + ", ".join(users_waiting) + "to answer" + "."*loading_amount)
+                    loading_amount += 1
+                    if loading_amount > 3:
+                        loading_amount = 1
                     time.sleep(.5)
 
             debug_message("All players have answered", "Game")
@@ -1123,6 +1121,9 @@ class Game(SaveFile):
 
         # If this is a client then wait for the server to sync and all players to answer
         elif is_client:
+            # Check that the server hasnt closed
+            if self.check_server_error(): return
+
             # Send the users answer to the server
             self.backend.send_self()
 
@@ -1574,7 +1575,8 @@ class Game(SaveFile):
                 os.system("cls")
                 error(self.backend.error)
                 input("Press enter to continue...")
+                self.backend.error = None
             return True
         return False
 
-# TODO: Fix user progress loading. handle client quitting, More error handling
+# TODO: Fix user progress loading. More Doxy. Testing.

@@ -4,10 +4,10 @@ import time
 from datetime import datetime
 
 # - - - - - - - Variables - - - - - - -#
-use_debug = True
+use_debug = False
 initialised_debug = False
 debugger = None
-in_ide = True
+in_ide = False
 
 session_message_log = []
 session_error_log = []

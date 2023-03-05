@@ -97,7 +97,7 @@ class QuizServer:
         connection, address = sock.accept()
 
         # Print the address
-        print(f"Accepted connection from {address}")
+        debug_message(f"Accepted connection from {address}", "network_server")
 
         # Dont block the process as we want to be able to accept multiple connections
         connection.setblocking(False)
@@ -138,7 +138,6 @@ class QuizServer:
                 self.client_names.pop(sock_index)
                 break
 
-
     def service_connection(self, key, mask):
         """
         Service a connection from a client
@@ -163,7 +162,7 @@ class QuizServer:
 
                 else:
                     # Print the address
-                    print(f"Closing connection on {data.addr}")
+                    debug_message(f"Closing connection on {data.addr}", "network_server")
 
                     # Close the connection
                     self.close_connection(sock)
@@ -407,10 +406,14 @@ class QuizGameServer(QuizServer):
                         break
 
                 self.game.convert_users()
+
+                # Set the sockets name to the user's name
+                self.client_names[self.clients.index(sock)] = self.game.users[temp_index].name
+
                 # User is now connected
                 self.game.users[temp_index].is_connected = True
                 self.send_message(sock, "You have joined the game", "client_join")
-                print(f"Player {message.message} has joined the game")
+                debug_message(f"Player {message.message['name']} has joined the game", "network_server")
 
             case "sync_player":
                 user = message.message
@@ -430,7 +433,7 @@ class QuizGameServer(QuizServer):
                 debug_message(f"Player: {self.game.users[index].name} has synced", "network_server")
 
             case _:
-                print(f"Unhandled message: {message.message}")
+                debug_message(f"Unhandled message: {message.message}", "network_server")
 
     def sync_game(self):
         # Ensure users have been converted, as timings can be off when networked
@@ -500,14 +503,11 @@ class QuizGameServer(QuizServer):
         sock.close()
 
         # Remove the socket from the list of clients
+        # Remove the player from the game
         for sock_index in range(len(self.clients)):
             if self.clients[sock_index] == sock:
-
-                # Remove the player from the game
                 for user_index in range(len(self.game.users)):
                     if self.game.users[user_index].name == self.client_names[sock_index]:
-                        # remove
-                        print(f"Player {self.game.users[user_index].name} has left the game")
                         self.game.users.pop(user_index)
                         break
 
@@ -567,14 +567,24 @@ class QuizGameClient(QuizClient):
                 # Ensure that the joined_game flag is not lost
                 self.game.joined_game = True
 
+                # Make sure the user playing is the local user and not the synced one
+                for user_index in range(len(self.game.users)):
+                    if self.game.users[user_index].name == self.game.current_user_playing_net_name:
+                        self.game.current_user_playing = user_index
+
             case "sync_players":
                 synced_users = message.message
-                for user_index in range(len(synced_users)):
-                    self.game.users[user_index] = synced_users[user_index]
+
+                self.game.users = synced_users
 
                 self.game.convert_users()
                 for user in self.game.users:
-                    print(f"Player: {user.name} has synced with a score of {user.points}")
+                    debug_message(f"Player: {user.name} has synced with a score of {user.points}")
+
+                # Make sure the user playing is the local user and not the synced one
+                for user_index in range(len(self.game.users)):
+                    if self.game.users[user_index].name == self.game.current_user_playing_net_name:
+                        self.game.current_user_playing = user_index
 
             case "sync_bots":
                 synced_bots = message.message
@@ -583,10 +593,18 @@ class QuizGameClient(QuizClient):
                 self.game.convert_bots()
 
             case _:
-                print(f"Unhandled message: {message.message}")
+                debug_message(f"Unhandled message: {message.message}", "network_client")
 
     def handle_error(self, sock, key_data, error_response):
-        super().handle_error(sock, key_data, error_response)
+        self.close_connection(sock)
+
+        error_response = str(error_response)
+
+        # Make errors more readable
+        if "An existing connection was forcibly closed by the remote host" in error_response:
+            error_response = "Server Closed"
+
+        self.error = error_response
         self.running = False
 
     def send_self(self):

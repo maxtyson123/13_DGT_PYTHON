@@ -13,6 +13,10 @@
 # [ ] GUI Extended, Buttons instead of based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
+
+
+# TODO: Finish Networked game, More Error Handling and unxepected input, Clean up code and comments. Testing
+
 import os
 # - - - - - - - Imports - - - - - - -#
 import sys
@@ -340,7 +344,6 @@ def main() -> None:
             game_main_menu()
 
     print("Done")
-
 
 if __name__ == "__main__":
     # Set up the program

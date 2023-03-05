@@ -2,6 +2,7 @@
 
 
 import os
+import sys
 import time
 
 from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message, in_ide
@@ -378,8 +379,6 @@ class Menu:
                 else:
                     menu_items.insert(slice_start, "Previous Page")
 
-
-
             # Check if the "Next Page" option is going to be added, if so need to minus 1 from the slice end
             if menu_items_count > slice_end:
                 if self.multi_dimensional:
@@ -399,6 +398,7 @@ class Menu:
                 menu_items = menu_items[slice_start: slice_end]
 
         return menu_items
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -550,7 +550,8 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
 
         # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
         # The length of the text, minus console width, minus 2 for the border
-        width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(Colour.clean_text(item_to_print_2)) - 2
+        width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(
+            Colour.clean_text(item_to_print_2)) - 2
         spacing = " " * width_left
 
         # Combine the two items
@@ -558,3 +559,14 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
         print(final_item_to_print)
 
     print(divider)
+
+
+def print_text_on_same_line(text_to_print):
+    # Clear the line
+    sys.stdout.write('\r' + " "*console_width)
+
+    # Print the text
+    sys.stdout.write('\r' + text_to_print)
+
+
+

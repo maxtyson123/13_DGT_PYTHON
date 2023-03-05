@@ -96,7 +96,5 @@ class SaveFile:
             except KeyError:
                 print("KeyError: save_data")
 
-            debug_message("File data: " + str(save_dict), "save_file")
-
             json.dump(save_dict, file)
             file.close()
