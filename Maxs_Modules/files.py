@@ -94,7 +94,7 @@ class SaveFile:
             try:
                 del save_dict["save_data"]
             except KeyError:
-                print("KeyError: save_data")
+                pass
 
             json.dump(save_dict, file)
             file.close()

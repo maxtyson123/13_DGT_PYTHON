@@ -434,6 +434,7 @@ class Game(SaveFile):
     joined_game = None
     game_started = False
     game_loaded = False
+    cancelled = False
 
     # API Conversion
     api_category = None
@@ -1457,8 +1458,11 @@ class Game(SaveFile):
                 elif not self.host_a_server:
                     self.settings_local()
 
+            case "Back":
+                self.cancelled = True
+
         # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if gameplay_menu.user_input != "Next":
+        if gameplay_menu.user_input != "Next" and gameplay_menu.user_input != "Back":
             self.settings_gameplay()
 
     def wait_for_players(self):
@@ -1479,8 +1483,7 @@ class Game(SaveFile):
             self.backend = QuizGameServer(get_ip(), self.server_port)
             self.backend.game = self
         except OSError:
-            error("Could not create a socket. Please try again.")
-            self.settings_networking()
+            error("Could not create a server (most likely already running on ip/port). Please try again.")
             return
 
         # Thread the server
@@ -1558,10 +1561,11 @@ class Game(SaveFile):
         """
         # Create a socket
         try:
+            print("Connecting to server...")
             self.backend = QuizGameClient(ip, port)
             self.backend.game = self
         except OSError:
-            error("Could not create a socket. Please try again.")
+            error("Could not connect (socket not created). Please try again.")
             return
 
         # Thread the server

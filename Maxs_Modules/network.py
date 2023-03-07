@@ -237,9 +237,6 @@ class QuizClient:
     """
     A class to represent a client for the quiz game
     """
-
-    message_queue = []
-
     def __init__(self, host: str, port: int):
         """
         @param host: The host ip to connect to
@@ -255,53 +252,56 @@ class QuizClient:
         self.selector.register(self.client, selectors.EVENT_READ, data=None)
 
     def run(self):
-        while True:
 
-            if len(self.message_queue) > 0:
-                self.send_message(self.client, self.message_queue[0][0], self.message_queue[0][1])
-                self.message_queue.pop(0)
+        try:
 
-            events = self.selector.select(timeout=1)
+            while True:
 
-            for key, mask in events:
+                events = self.selector.select(timeout=1)
 
-                try:
-                    sock = key.fileobj
-                    data = key.data
+                for key, mask in events:
 
-                    # If the socket has its read bit set
-                    if mask & selectors.EVENT_READ:
+                    try:
+                        sock = key.fileobj
+                        data = key.data
 
-                        # Store all the data parts in a list
-                        fragments = []
-                        recv_data = b''
+                        # If the socket has its read bit set
+                        if mask & selectors.EVENT_READ:
 
-                        # While there is data to read
-                        while True:
-                            data = sock.recv(4096)
-                            fragments.append(data)
-                            recv_data = b''.join(fragments)
+                            # Store all the data parts in a list
+                            fragments = []
+                            recv_data = b''
 
-                            try:
-                                decoded = recv_data.decode()
-                                json.loads(decoded)
-                                break
-                            except ValueError:
-                                continue
+                            # While there is data to read
+                            while True:
+                                data = sock.recv(4096)
+                                fragments.append(data)
+                                recv_data = b''.join(fragments)
 
-                        # If there is no data then the connection has been closed
-                        if recv_data:
-                            self.handle_data_received(sock, data, recv_data)
+                                try:
+                                    decoded = recv_data.decode()
+                                    json.loads(decoded)
+                                    break
+                                except ValueError:
+                                    continue
 
-                    # If the socket has its write bit set
-                    if mask & selectors.EVENT_WRITE:
+                            # If there is no data then the connection has been closed
+                            if recv_data:
+                                self.handle_data_received(sock, data, recv_data)
 
-                        # If there is data to send
-                        if data.outb:
-                            self.handle_request(sock, data, data.outb)
+                        # If the socket has its write bit set
+                        if mask & selectors.EVENT_WRITE:
 
-                except Exception as e:
-                    self.handle_error(sock, data, e)
+                            # If there is data to send
+                            if data.outb:
+                                self.handle_request(sock, data, data.outb)
+
+                    except Exception as e:
+                        self.handle_error(sock, data, e)
+
+        # OSErrors thrown here are caused when the socket is being deleted, so we can ignore them
+        except OSError as e:
+            pass
 
     def close_connection(self, sock):
         """
@@ -314,9 +314,6 @@ class QuizClient:
 
         # Close the socket
         sock.close()
-
-        # Debug this
-        debug_message("Closed connection", "network_client")
 
     def handle_data_received(self, sock, key_data, recv_data: bytes):
         pass
@@ -421,7 +418,6 @@ class QuizGameServer(QuizServer):
 
                 # User is now connected
                 self.game.users[temp_index].is_connected = True
-                self.send_message(sock, "You have joined the game", "client_join")
                 debug_message(f"Player {message.message['name']} has joined the game", "network_server")
 
             case "sync_player":
@@ -554,7 +550,6 @@ class QuizGameClient(QuizClient):
         # Handle the messasge
         match message.message_type:
             case "server_error":
-                debug_message("Closing connection", "network_client")
                 self.error = f"Server error: {message.message}"
                 self.close_connection(sock)
                 self.running = False
@@ -719,12 +714,8 @@ def connect_to_server(server_ip: str, port: int) -> socket.socket:
     # Create the socket. AF_INET is ipv4 and SOCK_STREAM is TCP
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    try:
-        # Connect to the server
-        sock.connect((server_ip, port))
-    except Exception as e:
-        error(f"Failed to connect to server: {e}")
-        return None
+    # Connect to the server
+    sock.connect((server_ip, port))
 
     # Return the socket
     return sock
@@ -766,94 +757,3 @@ def get_ip() -> str:
     """
     return socket.gethostbyname(socket.gethostname())
 
-
-def test_echo_server():
-    class EchoServer(QuizServer):
-
-        def handle_data_received(self, sock, key_data, recv_data: bytes):
-            """
-            Handle data received from a client
-
-            @param key_data:
-            @param recv_data: The data received
-            """
-            key_data.outb += recv_data
-
-        def handle_data_send(self, sock, key_data, send_data: bytes):
-            """
-            Handle data sent to a client
-
-            @param key_data:
-            @param data: The data sent
-
-            """
-            # Get the message from the data
-            message = QuizMessage(None, None, None, None)
-            message.from_bytes(send_data)
-
-            # Create a QuizMessage object
-            message = QuizMessage(message.message, get_ip(), key_data.addr[0], "echo")
-
-            # Send the data
-            sent = sock.send(message.to_bytes())
-
-            # Print the data
-            print(f"Echoing {message.message} to {key_data.addr}")
-
-            # Remove the data that has been sent from the output buffer
-            key_data.outb = key_data.outb[sent:]
-
-    try:
-        server = EchoServer(get_ip(), 5000)
-        server.run()
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-
-# debug server -echo-client
-# debug server -echo-server
-
-def test_echo_client():
-    class EchoClient(QuizClient):
-
-        def handle_response(self, sock, key_data, recv_data: bytes):
-            """
-            Handle a message received from the server
-
-            """
-            debug_message(f"Received {recv_data}", "network_client")
-
-            # Convert the response into a message object
-            message = QuizMessage(None, None, None, None)
-            message.from_bytes(recv_data)
-
-            print(f"Response: {message.message}")
-
-    # Get the IP
-    ip = get_ip()
-
-    # Port is 5000 for testing
-    port = 5000
-
-    # Create the client
-    client = EchoClient(ip, port)
-
-    # Thread the client
-    client_thread = threading.Thread(target=client.run)
-    client_thread.start()
-
-    client.send_message(client.client, "Hello world", "echo")
-
-    # Loop until the user wants to quit
-    while True:
-        # Get the message
-        message = input("Enter a message to send to the server: ")
-
-        # Check if the user wants to quit
-        if message == "quit":
-            break
-
-        client.message_queue.append([message, "echo"])
-
-# Note to self: using https://realpython.com/python-sockets/

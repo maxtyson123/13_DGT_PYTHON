@@ -124,8 +124,12 @@ def new_game() -> None:
     # Get the user to configure the game
     quiz.set_settings()
 
-    # Start the game
-    quiz.begin()
+    # Check if the user has cancelled the game
+    if not quiz.cancelled:
+        print("Starting Game")
+
+        # Start the game
+        quiz.begin()
 
     # Show the game finished menu
     game_finished(quiz)

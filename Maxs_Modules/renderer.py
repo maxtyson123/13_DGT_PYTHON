@@ -233,7 +233,6 @@ class Menu:
 
         # Calculate the possible options
         if self.multi_dimensional:
-
             input_items = menu_items[0]
         else:
             input_items = menu_items
@@ -242,9 +241,9 @@ class Menu:
 
         # Get the user input and validate it, note cant use the get_user_input_of_type function as the menu also
         # allows for "pre-input" and choosing an item index or the item itself
-
         while True:
 
+            # If there is no input then get the input
             if user_input is None:
                 input_promt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
 
@@ -280,8 +279,20 @@ class Menu:
                 else:
                     user_input = input(input_promt)
 
-            # Use try here as int doesn't use 'in'
-            try:
+            # If there is a type error then its returned as None otherwise it is the converted value
+            if try_convert(user_input, int, True) is not None:  # Is an int
+
+                # Convert the input to an int
+                user_input = try_convert(user_input, int)
+                if user_input in options:
+                    self.user_input = input_items[user_input]
+                    break
+                else:
+                    error("Invalid input, please enter one of these: " + str(options))
+                    user_input = None
+
+            # Not a int, so try
+            else:
                 # Check if it is a debug command
                 if "debug" in user_input:
                     command = user_input.split(" ")
@@ -308,7 +319,13 @@ class Menu:
                         menu_manager.pre_input = user_input
 
                         # Store the first input
-                        self.user_input = menu_items[menu_manager.pre_input[0]]
+                        if menu_manager.pre_input[0] < len(input_items):
+                            self.user_input = input_items[menu_manager.pre_input[0]]
+                        else:
+                            error("Invalid pre-input, not an option")
+                            menu_manager.pre_input = []
+                            user_input = None
+                            continue
 
                         # Remove the first input from the pre-input
                         menu_manager.pre_input.pop(0)
@@ -328,23 +345,6 @@ class Menu:
                 if user_input in input_items:
                     self.user_input = user_input
                     break
-
-            except Exception as e:
-                debug_message("Error in menu input: " + str(e))
-
-            user_input = try_convert(user_input, int)
-
-            # If there is a type error then its returned as None otherwise it is the converted value
-            if user_input is not None:
-                if user_input in options:
-                    if self.multi_dimensional:
-                        self.user_input = menu_items[0][user_input]
-                    else:
-                        self.user_input = menu_items[user_input]
-                    break
-                else:
-                    error("Invalid input, please enter one of these: " + str(options))
-                    user_input = None
         menu_manager.menu_history_input.append(self.user_input)
 
     def get_pages(self) -> list:
@@ -563,10 +563,7 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
 
 def print_text_on_same_line(text_to_print):
     # Clear the line
-    sys.stdout.write('\r' + " "*console_width)
+    sys.stdout.write('\r' + " " * console_width)
 
     # Print the text
     sys.stdout.write('\r' + text_to_print)
-
-
-
