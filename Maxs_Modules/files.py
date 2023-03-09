@@ -46,7 +46,7 @@ class SaveFile:
         """
         self.save_file = save_file
 
-        # If the user wants to autoload the file then try run the load function
+        # If the user wants to autoload the file then try to run the load function
         if auto_load:
             debug_message("Auto loading file", "save_file")
             self.load()
@@ -113,7 +113,7 @@ class UserData(SaveFile):
         """
         Create a new UserData object, loaded from setup.json
         """
-        super().__init__(data_folder + "setup.json")
+        super().__init__(data_folder + "data.json")
 
         # Load the data from the save file
         self.display_mode = try_convert(self.save_data.get("display_mode"), str)
@@ -133,7 +133,7 @@ class UserData(SaveFile):
 
     def save(self) -> None:
         """
-        Save the user data to setup.json
+        Save the user data to the save file
         """
         self.save_data = self.__dict__
 

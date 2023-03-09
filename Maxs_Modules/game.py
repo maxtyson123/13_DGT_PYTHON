@@ -1,71 +1,3 @@
-# Spec: (JUMP TO LINE 60 TO SKIP)
-#  - This module contains the Game class, which is the main class for the game.
-#  - When playing in single player mode person A goes through the whole quiz then person B goes through the whole quiz.
-#  - When playing in multiplayer mode person A and B go through the quiz simultaneously.
-#  - Terminology: User = Person playing the game, Player = User or Bot.
-# External Functions:
-#  - Join Game : Connects to a server and joins a game.
-#  - Play Game : Starts a game.
-#
-# Internal Functions:
-#  == (Main Gameplay functions) ==
-#  [x] Start : Starts the game.
-#  [x] Quit : Quits the game.
-#  [x] Restart : Restarts the game.
-#  [x] Save : Saves the game to a file.
-#  [x] Load : Loads the game from a file.
-#  [x] Set Settings : Sets the settings for the game.
-#  [x] Set Users : Sets the users for the game. (Single player mode only)
-#  [x] Get Questions : Gets the questions from the server (API).
-#  == (Networking functions) ==
-#  [x] Connect : Connects to a server.
-#  [x] Disconnect : Disconnects from a server.
-#  [x] Send : Sends data to a server.
-#  [x] Receive : Receives data from a server.
-#  [ ] Sync : Syncs the game with the server.
-#  [x] Host : Hosts a server.
-#  [x] Get Quiz Data : Gets the quiz data from the server (API).
-#  == (Gameplay functions) ==
-#  [x] Display Options : Displays the options for the question.
-#  [x] Mark Answer : Marks the answer as correct or incorrect.
-#  [x] Get Input : Gets the user input.
-#  [x] Display Score : Displays the score of each player.
-#  [x] Play Again Or Quit : Asks the user if they want to play again or quit.
-#  [x] Bot Answer : Makes the bot answer the question.
-#
-# Settings:
-#  == (Gameplay Settings) ==
-#  [x] Game Mode : The game mode (Local Players or Multiplayer).
-#  [x] Time Limit : The time limit for each question.
-#  [x] Show Score after Question or Game : Whether to show the score after each question or after the game
-#  [x] Show Correct Answer after Question or Game : Whether to show the correct answer after each question or after the
-#      game.
-#  [x] Points for Correct Answer : The points for a correct answer.
-#  [x] Points for Incorrect Answer : The points for an incorrect answer.
-#  [x] Points for No Answer : The points for no answer.
-#  [x] Points multiplier for a streak : The points multiplier for a streak.
-#  [x] Compounding amount for a streak : The compounding amount for a streak.
-#  [x] Randomise Questions : Whether to randomise the questions or not.
-#  [x] Randomise Answers : Whether to randomise the answers placement or not.
-#  [x] Pick Random Question : Whether to pick a random question or not once the time limit has been reached.
-#  [x] Bot Difficulty : The difficulty of the bot (% chance of picking the right answer out of 100).
-#  == (Network Settings) ==
-#  [ ] Server Name : The name of the server.
-#  [x] Server Port : The port of the server (1234 by default).
-#  [ ] Max Players : The maximum amount of players.
-#  == (Single Player Settings) ==
-#  [x] How many players : The amount of players.
-#  [x] How many bots : The amount of bots.
-#  == (Quiz Settings) ==
-#  [x] Quiz Category : The category of the quiz.
-#  [x] Quiz Difficulty : The difficulty of the quiz.
-#  [x] Question Amount : The amount of questions.
-#  [x] Question Type : The type of questions (True/False, Multi choice).
-#  == (Player Settings) ==
-#  [x] Player Name : The name of the player.
-#  [x] Player Colour : The colour of the player.
-#  [ ] Player Icon : The icon of the player (GUI Only).
-
 # - - - - - - - Imports - - - - - - -#
 import os
 import threading
@@ -167,8 +99,8 @@ class Question:
         self.incorrect_answers = data.get("incorrect_answers")
 
         # Unescape the incorrect answers
-        for i in range(len(self.incorrect_answers)):
-            self.incorrect_answers[i] = html.unescape(self.incorrect_answers[i])
+        for answer_index in range(len(self.incorrect_answers)):
+            self.incorrect_answers[answer_index] = html.unescape(self.incorrect_answers[answer_index])
 
 
 class User:
@@ -1299,19 +1231,20 @@ class Game(SaveFile):
         local_menu_options = ["How many players", "Next", "Back"]
         local_menu_values = [str(self.how_many_players), "Play Game", "Gameplay Settings"]
         single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
-        single_player_menu.get_input()
 
-        match single_player_menu.user_input:
-            case "How many players":
-                self.how_many_players = get_user_input_of_type(int, "How many players")
-            case "Next":
-                self.set_users()
-            case "Back":
-                self.settings_gameplay()
+        while True:
+            single_player_menu.get_input()
 
-        # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if single_player_menu.user_input != "Next" and single_player_menu.user_input != "Back":
-            self.settings_local()
+            match single_player_menu.user_input:
+                case "How many players":
+                    self.how_many_players = get_user_input_of_type(int, "How many players")
+                case "Next":
+                    self.set_users()
+                    break
+                case "Back":
+                    self.settings_gameplay()
+                    break
+
 
     def settings_networking(self) -> None:
         """
@@ -1323,146 +1256,146 @@ class Game(SaveFile):
                                   "Waiting for players", "Gameplay Settings"]
 
         networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
-        networking_menu.get_input()
 
-        match networking_menu.user_input:
+        while True:
 
-            case "Server Name":
-                self.server_name = get_user_input_of_type(str, "Server Name")
+            networking_menu.get_input()
+            match networking_menu.user_input:
 
-            case "Server Port":
-                self.server_port = get_user_input_of_type(int, "Server Port")
+                case "Server Name":
+                    self.server_name = get_user_input_of_type(str, "Server Name")
 
-            case "Max Players":
-                self.max_players = get_user_input_of_type(int, "Max Players")
+                case "Server Port":
+                    self.server_port = get_user_input_of_type(int, "Server Port")
 
-            case "Next":
-                pass
+                case "Max Players":
+                    self.max_players = get_user_input_of_type(int, "Max Players")
 
-            case "Back":
-                self.settings_gameplay()
+                case "Next":
+                    break
 
-        # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if networking_menu.user_input != "Next" and networking_menu.user_input != "Back":
-            self.settings_networking()
+                case "Back":
+                    self.settings_gameplay()
+                    break
 
     def settings_gameplay(self) -> None:
         """
         Shows a menu to configure the gameplay settings for the game
         """
-        game_play_menu_options = ["Host a server", "Time limit", "Question Amount", "Category", "Difficulty", "Type",
-                                  "Show score after Question/Game", "Show correct answer after Question/Game",
-                                  "Points for correct answer", "Points for incorrect answer",
-                                  "Points for no answer", "Points multiplier for a streak",
-                                  "Compounding amount for a streak", "Randomise questions",
-                                  "Randomise answer placement",
-                                  "Pick random question when run out of time",
-                                  "Bot difficulty", "Number of bots", "Next", "Back"]
 
-        game_play_menu_values = [str(self.host_a_server), str(self.time_limit), str(self.question_amount),
-                                 str(self.quiz_category), str(self.quiz_difficulty), str(self.question_type),
-                                 str(self.show_score_after_question_or_game),
-                                 str(self.show_correct_answer_after_question_or_game),
-                                 str(self.points_for_correct_answer), str(self.points_for_incorrect_answer),
-                                 str(self.points_for_no_answer),
-                                 str(self.points_multiplier_for_a_streak), str(self.compounding_amount_for_a_streak),
-                                 str(self.randomise_questions), str(self.randomise_answer_placement),
-                                 str(self.pick_random_question),
-                                 str(self.bot_difficulty), str(self.how_many_bots)]
+        # Menu options get updated so menu setup has to be in a loop
+        while True:
+            game_play_menu_options = ["Host a server", "Time limit", "Question Amount", "Category", "Difficulty", "Type",
+                                      "Show score after Question/Game", "Show correct answer after Question/Game",
+                                      "Points for correct answer", "Points for incorrect answer",
+                                      "Points for no answer", "Points multiplier for a streak",
+                                      "Compounding amount for a streak", "Randomise questions",
+                                      "Randomise answer placement",
+                                      "Pick random question when run out of time",
+                                      "Bot difficulty", "Number of bots", "Next", "Back"]
 
-        # Add the "Next" Value
-        if self.host_a_server:
-            game_play_menu_values.append("Networking Settings")
-        elif not self.host_a_server:
-            game_play_menu_values.append("Local Settings")
+            game_play_menu_values = [str(self.host_a_server), str(self.time_limit), str(self.question_amount),
+                                     str(self.quiz_category), str(self.quiz_difficulty), str(self.question_type),
+                                     str(self.show_score_after_question_or_game),
+                                     str(self.show_correct_answer_after_question_or_game),
+                                     str(self.points_for_correct_answer), str(self.points_for_incorrect_answer),
+                                     str(self.points_for_no_answer),
+                                     str(self.points_multiplier_for_a_streak), str(self.compounding_amount_for_a_streak),
+                                     str(self.randomise_questions), str(self.randomise_answer_placement),
+                                     str(self.pick_random_question),
+                                     str(self.bot_difficulty), str(self.how_many_bots)]
 
-        # Add the "Back" Value
-        game_play_menu_values.append("Main Menu")
+            # Add the "Next" Value
+            if self.host_a_server:
+                game_play_menu_values.append("Networking Settings")
+            elif not self.host_a_server:
+                game_play_menu_values.append("Local Settings")
 
-        gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
-        gameplay_menu.get_input()
+            # Add the "Back" Value
+            game_play_menu_values.append("Main Menu")
 
-        match gameplay_menu.user_input:
-            case "Host a server":
-                self.host_a_server = get_user_input_of_type(strBool,
-                                                            "Host a server (" + Colour.true_or_false_styled() + ")")
+            gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
+            gameplay_menu.get_input()
 
-            case "Time limit":
-                self.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
+            match gameplay_menu.user_input:
+                case "Host a server":
+                    self.host_a_server = get_user_input_of_type(strBool,
+                                                                "Host a server (" + Colour.true_or_false_styled() + ")")
 
-            case "Question Amount":
-                self.question_amount = get_user_input_of_type(int, "Question Amount (1-50)", range(1, 51))
+                case "Time limit":
+                    self.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
 
-            case "Category":
-                category_menu = Menu("Category", quiz_categories)
-                category_menu.get_input()
-                self.quiz_category = category_menu.user_input
+                case "Question Amount":
+                    self.question_amount = get_user_input_of_type(int, "Question Amount (1-50)", range(1, 51))
 
-            case "Difficulty":
-                self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Easy, Medium, Hard)", ["Easy", "Medium",
-                                                                                                       "Hard"])
+                case "Category":
+                    category_menu = Menu("Category", quiz_categories)
+                    category_menu.get_input()
+                    self.quiz_category = category_menu.user_input
 
-            case "Type":
-                self.question_type = get_user_input_of_type(str, "Type (Multiple, True/False)", ["Multiple",
-                                                                                                 "True/False"])
+                case "Difficulty":
+                    self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Easy, Medium, Hard)", ["Easy", "Medium",
+                                                                                                           "Hard"])
 
-            case "Show score after Question/Game":
-                self.show_score_after_question_or_game = get_user_input_of_type(str,
-                                                                                "Show score after: (Question/Game)",
-                                                                                ["Question", "Game"])
+                case "Type":
+                    self.question_type = get_user_input_of_type(str, "Type (Multiple, True/False)", ["Multiple",
+                                                                                                     "True/False"])
 
-            case "Show correct answer after Question/Game":
-                self.show_correct_answer_after_question_or_game = get_user_input_of_type(str,
-                                                                                         "Show correct answer "
-                                                                                         "after: (Question/Game)",
-                                                                                         ["Question", "Game"])
+                case "Show score after Question/Game":
+                    self.show_score_after_question_or_game = get_user_input_of_type(str,
+                                                                                    "Show score after: (Question/Game)",
+                                                                                    ["Question", "Game"])
 
-            case "Points for correct answer":
-                self.points_for_correct_answer = get_user_input_of_type(int, "Points for correct answer")
+                case "Show correct answer after Question/Game":
+                    self.show_correct_answer_after_question_or_game = get_user_input_of_type(str,
+                                                                                             "Show correct answer "
+                                                                                             "after: (Question/Game)",
+                                                                                             ["Question", "Game"])
 
-            case "Points for incorrect answer":
-                self.points_for_incorrect_answer = get_user_input_of_type(int, "Points for incorrect answer")
+                case "Points for correct answer":
+                    self.points_for_correct_answer = get_user_input_of_type(int, "Points for correct answer")
 
-            case "Points for no answer":
-                self.points_for_no_answer = get_user_input_of_type(int, "Points for no answer")
+                case "Points for incorrect answer":
+                    self.points_for_incorrect_answer = get_user_input_of_type(int, "Points for incorrect answer")
 
-            case "Points multiplier for a streak":
-                self.points_multiplier_for_a_streak = get_user_input_of_type(int, "Points multiplier for a streak")
+                case "Points for no answer":
+                    self.points_for_no_answer = get_user_input_of_type(int, "Points for no answer")
 
-            case "Compounding amount for a streak":
-                self.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
+                case "Points multiplier for a streak":
+                    self.points_multiplier_for_a_streak = get_user_input_of_type(int, "Points multiplier for a streak")
 
-            case "Randomise questions":
-                self.randomise_questions = get_user_input_of_type(strBool, "Randomise questions ("
-                                                                  + Colour.true_or_false_styled() + ")")
+                case "Compounding amount for a streak":
+                    self.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
 
-            case "Randomise answer placement":
-                self.randomise_answer_placement = get_user_input_of_type(strBool,
-                                                                         "Randomise answer placement ("
-                                                                         + Colour.true_or_false_styled() + ")")
+                case "Randomise questions":
+                    self.randomise_questions = get_user_input_of_type(strBool, "Randomise questions ("
+                                                                      + Colour.true_or_false_styled() + ")")
 
-            case "Pick random question when run out of time":
-                self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (" +
-                                                                   Colour.true_or_false_styled() + ")")
+                case "Randomise answer placement":
+                    self.randomise_answer_placement = get_user_input_of_type(strBool,
+                                                                             "Randomise answer placement ("
+                                                                             + Colour.true_or_false_styled() + ")")
 
-            case "Bot difficulty":
-                self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (%)", range(1, 101))
+                case "Pick random question when run out of time":
+                    self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (" +
+                                                                       Colour.true_or_false_styled() + ")")
 
-            case "Number of bots":
-                self.how_many_bots = get_user_input_of_type(int, "Number of bots")
+                case "Bot difficulty":
+                    self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (%)", range(1, 101))
 
-            case "Next":
-                if self.host_a_server:
-                    self.settings_networking()
-                elif not self.host_a_server:
-                    self.settings_local()
+                case "Number of bots":
+                    self.how_many_bots = get_user_input_of_type(int, "Number of bots")
 
-            case "Back":
-                self.cancelled = True
+                case "Next":
+                    if self.host_a_server:
+                        self.settings_networking()
+                    elif not self.host_a_server:
+                        self.settings_local()
+                    break
 
-        # Loop if they chose to modify the settings, do not loop if they chose to go to next menu
-        if gameplay_menu.user_input != "Next" and gameplay_menu.user_input != "Back":
-            self.settings_gameplay()
+                case "Back":
+                    self.cancelled = True
+                    break
 
     def wait_for_players(self):
         """

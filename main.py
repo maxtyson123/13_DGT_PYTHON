@@ -13,9 +13,8 @@
 # [ ] GUI Extended, Buttons instead of based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
-
-
-# TODO:Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+import inspect
+# TODO: Clean up debugger, Remove any global variables, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
 
 
 import os
@@ -49,25 +48,25 @@ def game_finished(game: Game) -> None:
     game_finished_menu.user_input = "Main Menu"
 
     # Only allow for playing again if the game was completed
-    if game.game_finished:
-        game_finished_menu.get_input()
+    while True:
+        if game.game_finished:
+            game_finished_menu.get_input()
 
-    match game_finished_menu.user_input:
-        case "Play Again":
+        match game_finished_menu.user_input:
+            case "Play Again":
 
-            # Replay the game
-            game.reset()
-            game.begin()
+                # Replay the game
+                game.reset()
+                game.begin()
 
-            # Show the game finished menu again
-            game_finished(game)
+            case "Main Menu":
+                # Delete the game save if it exists
+                if os.path.exists(game.save_file) and game.game_finished:
+                    debug_message("Deleting save file", "game_finished")
+                    os.remove(game.save_file)
 
-        case "Main Menu":
-            # Delete the game save if it exists
-            if os.path.exists(game.save_file) and game.game_finished:
-                debug_message("Deleting save file", "game_finished")
-                os.remove(game.save_file)
-            game_main_menu()
+                # Return to the main menu
+                break
 
 
 def continue_game() -> None:
@@ -91,14 +90,13 @@ def continue_game() -> None:
 
     # If the user selected back then return
     if continue_menu.user_input == "Back":
-        game_main_menu()
+        return
 
     # Load the game object
     quiz = Game(continue_menu.user_input)
 
     # Check if this is previous multiplayer game
     if quiz.joined_game:
-
         # Delete this game save as contining a multiplayer game is server side
         debug_message(f"Deleting {quiz.save_file}", "quiz_load_game")
         os.remove(quiz.save_file)
@@ -112,7 +110,6 @@ def continue_game() -> None:
 
     # Show the game finished menu
     game_finished(quiz)
-
 
 
 def new_game() -> None:
@@ -172,11 +169,9 @@ def join_game() -> None:
                     # Create a new game object
                     quiz = Game()
                     quiz.join_game(ip, port)
+
             case "Back":
                 break
-
-    # Return to the main menu
-    game_main_menu()
 
 
 def settings() -> None:
@@ -190,33 +185,34 @@ def settings() -> None:
                        "Main Menu"]
 
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
-    settings_menu.get_input()
 
-    match settings_menu.user_input:
-        case "Display Mode":
-            usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
-                                                               ["CLI", "GUI"])
+    # Input loop
+    while True:
+        settings_menu.get_input()
 
-        case "Network":
-            usersettings.network = get_user_input_of_type(strBool,
-                                                          "Do you want to use the network? (" +
-                                                          Colour.true_or_false_styled() + "): ")
+        match settings_menu.user_input:
+            case "Display Mode":
+                usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
+                                                                   ["CLI", "GUI"])
 
-        case "Fix API":
-            print("Note: Fixing the API involves removing parameters from the API call until it goes though, "
-                  "this can fix errors where there arent enough questions of that type in the database, however it "
-                  "can mean that the question types arent the same as the ones you selected.")
+            case "Network":
+                usersettings.network = get_user_input_of_type(strBool,
+                                                              "Do you want to use the network? (" +
+                                                              Colour.true_or_false_styled() + "): ")
 
-            usersettings.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error "
-                                                                        "occurs? (" + Colour.true_or_false_styled() +
-                                                               "): ")
-        case "Back":
-            game_main_menu()
+            case "Fix API":
+                print("Note: Fixing the API involves removing parameters from the API call until it goes though, "
+                      "this can fix errors where there arent enough questions of that type in the database, however it "
+                      "can mean that the question types arent the same as the ones you selected.")
 
-    # Save and replay the menu if not going back
-    if settings_menu.user_input != "Back":
-        usersettings.save()
-        settings()
+                usersettings.auto_fix_api = get_user_input_of_type(strBool,
+                                                                   "Do you want to auto fix the API if an error "
+                                                                   "occurs? (" + Colour.true_or_false_styled() +
+                                                                   "): ")
+
+            case "Back":
+                usersettings.save()
+                break
 
 
 def game_main_menu() -> None:
@@ -233,26 +229,28 @@ def game_main_menu() -> None:
         else:
             debug_message("Network is disabled", "network")
 
-    game_menu.get_input()
+    while True:
 
-    match game_menu.user_input:
-        case "Continue Game":
-            continue_game()
+        game_menu.get_input()
 
-        case "New Game":
-            new_game()
+        match game_menu.user_input:
+            case "Continue Game":
+                continue_game()
 
-        case "Join Game":
-            join_game()
+            case "New Game":
+                new_game()
 
-        case "Tutorial":
-            tutorial()
+            case "Join Game":
+                join_game()
 
-        case "Settings":
-            settings()
+            case "Tutorial":
+                tutorial()
 
-        case "Quit":
-            sys.exit()
+            case "Settings":
+                settings()
+
+            case "Quit":
+                sys.exit()
 
 
 def tutorial() -> None:
@@ -308,7 +306,6 @@ def tutorial() -> None:
     print("- To continue press enter")
     input()
     tut_menu.clear()
-    game_main_menu()
 
 
 def main() -> None:
@@ -329,13 +326,13 @@ def main() -> None:
 
     print("Done")
 
+
 if __name__ == "__main__":
     # Set up the program
     init_debug()
-
     # Run the main program and catch the exit to stop the debug session
     try:
         main()
     finally:
+        inspect.stack()
         close_debug_session()
-
