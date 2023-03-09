@@ -4,7 +4,8 @@ import threading
 import time
 import types
 
-from Maxs_Modules.setup import UserData
+from Maxs_Modules.files import UserData
+from Maxs_Modules.tools import install_package
 from Maxs_Modules.debug import debug_message, error
 
 import socket
@@ -691,8 +692,7 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
     """
 
     # Get the setup data
-    setup = UserData()
-    setup.get_packages(["requests"])
+    install_package("requests")
 
     import requests
 

@@ -73,9 +73,8 @@ import time
 import html
 import random
 
-from Maxs_Modules.files import SaveFile, load_questions_from_file
+from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
 from Maxs_Modules.network import get_ip, QuizGameServer, QuizClient, QuizGameClient
-from Maxs_Modules.setup import UserData
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line

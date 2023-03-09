@@ -2,10 +2,13 @@
 import json
 import os
 from Maxs_Modules.debug import debug_message, error
+from Maxs_Modules.tools import try_convert, set_if_none
 
 # - - - - - - - Variables - - - - - - -#
 
 offline_questions_file = "ProgramData/questions.json"
+data_folder = "UserData/"
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -19,12 +22,12 @@ def load_questions_from_file() -> dict:
     """
     # Open the file in read mode
     with open(offline_questions_file, "r") as file:
-
         # Read the file into a json object
         questions = json.load(file)
 
         # Return the questions
         return questions["results"]
+
 
 # - - - - - - - Classes - - - - - - -#
 
@@ -98,3 +101,42 @@ class SaveFile:
 
             json.dump(save_dict, file)
             file.close()
+
+
+class UserData(SaveFile):
+    # User settings
+    display_mode = None
+    network = None
+    auto_fix_api = None
+
+    def __init__(self) -> None:
+        """
+        Create a new UserData object, loaded from setup.json
+        """
+        super().__init__(data_folder + "setup.json")
+
+        # Load the data from the save file
+        self.display_mode = try_convert(self.save_data.get("display_mode"), str)
+        self.network = try_convert(self.save_data.get("network"), bool)
+        self.auto_fix_api = try_convert(self.save_data.get("auto_fix_api"), bool)
+
+        # Load the default values if the data is not found
+        self.load_defaults()
+
+    def load_defaults(self) -> None:
+        """
+        Load the default values for the user data if they are not found
+        """
+        self.display_mode = set_if_none(self.display_mode, "CLI")
+        self.network = set_if_none(self.network, False)
+        self.auto_fix_api = set_if_none(self.auto_fix_api, True)
+
+    def save(self) -> None:
+        """
+        Save the user data to setup.json
+        """
+        self.save_data = self.__dict__
+
+        super().save()
+
+

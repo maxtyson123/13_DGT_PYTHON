@@ -15,7 +15,7 @@
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 
 
-# TODO: Remove Setup Wizard, Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+# TODO:Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
 
 
 import os
@@ -26,8 +26,8 @@ from Maxs_Modules.network import get_ip
 from Maxs_Modules.renderer import Menu, Colour
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
-from Maxs_Modules.setup import UserData
-from Maxs_Modules.tools import get_user_input_of_type, strBool, ipAdress
+from Maxs_Modules.files import UserData
+from Maxs_Modules.tools import get_user_input_of_type, strBool, ipAdress, install_package
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -79,7 +79,7 @@ def continue_game() -> None:
 
     # Sort the files
     user_data = UserData()
-    user_data.get_packages(["natsort"])
+    install_package("natsort")
     from natsort import natsorted
     saves = natsorted(saves)
 
@@ -185,9 +185,9 @@ def settings() -> None:
     """
     usersettings = UserData()
 
-    settings_options = ["Display Mode", "Network", "Fix API", "Python EXE Command", "Back"]
+    settings_options = ["Display Mode", "Network", "Fix API", "Back"]
     settings_values = [str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
-                       str(usersettings.python_exe_command), "Main Menu"]
+                       "Main Menu"]
 
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
     settings_menu.get_input()
@@ -210,11 +210,6 @@ def settings() -> None:
             usersettings.auto_fix_api = get_user_input_of_type(strBool, "Do you want to auto fix the API if an error "
                                                                         "occurs? (" + Colour.true_or_false_styled() +
                                                                "): ")
-
-        case "Python EXE Command":
-            usersettings.python_exe_command = get_user_input_of_type(str, "Please enter the python executable command "
-                                                                          "(e.g. python, python3, py): ")
-
         case "Back":
             game_main_menu()
 
@@ -336,8 +331,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     # Set up the program
-    setup = UserData()
-    setup.init_script()
     init_debug()
 
     # Run the main program and catch the exit to stop the debug session
@@ -345,3 +338,4 @@ if __name__ == "__main__":
         main()
     finally:
         close_debug_session()
+

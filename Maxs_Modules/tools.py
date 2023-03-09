@@ -102,12 +102,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
 
             # Dont continuously import inputimeout, and there is no need to install it and import it if there is no
             # need for it yet
-            global imported_timeout
-            if not imported_timeout:
-                imported_timeout = True
-                from Maxs_Modules.setup import UserData
-                setup = UserData()
-                setup.get_packages(["inputimeout"])
+            install_package("inputimeout")
 
             from inputimeout import inputimeout, TimeoutOccurred
 
@@ -191,3 +186,15 @@ def try_convert(variable: object, type_to_convert: object, supress_errors: bool 
         return None
 
 
+def install_package(package: str) -> None:
+    """
+    Install a package using pip
+
+    @param package: The package to install
+    @return: None
+    """
+    try:
+        import pip
+        pip.main(['install', package])
+    except Exception as e:
+        error("Failed to install package: " + package)

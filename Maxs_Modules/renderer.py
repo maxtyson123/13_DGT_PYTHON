@@ -6,7 +6,7 @@ import sys
 import time
 
 from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message, in_ide
-from Maxs_Modules.tools import try_convert
+from Maxs_Modules.tools import try_convert, install_package
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -251,15 +251,7 @@ class Menu:
                 # running in the IDE
                 if self.time_limit != 0 and not in_ide:
 
-                    # Dont continuously import inputimeout, and there is no need to install it and import it if there is no
-                    # need for it yet
-                    global imported_timeout
-                    if not imported_timeout:
-                        imported_timeout = True
-                        from Maxs_Modules.setup import UserData
-                        setup = UserData()
-                        setup.get_packages(["inputimeout"])
-
+                    install_package("inputimeout")
                     from inputimeout import inputimeout, TimeoutOccurred
 
                     # Check if the time limit has been reached
