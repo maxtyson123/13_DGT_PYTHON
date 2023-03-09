@@ -1557,7 +1557,8 @@ class Game(SaveFile):
 
     def join_game(self, ip, port):
         """
-        Joins a game
+        Joins a game, by creating a socket and connecting to the server on the given ip and port. The game is then
+        ran when the server is ready. May return prematurely if an error occurs.
         """
         # Create a socket
         try:
@@ -1611,6 +1612,11 @@ class Game(SaveFile):
         self.backend.close_connection(self.backend.client)
 
     def check_server_error(self) -> bool:
+        """
+        Checks if the server has closed and if so then prints any errors and returns True. If the server is still
+        running and has no errors then returns False.
+        @return:
+        """
         # If the socket has closed then return and print any errors
         if not self.backend.running:
             if self.backend.error is not None:
@@ -1620,5 +1626,3 @@ class Game(SaveFile):
                 self.backend.error = None
             return True
         return False
-
-# TODO: Error handling, More Doxy. Testing.

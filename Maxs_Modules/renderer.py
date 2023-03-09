@@ -345,6 +345,10 @@ class Menu:
                 if user_input in input_items:
                     self.user_input = user_input
                     break
+                else:
+                    error("Invalid input")
+                    user_input = None
+                    continue
         menu_manager.menu_history_input.append(self.user_input)
 
     def get_pages(self) -> list:

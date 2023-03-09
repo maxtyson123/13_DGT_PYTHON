@@ -33,7 +33,11 @@ class QuizMessage:
     def __str__(self):
         return f"Message: {self.message}, Sender: {self.sender}, Recipient: {self.recipient}, Type: {self.message_type}"
 
-    def to_bytes(self):
+    def to_bytes(self) -> bytes:
+        """
+        Convert the message to bytes (JSON encoded in utf-8)
+        @return: The message as bytes
+        """
         obj = {
             "message": self.message,
             "sender": self.sender,
@@ -43,7 +47,12 @@ class QuizMessage:
         debug_message(f"Encoding message: {obj}", "Network")
         return json.dumps(obj, ensure_ascii=False).encode("utf-8")
 
-    def from_bytes(self, data: bytes):
+    def from_bytes(self, data: bytes) -> object:
+        """
+        Update this objects attributes from the bytes (JSON encoded in utf-8)
+        @param data: The data to decode
+        @return: This object
+        """
         decoded = data.decode("utf-8")
         debug_message(f"Decoded message: {decoded}", "Network")
 
@@ -52,6 +61,7 @@ class QuizMessage:
         self.sender = obj.get("sender")
         self.recipient = obj.get("recipient")
         self.message_type = obj.get("message_type")
+        return self
 
 
 class QuizServer:
@@ -227,16 +237,21 @@ class QuizServer:
         # Close the server
         self.close_connection(self.server)
 
-
-    def handle_error(self, sock, key_data, error_response):
+    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> object:
         self.close_connection(sock)
-        error(f"Error in server: {error_response}")
+
+        # Check if this is caused by a user disconnecting
+        if "An existing connection was forcibly closed by the remote host" in str(error_response):
+            debug_message(f"Client disconnected: {key_data.addr}", "network_server")
+        else:
+            error(f"Error in server: {error_response}")
 
 
 class QuizClient:
     """
     A class to represent a client for the quiz game
     """
+
     def __init__(self, host: str, port: int):
         """
         @param host: The host ip to connect to
@@ -252,7 +267,9 @@ class QuizClient:
         self.selector.register(self.client, selectors.EVENT_READ, data=None)
 
     def run(self):
-
+        """
+        Run the client
+        """
         try:
 
             while True:
@@ -403,13 +420,13 @@ class QuizGameServer(QuizServer):
                         break
 
                 # If this server is continuing a game then dont allow new players to join
-                print(f"Is new player: {is_new_player}. Game loaded: {self.game.game_loaded}")
                 if is_new_player and self.game.game_loaded:
-                    self.send_message(sock, "Server is continuing game, must rejoin using same name. New players arent allowed", "server_error")
+                    self.send_message(sock,
+                                      "Server is continuing game, must rejoin using same name. New players arent allowed",
+                                      "server_error")
                     # Remove the user from the list
                     self.game.users.pop(temp_index)
                     return
-
 
                 self.game.convert_users()
 
@@ -441,6 +458,10 @@ class QuizGameServer(QuizServer):
                 debug_message(f"Unhandled message: {message.message}", "network_server")
 
     def sync_game(self):
+        """
+        Sync the game data to all clients. This will send all the game data, so it is best practice to save any
+        varibles that need to be saved before handling this
+        """
         # Ensure users have been converted, as timings can be off when networked
         self.game.convert_users()
 
@@ -457,6 +478,10 @@ class QuizGameServer(QuizServer):
         self.game.convert_all_from_save_data()
 
     def sync_players(self):
+        """
+        Sync the player data to all clients. This will send all the player data, so it is best practice to save the
+        position of the local player
+        """
         # Ensure users have been converted, as timings can be off when networked
         self.game.convert_users()
 
@@ -473,6 +498,9 @@ class QuizGameServer(QuizServer):
         self.game.convert_all_from_save_data()
 
     def sync_bots(self):
+        """
+        Sync the bot data to all clients. 
+        """
         # Ensure bots have been converted, as timings can be off when networked
         self.game.convert_bots()
 
@@ -488,7 +516,13 @@ class QuizGameServer(QuizServer):
         # Convert everything back
         self.game.convert_all_from_save_data()
 
-    def handle_error(self, sock, key_data, error_response):
+    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
+        """
+        Handle an error from a client and then close the client
+        @param sock: The socket to close the connection from
+        @param key_data: The key data for the socket
+        @param error_response: The error response
+        """
         super().handle_error(sock, key_data, error_response)
         self.running = False
 
@@ -599,7 +633,13 @@ class QuizGameClient(QuizClient):
             case _:
                 debug_message(f"Unhandled message: {message.message}", "network_client")
 
-    def handle_error(self, sock, key_data, error_response):
+    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
+        """
+        Handle an error from a client
+        @param sock: The socket to handle the error from
+        @param key_data: The key data for the socket
+        @param error_response: The error response
+        """
         self.close_connection(sock)
 
         error_response = str(error_response)
@@ -612,6 +652,9 @@ class QuizGameClient(QuizClient):
         self.running = False
 
     def send_self(self):
+        """
+        Send the local user to the server
+        """
         # Convert the users to a dict
         self.game.prepare_save_data()
 
@@ -625,9 +668,13 @@ class QuizGameClient(QuizClient):
         self.game.convert_all_from_save_data()
 
     def wait_for_move_on(self):
+        """
+        Wait for the move on flag to be set (this is set by the server)
+        """
         self.move_on = False
         while not self.move_on and self.running:
             pass
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -756,4 +803,3 @@ def get_ip() -> str:
     @return: The IP of the computer
     """
     return socket.gethostbyname(socket.gethostname())
-

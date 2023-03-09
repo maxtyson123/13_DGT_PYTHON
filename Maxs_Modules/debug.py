@@ -157,7 +157,7 @@ def init_debug() -> None:
             @param args: The args to pass to the command 
             """
             from Maxs_Modules.tools import get_user_input_of_type, strBool
-            from Maxs_Modules.renderer import Colour
+            from Maxs_Modules.renderer import Colour, menu_manager
 
             # Default behaviour for no args
             if len(args) == 0:
@@ -179,6 +179,8 @@ def init_debug() -> None:
                         print(" -store-location: Sets the location to store the logs")
                         print(" -store-individual: Sets weather or not to store the logs in individual files")
                         print(" -store-max: Sets the maximum amount of logs to store")
+                        print(" -menu-history: Shows a log of all the menus in the current session")
+                        print(" -menu-history-input: Shows a log of all the input in the menus in the current session")
 
                     case "-ignore-add":
                         self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
@@ -225,6 +227,14 @@ def init_debug() -> None:
 
                     case "-clear-history":
                         self.full_message_log = []
+
+                    case "-menu-history":
+                        for menu in menu_manager.menu_history_names:
+                            print("- " + str(menu))
+
+                    case "-menu-history-input":
+                        for user_input in menu_manager.menu_history_input:
+                            print("- " + str(user_input))
 
                     case _:
                         print("Unknown command: " + arg)

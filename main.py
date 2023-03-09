@@ -6,16 +6,17 @@
 # [x] Extended user experience: Colours, mulitpage menus
 # [x] Easier debugging
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
-# [.] Multiplayer Game Logic: Scores sync questions sync
-# [ ] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
-# [ ] Clean Up and ake more efficient and correct commenting
+# [x] Multiplayer Game Logic: Scores sync questions sync
+# [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
+# [.] Clean Up aka more efficient and correct commenting
 # [ ] GUI Base, port the current render to a simple GUI
 # [ ] GUI Extended, Buttons instead of based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 
 
-# TODO: Finish Networked game, Remove Setup Wizard, Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing
+# TODO: Remove Setup Wizard, Less stack calls, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+
 
 import os
 # - - - - - - - Imports - - - - - - -#
