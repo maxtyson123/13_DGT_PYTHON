@@ -52,8 +52,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classnetwork_1_1_quiz_client.html",
-"namespacedebug.html#a8309293c533c049739ec8a356dab7249"
+"d5/dea/classgame_1_1_game.html#aa0036fc3d8e83cf7287fc6ac948420b8",
+"dd/d35/renderer_8py.html#a1f9909cb99ab50fb1d8e172f59ebe7af"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
