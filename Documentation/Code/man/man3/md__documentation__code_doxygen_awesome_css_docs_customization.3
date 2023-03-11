@@ -1,0 +1,108 @@
+.TH "md__documentation__code_doxygen_awesome_css_docs_customization" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+md__documentation__code_doxygen_awesome_css_docs_customization \- Customization 
+.PP
+
+.SH "CSS-Variables"
+.PP
+This theme is highly customizable because a lot of things are parameterized with CSS variables\&.
+.PP
+Just to give you an idea on how flexible the styling is, click this button:
+.PP
+Alter theme
+.SS "Setup"
+It is recommended to add your own \fCcustom\&.css\fP and overwrite the variables there: 
+.PP
+.nf
+HTML_EXTRA_STYLESHEET  = doxygen\-awesome\&.css custom\&.css
+
+.fi
+.PP
+.PP
+Make sure to override the variables in the correct spot\&. All variables should be customized where they have been defined, in the \fChtml\fP tag selector:
+.PP
+.PP
+.nf
+html {
+    /* override light\-mode variables here */
+}
+.fi
+.PP
+.PP
+For dark-mode overrides you have to choose where to put them, depending on whether the dark-mode toggle extension is installed or not:
+.PP
+.PP
+.IP "\(bu" 2
+\fBdark-mode toggle is installed\fP 
+.PP
+.nf
+html\&.dark\-mode {
+    /* define dark\-mode variable overrides here if you DO use doxygen\-awesome\-darkmode\-toggle\&.js */
+}
+
+.fi
+.PP
+
+.IP "\(bu" 2
+\fBdark-mode toggle is \fBNOT\fP installed\fP The dark-mode is enabled automatically depending on the system preference: 
+.PP
+.nf
+@media (prefers\-color\-scheme: dark) {
+    html:not(\&.light\-mode) {
+        /* define dark\-mode variable overrides here if you DON'T use doxygen\-awesome\-darkmode\-toggle\&.js */
+    }
+}
+
+.fi
+.PP
+
+.PP
+.PP
+.SS "Available variables"
+The following list gives an overview of the variables defined in \fC\fCdoxygen-awesome\&.css\fP\fP\&.
+.PP
+The list is not complete\&. To explore all available variables, have a look at the CSS starting from \fChere\fP\&. All variables are defined at the beginning of the stylesheet\&.
+.PP
+Parameter   Default (Light)   Default (Dark)    \fBColor Scheme\fP:
+.br
+primary theme colors\&. This will affect the entire websites color scheme: links, arrows, labels, \&.\&.\&.    \fC--primary-color\fP   \fC#1779c4\fP   \fC#1982d2\fP    \fC--primary-dark-color\fP   \fC#335c80\fP   \fC#5ca8e2\fP    \fC--primary-light-color\fP   \fC#70b1e9\fP   \fC#4779ac\fP    \fBPage Colors\fP:
+.br
+background and foreground (text-color) of the documentation\&.    \fC--page-background-color\fP   \fC#ffffff\fP   \fC#1C1D1F\fP    \fC--page-foreground-color\fP   \fC#2f4153\fP   \fC#d2dbde\fP    \fC--page-secondary-foreground-color\fP   \fC#6f7e8e\fP   \fC#859399\fP    \fBSpacing:\fP
+.br
+default spacings\&. Most ui components reference these values for spacing, to provide uniform spacing on the page\&.    \fC--spacing-small\fP   \fC5px\fP   \fC--spacing-medium\fP   \fC10px\fP   \fC--spacing-large\fP   \fC16px\fP   \fBBorder Radius\fP:
+.br
+border radius for all rounded ui components\&. Will affect many components, like dropdowns, memitems, codeblocks, \&.\&.\&.    \fC--border-radius-small\fP   \fC4px\fP   \fC--border-radius-medium\fP   \fC6px\fP   \fC--border-radius-large\fP   \fC8px\fP   \fBContent Width\fP:
+.br
+The content is centered and constrained in its width\&. To make the content fill the whole page, set the following variable to \fCauto\fP\&.    \fC--content-maxwidth\fP   \fC1000px\fP   \fBCode Fragment Colors\fP:
+.br
+Color-Scheme of multiline codeblocks    \fC--fragment-background\fP   \fC#F8F9FA\fP   \fC#282c34\fP    \fC--fragment-foreground\fP   \fC#37474F\fP   \fC#dbe4eb\fP    \fBArrow Opacity\fP:
+.br
+By default the arrows in the sidebar are only visible on hover\&. You can override this behavior so they are visible all the time\&.    \fC--side-nav-arrow-opacity\fP   \fC0\fP   \fC--side-nav-arrow-hover-opacity\fP   \fC0\&.9\fP   \&.\&.\&.and many more   
+.PP
+If you miss a configuration option or find a bug, please consider \fCopening an issue\fP!
+.SH "Doxygen generator"
+.PP
+The theme overrides most colors with the \fC--primary-color-*\fP variables\&.
+.PP
+But there is a few small images and graphics that the theme cannot adjust or replace\&. To make these blend in better with the rest, it is recommended to adjust the \fCdoxygen color settings\fP to something that matches the chosen color-scheme\&.
+.PP
+For the default color-scheme, these values work out quite well:
+.PP
+.PP
+.nf
+# Doxyfile
+HTML_COLORSTYLE_HUE    = 209
+HTML_COLORSTYLE_SAT    = 255
+HTML_COLORSTYLE_GAMMA  = 113
+.fi
+.PP
+.SH "Share your customizations"
+.PP
+If you customized the theme with custom colors, spacings, font-sizes, etc\&. and you want to share your creation with others, you can to this \fChere\fP\&.
+.PP
+I am always curious to learn about how you made the theme look even better!
+.PP
+.PP
+Read Next: \fBTips & Tricks\fP  

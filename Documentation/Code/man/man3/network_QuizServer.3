@@ -1,0 +1,277 @@
+.TH "network.QuizServer" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+network.QuizServer
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherited by \fBnetwork\&.QuizGameServer\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fB__init__\fP (self, str \fBhost\fP, int \fBport\fP)"
+.br
+.ti -1c
+.RI "None \fBrun\fP (self)"
+.br
+.ti -1c
+.RI "None \fBaccept_connection\fP (self, socket sock)"
+.br
+.ti -1c
+.RI "None \fBclose_connection\fP (self, socket sock)"
+.br
+.ti -1c
+.RI "None \fBservice_connection\fP (self, object key, object mask)"
+.br
+.ti -1c
+.RI "None \fBhandle_data_received\fP (self, socket sock, object key_data, bytes recv_data)"
+.br
+.ti -1c
+.RI "None \fBhandle_data_send\fP (self, socket sock, object key_data, bytes send_data)"
+.br
+.ti -1c
+.RI "None \fBsend_message\fP (self, socket sock, str message, str message_type)"
+.br
+.ti -1c
+.RI "None \fBsend_message_to_all\fP (self, str message, str message_type)"
+.br
+.ti -1c
+.RI "None \fBkill\fP (self)"
+.br
+.ti -1c
+.RI "None \fBhandle_error\fP (self, socket sock, object key_data, Exception error_response)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBhost\fP"
+.br
+.ti -1c
+.RI "\fBport\fP"
+.br
+.ti -1c
+.RI "\fBselector\fP"
+.br
+.ti -1c
+.RI "\fBclients\fP"
+.br
+.ti -1c
+.RI "\fBclient_names\fP"
+.br
+.ti -1c
+.RI "\fBserver\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+.nf
+A class to represent a server for the quiz game
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB67\fP of file \fBnetwork\&.py\fP\&.
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "def network\&.QuizServer\&.__init__ ( self, str host, int port)"
+
+.PP
+.nf
+Initialise the server, setups a selector and a server socket to listen for connections
+@param host: The host to listen on
+@param port: The port to listen on
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB72\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " None network\&.QuizServer\&.accept_connection ( self, socket sock)"
+
+.PP
+.nf
+Accept a connection from a client, saves the client and registers it with the selector\&. The data (sometimes
+called key_data) is a namespace with the address of the client and the data to send and receive\&.
+
+@param sock: The socket to accept the connection from
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB101\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.close_connection ( self, socket sock)"
+
+.PP
+.nf
+Close a connection from a client by removing it from the selector and the list of clients
+
+@param sock: The socket to close the connection on\&.
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBnetwork\&.QuizGameServer\fP\&.
+.PP
+Definition at line \fB130\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.handle_data_received ( self, socket sock, object key_data, bytes recv_data)"
+
+.PP
+.nf
+Handle data received from a client\&. This needs to be overridden by a subclass to handle for its use case\&.
+
+@param sock:  The socket the data came from\&.
+@param key_data: The data from the key, contains the address of
+the client, the data to send and the data to receive
+@param recv_data: The data received, can be also gotten from key_data\&.send_bytes but is passed for convenience
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBnetwork\&.QuizGameServer\fP\&.
+.PP
+Definition at line \fB195\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.handle_data_send ( self, socket sock, object key_data, bytes send_data)"
+
+.PP
+.nf
+Handle data sent to a client
+
+@param key_data: The data from the key
+@param sock: The socket to send the data on
+@param send_data: The data sent
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB205\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.handle_error ( self, socket sock, object key_data, Exception error_response)"
+
+.PP
+.nf
+Handle an error from the server\&. This is called when an error occurs in the server\&. The connection is closed
+on the socket and the error is printed\&. If the error is a user disconnecting then it is printed as a debug
+message, otherwise it is printed as an error this is because disconnection shouldn't be displayed\&.
+
+@param sock: The socket the error occurred on
+@param key_data: The data from the key
+@param error_response: The string representation of the error
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBnetwork\&.QuizGameServer\fP\&.
+.PP
+Definition at line \fB248\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.kill ( self)"
+
+.PP
+.nf
+Kill the server, closing all connections in the clients list and then finally closing the server
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB237\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.run ( self)"
+
+.PP
+.nf
+Loop forever and accept connections or service connections when they are ready
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB89\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.send_message ( self, socket sock, str message, str message_type)"
+
+.PP
+.nf
+Send a message to the socket specified\&. The message is wrapped in a QuizMessage object and then sent\&.
+
+@param message_type: The type of message to send
+@param sock: The socket to send the message on
+@param message: The message to send
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB214\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.send_message_to_all ( self, str message, str message_type)"
+
+.PP
+.nf
+Send a message to all clients using the send_message function and  looping through the clients
+
+@param message_type: The type of message to send
+@param message: The message to send
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB227\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizServer\&.service_connection ( self, object key, object mask)"
+
+.PP
+.nf
+Service a connection from a client\&. This is called when the client has data to send or is ready to receive
+data\&. Data is read in 4096 byte chunks so messages shouldnt be sent directly one after another or will cause
+issues on the recving end\&. Data is then sent to the handle_data_received function\&. If there is data to send
+then it is sent to the handle_data_send function\&.
+
+@param key: The key to the client
+@param mask: The mask to the client
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB153\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "network\&.QuizServer\&.client_names"
+
+.PP
+Definition at line \fB83\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizServer\&.clients"
+
+.PP
+Definition at line \fB82\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizServer\&.host"
+
+.PP
+Definition at line \fB78\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizServer\&.port"
+
+.PP
+Definition at line \fB79\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizServer\&.selector"
+
+.PP
+Definition at line \fB81\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizServer\&.server"
+
+.PP
+Definition at line \fB85\fP of file \fBnetwork\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

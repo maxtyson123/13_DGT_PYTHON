@@ -1,6 +1,5 @@
 # - - - - - - - Imports - - - - - - -#
 import json
-import threading
 import time
 import types
 
@@ -36,8 +35,8 @@ class QuizMessage:
 
     def to_bytes(self) -> bytes:
         """
-        Convert the message to bytes (JSON encoded in utf-8)
-        @return: The message as bytes
+        Creates a JSON object from the attributes of this object and encodes it in utf-8
+        @return: The message as bytes (JSON encoded in utf-8)
         """
         obj = {
             "message": self.message,
@@ -72,6 +71,7 @@ class QuizServer:
 
     def __init__(self, host: str, port: int):
         """
+        Initialise the server, setups a selector and a server socket to listen for connections
         @param host: The host to listen on
         @param port: The port to listen on
         """
@@ -86,9 +86,9 @@ class QuizServer:
 
         self.selector.register(self.server, selectors.EVENT_READ, data=None)
 
-    def run(self):
+    def run(self) -> None:
         """
-        Run the server
+        Loop forever and accept connections or service connections when they are ready
         """
         while True:
             events = self.selector.select(timeout=None)
@@ -98,9 +98,10 @@ class QuizServer:
                 else:
                     self.service_connection(key, mask)
 
-    def accept_connection(self, sock):
+    def accept_connection(self, sock: socket) -> None:
         """
-        Accept a connection from a client
+        Accept a connection from a client, saves the client and registers it with the selector. The data (sometimes
+        called key_data) is a namespace with the address of the client and the data to send and receive.
 
         @param sock: The socket to accept the connection from
         """
@@ -110,11 +111,11 @@ class QuizServer:
         # Print the address
         debug_message(f"Accepted connection from {address}", "network_server")
 
-        # Dont block the process as we want to be able to accept multiple connections
+        # Don't block the process as we want to be able to accept multiple connections
         connection.setblocking(False)
 
         # Create the data object
-        data = types.SimpleNamespace(addr=address, inb=b"", outb=b"")
+        data = types.SimpleNamespace(socket_adress=address, recieved_bytes=b"", send_bytes=b"")
 
         # Create the events. They are now read and write so set those bits
         events = selectors.EVENT_READ | selectors.EVENT_WRITE
@@ -126,11 +127,11 @@ class QuizServer:
         self.clients.append(connection)
         self.client_names.append(address)
 
-    def close_connection(self, sock):
+    def close_connection(self, sock: socket) -> None:
         """
-        Close a connection from a client
+        Close a connection from a client by removing it from the selector and the list of clients
 
-        @param sock: The socket to close the connection from
+        @param sock: The socket to close the connection on.
         """
 
         debug_message(f"Closing connection on {sock}", "network_server")
@@ -149,9 +150,12 @@ class QuizServer:
                 self.client_names.pop(sock_index)
                 break
 
-    def service_connection(self, key, mask):
+    def service_connection(self, key: object, mask: object) -> None:
         """
-        Service a connection from a client
+        Service a connection from a client. This is called when the client has data to send or is ready to receive
+        data. Data is read in 4096 byte chunks so messages shouldnt be sent directly one after another or will cause
+        issues on the recving end. Data is then sent to the handle_data_received function. If there is data to send
+        then it is sent to the handle_data_send function.
 
         @param key: The key to the client
         @param mask: The mask to the client
@@ -173,7 +177,7 @@ class QuizServer:
 
                 else:
                     # Print the address
-                    debug_message(f"Closing connection on {data.addr}", "network_server")
+                    debug_message(f"Closing connection on {data.socket_adress}", "network_server")
 
                     # Close the connection
                     self.close_connection(sock)
@@ -182,31 +186,34 @@ class QuizServer:
             if mask & selectors.EVENT_WRITE:
 
                 # If there is data to send
-                if data.outb:
-                    self.handle_data_send(sock, data, data.outb)
+                if data.send_bytes:
+                    self.handle_data_send(sock, data, data.send_bytes)
 
         except Exception as e:
             self.handle_error(sock, data, e)
 
-    def handle_data_received(self, sock, key_data, recv_data: bytes):
+    def handle_data_received(self, sock: socket, key_data: object, recv_data: bytes) -> None:
         """
-        Handle data received from a client
+        Handle data received from a client. This needs to be overridden by a subclass to handle for its use case.
 
-        @param sock:  T
-        @param key_data: The data from the key
-        @param recv_data: The data received
+        @param sock:  The socket the data came from.
+        @param key_data: The data from the key, contains the address of
+        the client, the data to send and the data to receive
+        @param recv_data: The data received, can be also gotten from key_data.send_bytes but is passed for convenience
         """
 
-    def handle_data_send(self, sock, key_data, send_data: bytes):
+    def handle_data_send(self, sock: socket, key_data: object, send_data: bytes) -> None:
         """
         Handle data sent to a client
 
+        @param key_data: The data from the key
+        @param sock: The socket to send the data on
         @param send_data: The data sent
         """
 
-    def send_message(self, sock, message: str, message_type: str):
+    def send_message(self, sock: socket, message: str, message_type: str) -> None:
         """
-        Send a message to the server
+        Send a message to the socket specified. The message is wrapped in a QuizMessage object and then sent.
 
         @param message_type: The type of message to send
         @param sock: The socket to send the message on
@@ -217,9 +224,9 @@ class QuizServer:
         sock.sendall(message.to_bytes())
         debug_message(f"Sent {message}", "network_server")
 
-    def send_message_to_all(self, message: str, message_type: str):
+    def send_message_to_all(self, message: str, message_type: str) -> None:
         """
-        Send a message to all clients
+        Send a message to all clients using the send_message function and  looping through the clients
 
         @param message_type: The type of message to send
         @param message: The message to send
@@ -227,9 +234,9 @@ class QuizServer:
         for client in self.clients:
             self.send_message(client, message, message_type)
 
-    def kill(self):
+    def kill(self) -> None:
         """
-        Kill the server
+        Kill the server, closing all connections in the clients list and then finally closing the server
         """
         # Close the clients
         for client in self.clients:
@@ -238,12 +245,21 @@ class QuizServer:
         # Close the server
         self.close_connection(self.server)
 
-    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> object:
+    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
+        """
+        Handle an error from the server. This is called when an error occurs in the server. The connection is closed
+        on the socket and the error is printed. If the error is a user disconnecting then it is printed as a debug
+        message, otherwise it is printed as an error this is because disconnection shouldn't be displayed.
+
+        @param sock: The socket the error occurred on
+        @param key_data: The data from the key
+        @param error_response: The string representation of the error
+        """
         self.close_connection(sock)
 
         # Check if this is caused by a user disconnecting
         if "An existing connection was forcibly closed by the remote host" in str(error_response):
-            debug_message(f"Client disconnected: {key_data.addr}", "network_server")
+            debug_message(f"Client disconnected: {key_data.socket_adress}", "network_server")
         else:
             error(f"Error in server: {error_response}")
 
@@ -255,6 +271,9 @@ class QuizClient:
 
     def __init__(self, host: str, port: int):
         """
+        Initialise the client and connect to the server. The selector set and then is used to listen for data from
+        the server
+
         @param host: The host ip to connect to
         @param port: The port to listen on
         """
@@ -267,9 +286,11 @@ class QuizClient:
 
         self.selector.register(self.client, selectors.EVENT_READ, data=None)
 
-    def run(self):
+    def run(self) -> None:
         """
-        Run the client
+        Run the client, listening for data from the server refreshing every second. If there is data then it is read
+        at 4096 bytes per chunk and then checked to see if it is a valid json string. If it is then it is sent to the
+        handle_data_received function. If there is no data then the connection has been closed and the client is closed.
         """
         try:
 
@@ -301,6 +322,8 @@ class QuizClient:
                                     json.loads(decoded)
                                     break
                                 except ValueError:
+                                    # TODO: This is not the best way of doing this as a malicious server could send
+                                    #  broken JSON and cause the client to loop forever
                                     continue
 
                             # If there is no data then the connection has been closed
@@ -311,21 +334,22 @@ class QuizClient:
                         if mask & selectors.EVENT_WRITE:
 
                             # If there is data to send
-                            if data.outb:
-                                self.handle_request(sock, data, data.outb)
+                            if data.send_bytes:
+                                self.handle_request(sock, data, data.send_bytes)
 
                     except Exception as e:
                         self.handle_error(sock, data, e)
 
-        # OSErrors thrown here are caused when the socket is being deleted, so we can ignore them
-        except OSError as e:
+        # OSErrors thrown here are caused when the socket is being deleted, so can ignore them
+        except OSError:
             pass
 
-    def close_connection(self, sock):
+    def close_connection(self, sock: socket) -> None:
         """
-        Close a connection from a client
+        Close a connection on a socket and unregisters it from the selector, mostly used to close the connection on 
+        the server
 
-        @param sock: The socket to close the connection from
+        @param sock: The socket to close the connection on.
         """
         # Unregister the socket from the selector
         self.selector.unregister(sock)
@@ -333,19 +357,43 @@ class QuizClient:
         # Close the socket
         sock.close()
 
-    def handle_data_received(self, sock, key_data, recv_data: bytes):
+    def handle_data_received(self, sock: socket, key_data: object, recv_data: bytes) -> None:
+        """
+        Handle data received from the server. This is called when data is received from the server. Functionality needs
+        to be written by the subclass
+
+        @param sock: The socket the data was received on
+        @param key_data: The data from the key
+        @param recv_data: The data received from the server, same as key_data.receive_bytes but kept for convenience
+        """
         pass
 
-    def handle_request(self, sock, key_data, send_data: bytes):
+    def handle_request(self, sock: socket, key_data: object, send_data: bytes) -> None:
+        """
+        Handle a request to send data to the server. This is called when data is sent to the server. Functionality needs
+        to be written by the subclass
+
+        @param sock: The socket to send the data on
+        @param key_data: The data from the key
+        @param send_data: The data to send to the server, same as key_data.send_bytes but kept for convenience
+        """
         pass
 
-    def handle_error(self, sock, key_data, error_response):
+    def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
+        """
+        Handle an error from the client. This is called when an error occurs in the client. The connection is closed
+        and then the exception is printed using the error function
+
+        @param sock: The socket the error occurred on
+        @param key_data: The data from the selector key
+        @param error_response: The string representation of the error
+        """
         self.close_connection(sock)
         error(f"Error in client: {error_response}")
 
-    def send_message(self, sock, message: str, message_type: str):
+    def send_message(self, sock: object, message: str, message_type: str) -> None:
         """
-        Send a message to the server
+        Send a message to the server enclosed in a QuizMessage object
 
         @param message_type: The type of message to send
         @param sock: The socket to send the message on
@@ -361,20 +409,25 @@ class QuizGameServer(QuizServer):
     running = False
     error = None
 
-    def handle_data_received(self, sock, key_data, recv_data: bytes):
+    def handle_data_received(self, sock: socket, key_data: object, recv_data: bytes) -> None:
         """
-        Handle data received from a client
+        Handle data received from a client. This function can handle the client_join message type and the sync_player
+        message. Both of these actions involve updating the game's users array with the new user data if the request
+        was handled without error. Upon handling the messages the server will send a error response to the socket if
+        the game is full or has already started or if the username is already taken.  If the game has already started
+        then the server will only allow the client to join if they have a name that is already in the game's users
+        but not connected, which is treated as a reconnect.
 
         @param sock: The socket to handle the data from
-        @param key_data:
-        @param recv_data: The data received
+        @param key_data: The data from the selector key
+        @param recv_data: The data received from the client (same as key_data.receive_bytes but kept for convenience)
         """
 
         # Convert the data to a message
         message = QuizMessage(None, None, None, None)
         message.from_bytes(recv_data)
 
-        # Handle the messasge
+        # Handle the message
         match message.message_type:
             case "client_join":
                 # Check if the game has started
@@ -387,7 +440,7 @@ class QuizGameServer(QuizServer):
                     self.send_message(sock, "Game is full", "server_error")
                     return
 
-                # Convert the user to a object
+                # Convert the user to an object
                 self.game.users.append(message.message)
                 temp_index = len(self.game.users) - 1
                 self.game.convert_users()
@@ -420,7 +473,7 @@ class QuizGameServer(QuizServer):
 
                         break
 
-                # If this server is continuing a game then dont allow new players to join
+                # If this server is continuing a game then don't allow new players to join
                 if is_new_player and self.game.game_loaded:
                     self.send_message(sock,
                                       "Server is continuing game, must rejoin using same name. New players arent allowed",
@@ -458,10 +511,12 @@ class QuizGameServer(QuizServer):
             case _:
                 debug_message(f"Unhandled message: {message.message}", "network_server")
 
-    def sync_game(self):
+    def sync_game(self) -> None:
         """
         Sync the game data to all clients. This will send all the game data, so it is best practice to save any
-        varibles that need to be saved before handling this
+        variables that need to be saved before handling this. As games can be quite large (30kb with 50 questions,
+        50 players) this function should be used sparingly, instead send the data that needs to be updated,
+        i.e use sync_players when showing the scoreboard.
         """
         # Ensure users have been converted, as timings can be off when networked
         self.game.convert_users()
@@ -478,10 +533,10 @@ class QuizGameServer(QuizServer):
         # Convert everything back
         self.game.convert_all_from_save_data()
 
-    def sync_players(self):
+    def sync_players(self) -> None:
         """
         Sync the player data to all clients. This will send all the player data, so it is best practice to save the
-        position of the local player
+        position of the local player before handling this. 
         """
         # Ensure users have been converted, as timings can be off when networked
         self.game.convert_users()
@@ -498,9 +553,9 @@ class QuizGameServer(QuizServer):
         # Convert everything back
         self.game.convert_all_from_save_data()
 
-    def sync_bots(self):
+    def sync_bots(self) -> None:
         """
-        Sync the bot data to all clients. 
+        Sync the bot data to all clients.
         """
         # Ensure bots have been converted, as timings can be off when networked
         self.game.convert_bots()
@@ -519,19 +574,22 @@ class QuizGameServer(QuizServer):
 
     def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
         """
-        Handle an error from a client and then close the client
-        @param sock: The socket to close the connection from
+        Handle an error from a client and then close the client. Uses the super class to handle the error and then sets
+        the running variable to false
+
+        @param sock: The socket that the error occurred on
         @param key_data: The key data for the socket
-        @param error_response: The error response
+        @param error_response: The exception that was raised that caused the error
         """
         super().handle_error(sock, key_data, error_response)
         self.running = False
 
-    def close_connection(self, sock):
+    def close_connection(self, sock: socket) -> None:
         """
-        Close a connection from a client
+        Close a connection from a client by removing it from the selector and the list of clients. The user is also
+        removed from the games list of players.
 
-        @param sock: The socket to close the connection from
+        @param sock: The socket to close the connection on.
         """
 
         debug_message(f"Closing connection on {sock}", "network_server")
@@ -567,22 +625,25 @@ class QuizGameClient(QuizClient):
     def __init__(self, host: str, port: int):
         super().__init__(host, port)
 
-    def handle_data_received(self, sock, key_data, recv_data: bytes):
+    def handle_data_received(self, sock: socket, key_data: object, recv_data: bytes) -> None:
         """
-        Handle data received from a client
+        Handle data received from the server. The message is converted to a QuizMessage object and then handled,
+        the types that can be handled are: server_error, move_on, sync_game, sync_players, sync_bots. Server error
+        will cause the client to close, move on will exit the wait_for_move_on()'s loop, sync_game will sync the game
+        data, sync_players will sync the player data and sync_bots will sync the bot data.
 
         @param sock: The socket to handle the data from
-        @param key_data:
-        @param recv_data: The data received
+        @param key_data: The key data for the socket's selector
+        @param recv_data: The data received from the server as bytes (the same as key_data.receive_bytes but kept for
+        convenience)
         """
-        # TODO: Find a better way to get the server socket for sending messages
         self.server = sock
 
         # Convert the data to a message
         message = QuizMessage(None, None, None, None)
         message.from_bytes(recv_data)
 
-        # Handle the messasge
+        # Handle the message
         match message.message_type:
             case "server_error":
                 self.error = f"Server error: {message.message}"
@@ -636,7 +697,9 @@ class QuizGameClient(QuizClient):
 
     def handle_error(self, sock: socket, key_data: object, error_response: Exception) -> None:
         """
-        Handle an error from a client
+        Handle an error from the server, close the connection and set the running variable to false. If the error
+        message was that the connection was closed by the host then it is rephrased as "Server Closed" for readability.
+
         @param sock: The socket to handle the error from
         @param key_data: The key data for the socket
         @param error_response: The error response
@@ -670,7 +733,7 @@ class QuizGameClient(QuizClient):
 
     def wait_for_move_on(self):
         """
-        Wait for the move on flag to be set (this is set by the server)
+        Wait for the move on flag to be set (this is set when receiving the move on message from the server)
         """
         self.move_on = False
         while not self.move_on and self.running:
@@ -680,14 +743,14 @@ class QuizGameClient(QuizClient):
 # - - - - - - - Functions - - - - - - -#
 
 
-def api_get_questions(amount: int, category: int, difficulty: str, type: str) -> list:
+def api_get_questions(amount: int, category: int, difficulty: str, question_type: str) -> list:
     """
     Gets questions from the API at https://opentdb.com/api.php and returns them as a list of dictionaries
 
     @param amount: How many questions to get (Max 50)
     @param category: The category of the questions (index, offset by 9)
     @param difficulty: The difficulty of the questions
-    @param type: The type of the questions
+    @param question_type: The type of the questions
     @return: A list of dictionaries containing the questions
     """
 
@@ -709,8 +772,8 @@ def api_get_questions(amount: int, category: int, difficulty: str, type: str) ->
         # Ignore the options if they are "Any" (or none because 'convert_question_settings_to_api' already does this)
         # since the API gives any by default
 
-        if type is not None and api_fix < 1:
-            url += f"&type={type}"
+        if question_type is not None and api_fix < 1:
+            url += f"&type={question_type}"
 
         if difficulty != "Any" and api_fix < 2:
             url += f"&difficulty={difficulty.lower()}"
@@ -753,8 +816,8 @@ def connect_to_server(server_ip: str, port: int) -> socket.socket:
     """
     Connect to a server using a socket
 
-    @param server_ip: The IP of the server (IPV4)
-    @param port: The port of the server. Note: use any port higher than 1024 for privileged users
+    @param server_ip: The IP of the server (IPv4)
+    @param port: The port of the server. Note: use any port higher than 1024 for un-privileged users
     @return: The socket object
     """
 
@@ -770,7 +833,7 @@ def connect_to_server(server_ip: str, port: int) -> socket.socket:
 
 def setup_tcp_server(port: int) -> socket.socket:
     """
-    Sets up a TCP server
+    Sets up a TCP server on the local machine.
 
     @param port: The port to listen on
     @return: The socket object
@@ -779,7 +842,7 @@ def setup_tcp_server(port: int) -> socket.socket:
     # Create the socket. AF_INET is ipv4 and SOCK_STREAM is TCP
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    # Get the IP adress to bind to
+    # Get the IP address to bind to
     ip = get_ip()
 
     # Bind the socket to the port
@@ -789,7 +852,7 @@ def setup_tcp_server(port: int) -> socket.socket:
     # Start listening
     sock.listen()
 
-    # Dont block the process as we want to be able to accept multiple connections
+    # Don't block the process as we want to be able to accept multiple connections
     sock.setblocking(False)
 
     # Return the socket
@@ -798,7 +861,7 @@ def setup_tcp_server(port: int) -> socket.socket:
 
 def get_ip() -> str:
     """
-    Gets the IP of the computer
+    Gets the IP of the computer using the socket library
 
     @return: The IP of the computer
     """

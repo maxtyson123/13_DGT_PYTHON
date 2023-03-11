@@ -1,0 +1,124 @@
+\href{https://github.com/jothepro/doxygen-awesome-css/releases/latest}{\texttt{ }} \href{https://github.com/jothepro/doxygen-awesome-css/blob/main/LICENSE}{\texttt{ }} 
+
+
+
+
+
+
+
+{\bfseries{Doxygen Awesome}} is a custom {\bfseries{CSS theme for Doxygen HTML-\/documentation}} with lots of customization parameters.\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md27}{}\doxysection{Motivation}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md27}
+I really like how the Doxygen HTML-\/documentation is structured! But IMHO it looks a bit outdated.
+
+This theme is an attempt to update the visuals of Doxygen without changing its overall layout too much.\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md28}{}\doxysection{Features}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md28}
+
+\begin{DoxyItemize}
+\item 🌈 Clean, modern design
+\item 🚀 Heavily customizable by adjusting CSS-\/variables
+\item 🧩 No changes to the HTML structure of Doxygen required
+\item 📱 Improved mobile usability
+\item 🌘 Dark mode support!
+\item 🥇 Works best with {\bfseries{doxygen 1.\+9.\+1}} -\/ {\bfseries{1.\+9.\+4}} and {\bfseries{1.\+9.\+6}}
+\end{DoxyItemize}\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md29}{}\doxysection{Examples}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md29}
+Some websites using this theme\+:
+
+
+\begin{DoxyItemize}
+\item \href{https://jothepro.github.io/doxygen-awesome-css/}{\texttt{ Documentation of this repository}}
+\item \href{https://docs.wxwidgets.org/3.2/}{\texttt{ wx\+Widgets}}
+\item \href{https://docs.opencv.org/5.x/}{\texttt{ Open\+CV 5.\+x}}
+\item \href{https://docs.zephyrproject.org/latest/doxygen/html/index.html}{\texttt{ Zephyr}}
+\item \href{https://mwiesenberger.github.io/feltor/dg/html/modules.html}{\texttt{ FELTOR}}
+\item \href{https://leomccormack.github.io/Spatial_Audio_Framework/index.html}{\texttt{ Spatial Audio Framework (SAF)}}
+\item \href{https://jothepro.github.io/libCloudSync/}{\texttt{ lib\+Cloud\+Sync}}
+\item \href{https://a4z.github.io/libsl3/}{\texttt{ libsl3}}
+\end{DoxyItemize}\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md30}{}\doxysection{Installation}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md30}
+To use the theme in your documentation, copy the required CSS and JS files from this repository into your project or add the repository as submodule and check out the latest release\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{git\ submodule\ add\ https://github.com/jothepro/doxygen-\/awesome-\/css.git}
+\DoxyCodeLine{cd\ doxygen-\/awesome-\/css}
+\DoxyCodeLine{git\ checkout\ v2.2.0}
+
+\end{DoxyCode}
+
+
+You can even install the theme system-\/wide by running {\ttfamily make install}. The files will be installed to {\ttfamily /usr/local/share/} by default, but you can customize the install location with {\ttfamily make PREFIX=/my/custom/path install}.
+
+All theme files are located in the root of this repository and start with the prefix {\ttfamily doxygen-\/awesome-\/}. You may not need all of them. Follow the install instructions to figure out what files are required for your setup.\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md31}{}\doxysubsection{Choosing a layout}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md31}
+There is two layout options. Choose one of them and configure Doxygen accordingly\+:
+
+
+
+
+
+
+
+
+
+
+\begin{DoxyItemize}
+\item {\bfseries{1️⃣ Base Theme }} Comes with the typical Doxygen titlebar. Optionally the treeview in the sidebar can be enabled.
+
+Required files\+: {\ttfamily doxygen-\/awesome.\+css}
+
+Required {\ttfamily Doxyfile} configuration\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{GENERATE\_TREEVIEW\ \ \ \ \ \ =\ YES\ \#\ optional.\ Also\ works\ without\ treeview}
+\DoxyCodeLine{DISABLE\_INDEX\ =\ NO}
+\DoxyCodeLine{FULL\_SIDEBAR\ =\ NO}
+\DoxyCodeLine{HTML\_EXTRA\_STYLESHEET\ \ =\ doxygen-\/awesome-\/css/doxygen-\/awesome.css}
+\DoxyCodeLine{HTML\_COLORSTYLE\ \ \ \ \ \ \ \ =\ LIGHT\ \#\ required\ with\ Doxygen\ >=\ 1.9.5}
+
+\end{DoxyCode}
+
+\item {\bfseries{2️⃣ Sidebar-\/\+Only Theme }} Hides the top titlebar to give more space to the content. The treeview must be enabled in order for this theme to work.
+
+Required files\+: {\ttfamily doxygen-\/awesome.\+css}, {\ttfamily doxygen-\/awesome-\/sidebar-\/only.\+css}
+
+Required {\ttfamily Doxyfile} configuration\+: 
+\begin{DoxyCode}{0}
+\DoxyCodeLine{GENERATE\_TREEVIEW\ \ \ \ \ \ =\ YES\ \#\ required!}
+\DoxyCodeLine{DISABLE\_INDEX\ \ \ \ \ \ \ \ \ \ =\ NO}
+\DoxyCodeLine{FULL\_SIDEBAR\ \ \ \ \ \ \ \ \ \ \ =\ NO}
+\DoxyCodeLine{HTML\_EXTRA\_STYLESHEET\ \ =\ doxygen-\/awesome-\/css/doxygen-\/awesome.css\ \(\backslash\)}
+\DoxyCodeLine{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ doxygen-\/awesome-\/css/doxygen-\/awesome-\/sidebar-\/only.css}
+\DoxyCodeLine{HTML\_COLORSTYLE\ \ \ \ \ \ \ \ =\ LIGHT\ \#\ required\ with\ Doxygen\ >=\ 1.9.5}
+
+\end{DoxyCode}
+
+\end{DoxyItemize}
+
+
+
+{\bfseries{Caution}}\+:
+\begin{DoxyItemize}
+\item This theme is not compatible with the {\ttfamily FULL\+\_\+\+SIDEBAR = YES} option provided by Doxygen!
+\item {\ttfamily HTML\+\_\+\+COLORSTYLE} must be set to {\ttfamily LIGHT} since Doxygen 1.\+9.\+5!
+\end{DoxyItemize}\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md32}{}\doxysubsection{Further installation instructions\+:}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md32}
+
+\begin{DoxyItemize}
+\item \mbox{\hyperlink{md__documentation__code_doxygen_awesome_css_docs_extensions}{Installing extensions}}
+\item \mbox{\hyperlink{md__documentation__code_doxygen_awesome_css_docs_customization}{Customizing the theme (colors, spacing, border-\/radius, ...)}}
+\item \mbox{\hyperlink{md__documentation__code_doxygen_awesome_css_docs_tricks}{Tips and Tricks for further configuration}}
+\end{DoxyItemize}\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md33}{}\doxysection{Browser support}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md33}
+Tested with
+
+
+\begin{DoxyItemize}
+\item Chrome 110, Chrome 109 for Android, Chrome 110 for i\+OS
+\item Safari 16, Safari for i\+OS 16
+\item Firefox 110, Firefox 110 for Android, Firefox 109 for i\+OS
+\item Edge 110
+\end{DoxyItemize}
+
+The theme does not strive to be backwards compatible to (significantly) older browser versions.\hypertarget{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md34}{}\doxysection{Credits}\label{md__documentation__code_doxygen_awesome_css__r_e_a_d_m_e_autotoc_md34}
+Thanks for all the bug reports and inspiring feedback on github!
+
+Special thanks to all the contributors\+: ~\newline
+~\newline
+ \href{https://github.com/jothepro/doxygen-awesome-css/graphs/contributors}{\texttt{  }}
+
+
+
+Read Next\+: \mbox{\hyperlink{md__documentation__code_doxygen_awesome_css_docs_extensions}{Extensions}}  

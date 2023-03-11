@@ -1,0 +1,596 @@
+\hypertarget{renderer_8py_source}{}\doxysection{renderer.\+py}
+\label{renderer_8py_source}\index{Maxs\_Modules/renderer.py@{Maxs\_Modules/renderer.py}}
+\mbox{\hyperlink{renderer_8py}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00001}\mbox{\hyperlink{namespacerenderer}{00001}}\ \textcolor{comment}{\#\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ Imports\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\#}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00002}00002\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00003}00003\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00004}00004\ \textcolor{keyword}{import}\ os}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00005}00005\ \textcolor{keyword}{import}\ sys}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00006}00006\ \textcolor{keyword}{import}\ time}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00007}00007\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00008}00008\ \textcolor{keyword}{from}\ Maxs\_Modules.debug\ \textcolor{keyword}{import}\ error,\ debug\_cli,\ debug\_message,\ in\_ide}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00009}00009\ \textcolor{keyword}{from}\ Maxs\_Modules.tools\ \textcolor{keyword}{import}\ try\_convert,\ install\_package}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00010}00010\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00011}00011\ \textcolor{comment}{\#\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ Variables\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\#}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00012}00012\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00013}00013\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00014}\mbox{\hyperlink{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}{00014}}\ console\_width\ =\ 100}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00015}\mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{00015}}\ divider\_symbol\ =\ \textcolor{stringliteral}{"{}\#"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00016}\mbox{\hyperlink{namespacerenderer_ac3bed2098fa09f5b657228373802aa88}{00016}}\ divider\_symbol\_size\ =\ len(divider\_symbol)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00017}\mbox{\hyperlink{namespacerenderer_a2bbd4c561239fe59326b95eaf6eaa6f0}{00017}}\ divider\ =\ divider\_symbol\ *\ console\_width}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00018}\mbox{\hyperlink{namespacerenderer_ac9865303362455243804ce483b013583}{00018}}\ menu\_manager\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00019}\mbox{\hyperlink{namespacerenderer_a260c72f08b4086d7fa9e4eee50427b40}{00019}}\ max\_menu\_items\_per\_page\ =\ 10}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00020}\mbox{\hyperlink{namespacerenderer_aaef55d4218d66d35821effe65c5843a6}{00020}}\ imported\_timeout\ =\ \textcolor{keyword}{False}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00021}00021\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00022}00022\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00023}00023\ \textcolor{comment}{\#\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ Classes\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\#}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00024}\mbox{\hyperlink{classrenderer_1_1_wrap_mode}{00024}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classrenderer_1_1_wrap_mode}{WrapMode}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00025}00025\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00026}00026\ \textcolor{stringliteral}{\ \ \ \ A\ }\textcolor{keyword}{class\ }that\ stores\ shorthands\ for\ the\ styling\ to\ preform\ when\ text\ is\ larger\ than\ the\ console\ width}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00027}00027\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00028}\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a3001627f58956ec8975929cb4da53d8c}{00028}}\ \textcolor{stringliteral}{\ \ \ \ NONE\ =\ 0}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00029}\mbox{\hyperlink{classrenderer_1_1_wrap_mode_af8ac28656ea9b0ea1699bb35077378bc}{00029}}\ \textcolor{stringliteral}{\ \ \ \ CHAR\ =\ 1}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00030}\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a7eadf02ca3daaf8a72c743189d491b89}{00030}}\ \textcolor{stringliteral}{\ \ \ \ WORD\ =\ 2}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00031}\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{00031}}\ \textcolor{stringliteral}{\ \ \ \ TRUNCATE\ =\ 2}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00032}00032\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00033}00033\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00034}\mbox{\hyperlink{classrenderer_1_1_colour}{00034}}\ \textcolor{stringliteral}{}\textcolor{keyword}{class\ }\mbox{\hyperlink{classrenderer_1_1_colour}{Colour}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00035}00035\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00036}00036\ \textcolor{stringliteral}{\ \ \ \ A\ }\textcolor{keyword}{class\ }that\ stores\ the\ colour\ codes\ for\ the\ different\ colours.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00037}00037\ \ \ \ \ Note:\ \textcolor{keyword}{from}\ https://en.wikipedia.org/wiki/ANSI\_escape\_code}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00038}00038\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00039}00039\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{comment}{\#\ Colours}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00040}\mbox{\hyperlink{classrenderer_1_1_colour_ac8ff9b7bd558542643e4db80b39f3a48}{00040}}\ \ \ \ \ BLACK\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[30m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00041}\mbox{\hyperlink{classrenderer_1_1_colour_a0da5d5a1acb2f30959c394aa27da5ffe}{00041}}\ \ \ \ \ RED\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[31m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00042}\mbox{\hyperlink{classrenderer_1_1_colour_a577eb2e3c6fc1d2a453583f670832f8f}{00042}}\ \ \ \ \ GREEN\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[32m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00043}\mbox{\hyperlink{classrenderer_1_1_colour_a250f6ba4d8b5a0317aa10d1849665ea0}{00043}}\ \ \ \ \ YELLOW\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[33m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00044}\mbox{\hyperlink{classrenderer_1_1_colour_a510d865c53c341603440024fad29fad0}{00044}}\ \ \ \ \ BLUE\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[34m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00045}\mbox{\hyperlink{classrenderer_1_1_colour_a8d80bd7256c78d1370948b81818ec5ba}{00045}}\ \ \ \ \ MAGENTA\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[35m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00046}\mbox{\hyperlink{classrenderer_1_1_colour_ab414a00f537ed1cf833a5474b4df99b1}{00046}}\ \ \ \ \ CYAN\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[36m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00047}\mbox{\hyperlink{classrenderer_1_1_colour_ae9e551e9253a7d19b1f44f8085636364}{00047}}\ \ \ \ \ WHITE\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[37m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00048}\mbox{\hyperlink{classrenderer_1_1_colour_a8db15afdb2e32432cf35036b4a92550b}{00048}}\ \ \ \ \ GREY\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[90m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00049}00049\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00050}\mbox{\hyperlink{classrenderer_1_1_colour_ab9b447af6de3a36378eff92b778c9bae}{00050}}\ \ \ \ \ colours\_list\ =\ (BLACK,\ RED,\ GREEN,\ YELLOW,\ BLUE,\ MAGENTA,\ CYAN,\ WHITE,\ GREY)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00051}\mbox{\hyperlink{classrenderer_1_1_colour_ae95004f73ce0b4834969f74a804784e3}{00051}}\ \ \ \ \ colours\_names\_list\ =\ (\textcolor{stringliteral}{"{}Black"{}},\ \textcolor{stringliteral}{"{}Red"{}},\ \textcolor{stringliteral}{"{}Green"{}},\ \textcolor{stringliteral}{"{}Yellow"{}},\ \textcolor{stringliteral}{"{}Blue"{}},\ \textcolor{stringliteral}{"{}Magenta"{}},\ \textcolor{stringliteral}{"{}Cyan"{}},\ \textcolor{stringliteral}{"{}White"{}},\ \textcolor{stringliteral}{"{}Grey"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00052}00052\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00053}00053\ \ \ \ \ \textcolor{comment}{\#\ Styles}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00054}\mbox{\hyperlink{classrenderer_1_1_colour_a16eac81c10eb41dcd9308d6ab4010183}{00054}}\ \ \ \ \ BOLD\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[1m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00055}\mbox{\hyperlink{classrenderer_1_1_colour_ade40fcb182feda98f5958cf713f76374}{00055}}\ \ \ \ \ DIM\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[2m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00056}\mbox{\hyperlink{classrenderer_1_1_colour_a19c3ca56087365ba98ab28efbb2ddade}{00056}}\ \ \ \ \ ITALIC\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[3m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00057}\mbox{\hyperlink{classrenderer_1_1_colour_ab9334fadf03914f21bafacb41e558053}{00057}}\ \ \ \ \ UNDERLINE\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[4m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00058}\mbox{\hyperlink{classrenderer_1_1_colour_aa329b6c6c9264b9c2dbfb9cfdfc2dfc5}{00058}}\ \ \ \ \ BLINK\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[5m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00059}\mbox{\hyperlink{classrenderer_1_1_colour_a454d385112e287e1e4168ecf13bf9b51}{00059}}\ \ \ \ \ INVERT\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[7m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00060}\mbox{\hyperlink{classrenderer_1_1_colour_a41f11b20942d139fbb0a984eb30a8cec}{00060}}\ \ \ \ \ STRIKETHROUGH\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[9m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00061}00061\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00062}\mbox{\hyperlink{classrenderer_1_1_colour_a8dd6e2aa07b98cf31bba4afa5f0dc0a2}{00062}}\ \ \ \ \ styles\_list\ =\ (BOLD,\ DIM,\ ITALIC,\ UNDERLINE,\ BLINK,\ INVERT,\ STRIKETHROUGH)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00063}\mbox{\hyperlink{classrenderer_1_1_colour_a8240e9c6d631d65ee6abf95f9b8cb05c}{00063}}\ \ \ \ \ styles\_names\_list\ =\ (\textcolor{stringliteral}{"{}Bold"{}},\ \textcolor{stringliteral}{"{}Dim"{}},\ \textcolor{stringliteral}{"{}Italic"{}},\ \textcolor{stringliteral}{"{}Underline"{}},\ \textcolor{stringliteral}{"{}Blink"{}},\ \textcolor{stringliteral}{"{}Invert"{}},\ \textcolor{stringliteral}{"{}Strikethrough"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00064}00064\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00065}00065\ \ \ \ \ \textcolor{comment}{\#\ Reset}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00066}\mbox{\hyperlink{classrenderer_1_1_colour_a0d4fd10d6bafe1f1dd8954ca68b361d1}{00066}}\ \ \ \ \ RESET\ =\ \textcolor{stringliteral}{"{}\(\backslash\)033[0m"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00067}00067\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00068}00068\ \ \ \ \ \textcolor{comment}{\#\ THEME}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00069}\mbox{\hyperlink{classrenderer_1_1_colour_a7f5a9fb1deba034c73b3fbdeadcf4d0e}{00069}}\ \ \ \ \ error\ =\ RED}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00070}\mbox{\hyperlink{classrenderer_1_1_colour_ac96764e6f6797661ab91e67f96783af3}{00070}}\ \ \ \ \ info\ =\ BLUE}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00071}\mbox{\hyperlink{classrenderer_1_1_colour_a9f222091fcd5ff6b7be761e980dc19fe}{00071}}\ \ \ \ \ success\ =\ GREEN}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00072}\mbox{\hyperlink{classrenderer_1_1_colour_a83196d44dd829dce538d717f30fa17c7}{00072}}\ \ \ \ \ warning\ =\ YELLOW}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00073}00073\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00074}00074\ \ \ \ \ \textcolor{preprocessor}{@staticmethod}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00075}\mbox{\hyperlink{classrenderer_1_1_colour_ada979f33aa572ca66819fc8e4f517761}{00075}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_colour_ada979f33aa572ca66819fc8e4f517761}{text\_with\_colour}}(text:\ str,\ colour:\ str)\ -\/>\ str:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00076}00076\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00077}00077\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Returns\ the\ text\ }\textcolor{keyword}{with}\ the\ colour\ code\ before\ \textcolor{keywordflow}{and}\ the\ reset\ code\ after\ it}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00078}00078\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00079}00079\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ text:\ The\ text\ to\ colour}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00080}00080\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ colour:\ The\ colour\ code}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00081}00081\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@return}:\ The\ coloured\ text}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00082}00082\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00083}00083\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{keywordflow}{return}\ colour\ +\ text\ +\ Colour.RESET}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00084}00084\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00085}00085\ \ \ \ \ \textcolor{preprocessor}{@staticmethod}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00086}\mbox{\hyperlink{classrenderer_1_1_colour_a1e50762290b58dcc3a58a4796e074cee}{00086}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_colour_a1e50762290b58dcc3a58a4796e074cee}{clean\_text}}(text:\ str)\ -\/>\ str:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00087}00087\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00088}00088\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Removes\ the\ colour\ codes\ }\textcolor{keyword}{from}\ the\ text,\ useful\ when\ doing\ len()\ operations\ on\ the\ text}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00089}00089\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00090}00090\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00091}00091\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ text:\ The\ text\ to\ remove\ the\ colour\ codes\ \textcolor{keyword}{from}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00092}00092\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@return}:\ The\ text\ without\ the\ colour\ codes\ (copy\ of\ original\ string)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00093}00093\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00094}00094\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00095}00095\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ uncoloured\_text\ =\ text}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00096}00096\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00097}00097\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{comment}{\#\ Loop\ through\ all\ the\ colours}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00098}00098\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ colour\ \textcolor{keywordflow}{in}\ Colour.colours\_list:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00099}00099\ \ \ \ \ \ \ \ \ \ \ \ \ uncoloured\_text\ =\ uncoloured\_text.replace(colour,\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00100}00100\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00101}00101\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Loop\ through\ all\ the\ styles}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00102}00102\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ style\ \textcolor{keywordflow}{in}\ Colour.styles\_list:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00103}00103\ \ \ \ \ \ \ \ \ \ \ \ \ uncoloured\_text\ =\ uncoloured\_text.replace(style,\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00104}00104\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00105}00105\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Remove\ the\ reset\ code}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00106}00106\ \ \ \ \ \ \ \ \ uncoloured\_text\ =\ uncoloured\_text.replace(Colour.RESET,\ \textcolor{stringliteral}{"{}"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00107}00107\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00108}00108\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Return\ the\ uncoloured\ text}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00109}00109\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ uncoloured\_text}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00110}00110\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00111}00111\ \ \ \ \ \textcolor{preprocessor}{@staticmethod}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00112}\mbox{\hyperlink{classrenderer_1_1_colour_a715c0dee1a03a0d8449d733f0a1b05e5}{00112}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_colour_a715c0dee1a03a0d8449d733f0a1b05e5}{true\_or\_false\_styled}}()\ -\/>\ str:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00113}00113\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00114}00114\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Returns\ a\ coloured\ true\ }\textcolor{keywordflow}{or}\ false\ string}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00115}00115\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@return}:\ \textcolor{stringliteral}{"{}(green)True/(red)False"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00116}00116\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00117}00117\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00118}00118\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{keywordflow}{return}\ Colour.text\_with\_colour(\textcolor{stringliteral}{"{}True"{}},\ Colour.success)\ +\ \textcolor{stringliteral}{"{}/"{}}\ +\ Colour.text\_with\_colour(\textcolor{stringliteral}{"{}False"{}},\ Colour.error)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00119}00119\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00120}00120\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00121}\mbox{\hyperlink{classrenderer_1_1_menu_manager}{00121}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classrenderer_1_1_menu_manager}{MenuManager}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00122}\mbox{\hyperlink{classrenderer_1_1_menu_manager_a597f9b7b27aebc9a2e24b409e393fc25}{00122}}\ \ \ \ \ menu\_history\_names\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00123}\mbox{\hyperlink{classrenderer_1_1_menu_manager_a9a981e4173f1a1760e371adbf8fb1d52}{00123}}\ \ \ \ \ menu\_history\_input\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00124}\mbox{\hyperlink{classrenderer_1_1_menu_manager_ad2f4598dd375bb1acb4af854876e16d1}{00124}}\ \ \ \ \ pre\_input\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00125}00125\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00126}00126\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00127}00127\ menu\_manager\ =\ \mbox{\hyperlink{classrenderer_1_1_menu_manager}{MenuManager}}()}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00128}00128\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00129}00129\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00130}\mbox{\hyperlink{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}{00130}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}{clear}}()\ -\/>\ None:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00131}00131\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00132}00132\ \textcolor{stringliteral}{\ \ \ \ Clears\ the\ screen}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00133}00133\ \textcolor{stringliteral}{\ \ \ \ "{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00134}00134\ \textcolor{stringliteral}{\ \ \ \ os.system("{}cls"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00135}00135\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00136}00136\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00137}\mbox{\hyperlink{classrenderer_1_1_menu}{00137}}\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classrenderer_1_1_menu}{Menu}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00138}00138\ \ \ \ \ \textcolor{comment}{\#\ Note\ for\ future,\ the\ print\ should\ be\ changed\ to\ a\ render()\ function\ that\ allows\ for\ the\ menu\ to\ be\ rendered\ in}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00139}00139\ \ \ \ \ \textcolor{comment}{\#\ different\ ways\ (CLI,\ GUI)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00140}00140\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00141}00141\ \ \ \ \ \textcolor{comment}{\#\ Menu\ data}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00142}\mbox{\hyperlink{classrenderer_1_1_menu_a019581be1bebf2c9c5f211ff5f3f2143}{00142}}\ \ \ \ \ title\ =\ \textcolor{stringliteral}{"{}None"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00143}\mbox{\hyperlink{classrenderer_1_1_menu_a55771fa192f1a6c1b6c0e60ec2a4f37e}{00143}}\ \ \ \ \ items\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00144}\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{00144}}\ \ \ \ \ user\_input\ =\ \textcolor{stringliteral}{"{}undefined"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00145}00145\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00146}00146\ \ \ \ \ \textcolor{comment}{\#\ Menu\ options}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00147}\mbox{\hyperlink{classrenderer_1_1_menu_a5421327b7b93116d3c6b0bd1e1c4b961}{00147}}\ \ \ \ \ clear\_screen\ =\ \textcolor{keyword}{True}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00148}\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{00148}}\ \ \ \ \ multi\_dimensional\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00149}\mbox{\hyperlink{classrenderer_1_1_menu_a5d57ee8f504e82ff327c0be0920b0203}{00149}}\ \ \ \ \ wrap\_mode\ =\ WrapMode.WORD}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00150}\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{00150}}\ \ \ \ \ page\_number\ =\ 1}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00151}\mbox{\hyperlink{classrenderer_1_1_menu_a7624dd67d3f24d4d1b04f95193468049}{00151}}\ \ \ \ \ items\_per\_page\ =\ max\_menu\_items\_per\_page}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00152}\mbox{\hyperlink{classrenderer_1_1_menu_a12f483a7b3e86e75884f20100f186bc8}{00152}}\ \ \ \ \ time\_limit\ =\ 0}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00153}00153\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00154}\mbox{\hyperlink{classrenderer_1_1_menu_a89ff3ec7c41e95735f6bb10a52485d9f}{00154}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_menu_a89ff3ec7c41e95735f6bb10a52485d9f}{\_\_init\_\_}}(self,\ title:\ str,\ items:\ list\ |\ tuple,\ multi\_dimensional:\ bool\ =\ \textcolor{keyword}{False})\ -\/>\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00155}00155\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00156}00156\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Creates\ a\ menu\ object}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00157}00157\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00158}00158\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{preprocessor}{@param}\ title:\ The\ title\ of\ the\ menu}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00159}00159\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ items:\ The\ items\ \textcolor{keywordflow}{in}\ the\ menu,\ \textcolor{keywordflow}{if}\ multi\_dimensional\ \textcolor{keywordflow}{is}\ \textcolor{keyword}{True}\ then\ the\ items\ should\ be\ a\ list\ of\ lists}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00160}00160\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ multi\_dimensional:\ If\ the\ menu\ items\ array\ \textcolor{keywordflow}{is}\ multi-\/dimensional\ (i.e.\ has\ a\ value\ \textcolor{keywordflow}{for}\ each\ item)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00161}00161\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00162}\mbox{\hyperlink{classrenderer_1_1_menu_a71e2b1cd4286d0cc5fd740e01c4a6520}{00162}}\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_a019581be1bebf2c9c5f211ff5f3f2143}{title}}\mbox{\hyperlink{classrenderer_1_1_menu_a71e2b1cd4286d0cc5fd740e01c4a6520}{title}}\ =\ title}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00163}\mbox{\hyperlink{classrenderer_1_1_menu_a0f67deab23facf19314331f84048aa10}{00163}}\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_a55771fa192f1a6c1b6c0e60ec2a4f37e}{items}}\mbox{\hyperlink{classrenderer_1_1_menu_a0f67deab23facf19314331f84048aa10}{items}}\ =\ items}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00164}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{00164}}\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}\ =\ multi\_dimensional}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00165}00165\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ menu\_manager.menu\_history\_names.append(title)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00166}00166\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00167}\mbox{\hyperlink{classrenderer_1_1_menu_a6f8c5615ca5df7f346b2369a4f40bdd0}{00167}}\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_menu_a6f8c5615ca5df7f346b2369a4f40bdd0}{show\_menu}}(self)\ -\/>\ list:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00168}00168\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00169}00169\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Prints\ the\ menu\ to\ a\ clear\ screen.\ Automatically\ uses\ the\ multi\_dimensional\ variable\ to\ determine\ }\textcolor{keywordflow}{if}\ the\ menu}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00170}00170\ \ \ \ \ \ \ \ \ should\ use\ show\_menu\_double\ \textcolor{keywordflow}{or}\ show\_menu}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00171}00171\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00172}00172\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{comment}{\#\ Store\ menu\_items\ as\ a\ local\ variable\ as\ it\ can\ be\ changed\ if\ the\ menu\ is\ split\ into\ pages}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00173}00173\ \ \ \ \ \ \ \ \ menu\_items\ =\ self.\mbox{\hyperlink{classrenderer_1_1_menu_add616c35f2a987cc42bae6f1b08ad3ae}{get\_pages}}()}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00174}00174\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00175}00175\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ screen\ should\ be\ cleared}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00176}00176\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a5421327b7b93116d3c6b0bd1e1c4b961}{clear\_screen}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00177}00177\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Clear\ the\ screen}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00178}00178\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}{clear}}()}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00179}00179\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00180}00180\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Print\ the\ menu}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00181}00181\ \ \ \ \ \ \ \ \ print(divider)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00182}00182\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(\textcolor{stringliteral}{"{}\ "{}}\ +\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a019581be1bebf2c9c5f211ff5f3f2143}{title}}\mbox{\hyperlink{classrenderer_1_1_menu_a71e2b1cd4286d0cc5fd740e01c4a6520}{title}},\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a5d57ee8f504e82ff327c0be0920b0203}{wrap\_mode}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00183}00183\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00184}00184\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}{show\_menu\_double}}(menu\_items,\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a5d57ee8f504e82ff327c0be0920b0203}{wrap\_mode}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00185}00185\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00186}00186\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classrenderer_1_1_menu_a6f8c5615ca5df7f346b2369a4f40bdd0}{show\_menu}}(menu\_items,\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a5d57ee8f504e82ff327c0be0920b0203}{wrap\_mode}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00187}00187\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00188}00188\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ menu\_items}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00189}00189\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00190}\mbox{\hyperlink{classrenderer_1_1_menu_a097598a4c9f58f7df67f9bb8d47f205e}{00190}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_menu_a097598a4c9f58f7df67f9bb8d47f205e}{get\_input}}(self,\ user\_input:\ str\ =\ \textcolor{keywordtype}{None})\ -\/>\ str:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00191}00191\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00192}00192\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Prints\ the\ menu\ to\ a\ clear\ screen\ }\textcolor{keywordflow}{and}\ then\ gets\ the\ user\ input\ \textcolor{keyword}{as}\ an\ index\ of\ the\ menu\ items.\ Then\ stores\ the}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00193}00193\ \ \ \ \ \ \ \ \ item\ \textcolor{keywordflow}{in}\ the\ user\_input\ variable.\ If\ the\ user\ input\ \textcolor{keywordflow}{is}\ invalid\ then\ it\ will\ ask\ the\ user\ to\ \textcolor{keywordflow}{try}\ again\ until\ it}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00194}00194\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{is}\ valid.\ Valid\ input\ \textcolor{keywordflow}{is}\ an\ integer\ between\ 0\ \textcolor{keywordflow}{and}\ the\ length\ of\ the\ menu\ items\ array,\ \textcolor{keywordflow}{or}\ a\ string\ that\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{in}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00195}00195\ \ \ \ \ \ \ \ \ the\ menu\ items\ array.\ If\ input\ \textcolor{keywordflow}{is}\ passed\ \textcolor{keywordflow}{in}\ then\ it\ will\ \textcolor{keywordflow}{not}\ ask\ the\ user\ \textcolor{keywordflow}{for}\ input\ \textcolor{keywordflow}{and}\ will\ instead\ use\ the}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00196}00196\ \ \ \ \ \ \ \ \ input\ passed\ \textcolor{keywordflow}{in}\ (\textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ valid\ then\ it\ will\ ask).\ If\ the\ time\_limit\ \textcolor{keywordflow}{is}\ set\ to\ a\ value\ greater\ than\ 0\ then}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00197}00197\ \ \ \ \ \ \ \ \ it\ will\ \textcolor{keywordflow}{return}\ after\ the\ time\ limit\ has\ been\ reached\ (\textcolor{keywordflow}{if}\ the\ user\ has\ \textcolor{keywordflow}{not}\ input\ anything\ before\ that).}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00198}00198\ \ \ \ \ \ \ \ \ Pre-\/input\ allows\ \textcolor{keywordflow}{for}\ the\ user\ to\ input\ a\ list\ of\ indexes\ that\ will\ be\ automatically\ used\ \textcolor{keyword}{as}\ the\ user\ input.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00199}00199\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00200}00200\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@param}\ user\_input:\ The\ user\ input\ to\ use\ instead\ of\ getting\ input\ \textcolor{keyword}{from}\ the\ user.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00201}00201\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@return}:\ The\ option\ the\ user\ selected\ (the\ item\ \textcolor{keywordflow}{in}\ the\ menu\ items\ array)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00202}00202\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00203}00203\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00204}00204\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ menu\_items\ =\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a6f8c5615ca5df7f346b2369a4f40bdd0}{show\_menu}}()}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00205}00205\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00206}00206\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{comment}{\#\ Store\ the\ start\ time}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00207}00207\ \ \ \ \ \ \ \ \ start\_time\ =\ time.time()}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00208}00208\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00209}00209\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ menu\ has\ a\ pre-\/input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00210}00210\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ len(menu\_manager.pre\_input)\ >\ 0:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00211}00211\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00212}00212\ \ \ \ \ \ \ \ \ \ \ \ \ debug\_message(f\textcolor{stringliteral}{"{}Using\ pre-\/input\ (\{menu\_manager.pre\_input[0]\})\ from\ \{menu\_manager.pre\_input\}"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00213}00213\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00214}00214\ \ \ \ \ \ \ \ \ \ \ \ \ valid\ =\ menu\_manager.pre\_input[0]\ <\ len(menu\_items)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00215}00215\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00216}00216\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ pre-\/input\ is\ a\ valid\ option\ index\ for\ this\ menu\ (multi-\/dimensional)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00217}00217\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00218}00218\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ valid\ =\ menu\_manager.pre\_input[0]\ <\ len(menu\_items[0])}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00219}00219\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00220}00220\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ pre-\/input\ is\ a\ valid\ option\ index\ for\ this\ menu}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00221}00221\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ valid:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00222}00222\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00223}00223\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00224}00224\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00225}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{00225}}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ menu\_items[0][menu\_manager.pre\_input[0]]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00226}00226\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00227}00227\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ menu\_items[menu\_manager.pre\_input[0]]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00228}00228\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00229}00229\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Remove\ the\ pre-\/input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00230}00230\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.pre\_input.pop(0)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00231}00231\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00232}00232\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ input\ to\ the\ input\ history}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00233}00233\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.menu\_history\_input.append(self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00234}00234\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00235}00235\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Return}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00236}00236\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00237}00237\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00238}00238\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00239}00239\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Print\ an\ error}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00240}00240\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error(\textcolor{stringliteral}{"{}The\ pre-\/input\ ("{}}\ +\ str(menu\_manager.pre\_input[0])\ +\ \textcolor{stringliteral}{"{})\ was\ not\ a\ valid\ option\ for\ this\ menu\ "{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00241}00241\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00242}00242\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Clear\ the\ pre-\/input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00243}00243\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.pre\_input\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00244}00244\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00245}00245\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Calculate\ the\ possible\ options}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00246}00246\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00247}00247\ \ \ \ \ \ \ \ \ \ \ \ \ input\_items\ =\ menu\_items[0]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00248}00248\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00249}00249\ \ \ \ \ \ \ \ \ \ \ \ \ input\_items\ =\ menu\_items}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00250}00250\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00251}00251\ \ \ \ \ \ \ \ \ options\ =\ [*range(len(input\_items))]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00252}00252\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00253}00253\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ user\ input\ and\ validate\ it,\ note\ cant\ use\ the\ get\_user\_input\_of\_type\ function\ as\ the\ menu\ also}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00254}00254\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ allows\ for\ "{}pre-\/input"{}\ and\ choosing\ an\ item\ index\ or\ the\ item\ itself}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00255}00255\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{while}\ \textcolor{keyword}{True}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00256}00256\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00257}00257\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ there\ is\ no\ input\ then\ get\ the\ input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00258}00258\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ user\_input\ \textcolor{keywordflow}{is}\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00259}00259\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ input\_prompt\ =\ \textcolor{stringliteral}{"{}Choose\ an\ option\ ("{}}\ +\ str(options[0])\ +\ \textcolor{stringliteral}{"{}-\/"{}}\ +\ str(options[len(options)\ -\/\ 1])\ +\ \textcolor{stringliteral}{"{})\ >\ "{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00260}00260\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00261}00261\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ there\ is\ a\ time\ limit\ and\ since\ inputimeout\ doesn't\ work\ in\ the\ IDE,\ check\ if\ the\ program\ is}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00262}00262\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ running\ in\ the\ IDE}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00263}00263\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a12f483a7b3e86e75884f20100f186bc8}{time\_limit}}\ !=\ 0\ \textcolor{keywordflow}{and}\ \textcolor{keywordflow}{not}\ in\_ide:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00264}00264\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00265}00265\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ install\_package(\textcolor{stringliteral}{"{}inputimeout"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00266}00266\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keyword}{from}\ inputimeout\ \textcolor{keyword}{import}\ inputimeout,\ TimeoutOccurred}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00267}00267\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00268}00268\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ time\ limit\ has\ been\ reached}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00269}00269\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ time.time()\ -\/\ start\_time\ >\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a12f483a7b3e86e75884f20100f186bc8}{time\_limit}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00270}00270\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00271}00271\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00272}00272\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00273}00273\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Calculate\ the\ time\ left}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00274}00274\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ time\_left\ =\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a12f483a7b3e86e75884f20100f186bc8}{time\_limit}}\ -\/\ (time.time()\ -\/\ start\_time)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00275}00275\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00276}00276\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ user\ input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00277}00277\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{try}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00278}00278\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ inputimeout(prompt=input\_prompt,\ timeout=time\_left)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00279}00279\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{except}\ TimeoutOccurred:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00280}00280\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00281}00281\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00282}00282\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00283}00283\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ input(input\_prompt)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00284}00284\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00285}00285\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ there\ is\ a\ type\ error\ then\ its\ returned\ as\ None\ otherwise\ it\ is\ the\ converted\ value}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00286}00286\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ try\_convert(user\_input,\ int,\ \textcolor{keyword}{True})\ \textcolor{keywordflow}{is}\ \textcolor{keywordflow}{not}\ \textcolor{keywordtype}{None}:\ \ \textcolor{comment}{\#\ Is\ an\ int}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00287}00287\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00288}00288\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Convert\ the\ input\ to\ an\ int}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00289}00289\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ try\_convert(user\_input,\ int)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00290}00290\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ user\_input\ \textcolor{keywordflow}{in}\ options:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00291}00291\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ input\_items[user\_input]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00292}00292\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00293}00293\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00294}00294\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error(\textcolor{stringliteral}{"{}Invalid\ input,\ please\ enter\ one\ of\ these:\ "{}}\ +\ str(options))}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00295}00295\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00296}00296\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00297}00297\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Not\ an\ int,\ so\ try}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00298}00298\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00299}00299\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ it\ is\ a\ debug\ command}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00300}00300\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{"{}debug"{}}\ \textcolor{keywordflow}{in}\ user\_input:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00301}00301\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ command\ =\ user\_input.split(\textcolor{stringliteral}{"{}\ "{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00302}00302\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00303}00303\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ there\ is\ a\ command\ and\ if\ there\ is\ then\ remove\ the\ "{}debug"{}\ part\ and\ pass\ the\ rest\ to\ the}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00304}00304\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ len(command)\ >\ 1:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00305}00305\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ command.pop(0)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00306}00306\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00307}00307\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ debug\_cli(command)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00308}00308\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00309}00309\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00310}00310\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00311}00311\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ user\ is\ wanting\ to\ do\ pre-\/input\ (i.e\ a\ list\ of\ indexes\ "{}1,4,3,2"{})}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00312}00312\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{stringliteral}{"{},"{}}\ \textcolor{keywordflow}{in}\ user\_input:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00313}00313\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Split\ the\ string\ into\ a\ list}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00314}00314\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ user\_input.split(\textcolor{stringliteral}{"{},"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00315}00315\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00316}00316\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Convert\ the\ list\ to\ ints}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00317}00317\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ [try\_convert(item,\ int,\ \textcolor{keyword}{True})\ \textcolor{keywordflow}{for}\ item\ \textcolor{keywordflow}{in}\ user\_input]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00318}00318\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00319}00319\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ list\ is\ valid}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00320}00320\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ \textcolor{keywordtype}{None}\ \textcolor{keywordflow}{not}\ \textcolor{keywordflow}{in}\ user\_input:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00321}00321\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ pre-\/input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00322}00322\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.pre\_input\ =\ user\_input}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00323}00323\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00324}00324\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ first\ input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00325}00325\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ menu\_manager.pre\_input[0]\ <\ len(input\_items):}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00326}00326\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ input\_items[menu\_manager.pre\_input[0]]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00327}00327\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00328}00328\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error(\textcolor{stringliteral}{"{}Invalid\ pre-\/input,\ not\ an\ option"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00329}00329\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.pre\_input\ =\ []}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00330}00330\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00331}00331\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00332}00332\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00333}00333\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Remove\ the\ first\ input\ from\ the\ pre-\/input}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00334}00334\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.pre\_input.pop(0)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00335}00335\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00336}00336\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ input\ to\ the\ input\ history}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00337}00337\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_manager.menu\_history\_input.append(self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00338}00338\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00339}00339\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Return}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00340}00340\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00341}00341\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00342}00342\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00343}00343\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error(\textcolor{stringliteral}{"{}Invalid\ pre-\/input,\ please\ enter\ a\ list\ of\ numbers\ separated\ by\ commas"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00344}00344\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00345}00345\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00346}00346\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00347}00347\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ user\ inputted\ an\ allowed\ string}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00348}00348\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ user\_input\ \textcolor{keywordflow}{in}\ input\_items:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00349}00349\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}\ =\ user\_input}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00350}00350\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00351}00351\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00352}00352\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ error(\textcolor{stringliteral}{"{}Invalid\ input"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00353}00353\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ user\_input\ =\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00354}00354\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00355}00355\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00356}00356\ \ \ \ \ \ \ \ \ menu\_manager.menu\_history\_input.append(self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00357}00357\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_aadefe1ca674e20d87baf9e8e3cbe3484}{user\_input}}\mbox{\hyperlink{classrenderer_1_1_menu_ad59e652aa6c62d0d2660439e7f5662b8}{user\_input}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00358}00358\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00359}\mbox{\hyperlink{classrenderer_1_1_menu_add616c35f2a987cc42bae6f1b08ad3ae}{00359}}\ \ \ \ \ \textcolor{keyword}{def\ }\mbox{\hyperlink{classrenderer_1_1_menu_add616c35f2a987cc42bae6f1b08ad3ae}{get\_pages}}(self)\ -\/>\ list:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00360}00360\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00361}00361\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ Splits\ the\ menu\ items\ into\ pages\ }\textcolor{keywordflow}{if}\ there\ are\ more\ than\ the\ max\ menu\ items\ \textcolor{keywordflow}{in}\ the\ list\ of\ items.\ Curently\ \textcolor{keywordflow}{not}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00362}00362\ \ \ \ \ \ \ \ \ working\ will\ be\ fixed\ \textcolor{keywordflow}{or}\ removed\ later}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00363}00363\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00364}00364\ \ \ \ \ \ \ \ \ \textcolor{preprocessor}{@return}:\ The\ current\ page\ of\ menu\ items\ (a\ list\ of\ 10\ options,\ including\ previous\ \textcolor{keywordflow}{and}\ next\ page)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00365}00365\ \ \ \ \ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00366}00366\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00367}00367\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ }\textcolor{comment}{\#\ TODO:\ Will\ finish\ pages\ later\ if\ I\ have\ time\ but\ right\ now\ they\ are\ not\ working}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00368}00368\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a55771fa192f1a6c1b6c0e60ec2a4f37e}{items}}\mbox{\hyperlink{classrenderer_1_1_menu_a0f67deab23facf19314331f84048aa10}{items}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00369}00369\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00370}00370\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ menu\_items\ as\ a\ local\ variable\ as\ don't\ want\ to\ change\ the\ original}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00371}00371\ \ \ \ \ \ \ \ \ menu\_items\ =\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a55771fa192f1a6c1b6c0e60ec2a4f37e}{items}}\mbox{\hyperlink{classrenderer_1_1_menu_a0f67deab23facf19314331f84048aa10}{items}}.copy()}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00372}00372\ \ \ \ \ \ \ \ \ menu\_items\_count\ =\ len(menu\_items)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00373}00373\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00374}00374\ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items\_count\ =\ len(menu\_items[0])}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00375}00375\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00376}00376\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ items\ have\ to\ be\ split\ into\ pages}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00377}00377\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ menu\_items\_count\ >\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a7624dd67d3f24d4d1b04f95193468049}{items\_per\_page}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00378}00378\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Get\ the\ items\ for\ the\ current\ page}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00379}00379\ \ \ \ \ \ \ \ \ \ \ \ \ slice\_start\ =\ (self.\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{page\_number}}\ -\/\ 1)\ *\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a7624dd67d3f24d4d1b04f95193468049}{items\_per\_page}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00380}00380\ \ \ \ \ \ \ \ \ \ \ \ \ slice\_end\ =\ (self.\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{page\_number}}\ *\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a7624dd67d3f24d4d1b04f95193468049}{items\_per\_page}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00381}00381\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00382}00382\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ "{}Previous\ Page"{}\ option\ is\ going\ to\ be\ added,\ if\ so\ need\ to\ remove\ one\ from\ the\ slice\ end}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00383}00383\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ to\ ensure\ the\ max\ items\ per\ page\ is\ not\ exceeded}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00384}00384\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{page\_number}}\ >\ 1:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00385}00385\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ slice\_start\ -\/=\ 1}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00386}00386\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00387}00387\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00388}00388\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[0].insert(slice\_start,\ \textcolor{stringliteral}{"{}Previous\ Page"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00389}00389\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[1].insert(slice\_start,\ str(self.\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{page\_number}}\ -\/\ 1))}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00390}00390\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00391}00391\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items.insert(slice\_start,\ \textcolor{stringliteral}{"{}Previous\ Page"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00392}00392\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00393}00393\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Check\ if\ the\ "{}Next\ Page"{}\ option\ is\ going\ to\ be\ added,\ if\ so\ need\ to\ minus\ 1\ from\ the\ slice\ end}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00394}00394\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ menu\_items\_count\ >\ slice\_end:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00395}00395\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00396}00396\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[0].insert(slice\_end,\ \textcolor{stringliteral}{"{}Next\ Page"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00397}00397\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[1].insert(slice\_end,\ str(self.\mbox{\hyperlink{classrenderer_1_1_menu_ae0812c45b4bc8a5e12509b7853d0b1d4}{page\_number}}\ +\ 1))}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00398}00398\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00399}00399\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items.insert(slice\_end,\ \textcolor{stringliteral}{"{}Next\ Page"{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00400}00400\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00401}00401\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ slice\_end\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00402}00402\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00403}00403\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ the\ menu\ is\ multidimensional,\ then\ the\ items\ are\ stored\ in\ a\ list\ of\ lists\ and\ both\ arrays\ need\ to\ be}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00404}00404\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ sliced}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00405}00405\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ self.\mbox{\hyperlink{classrenderer_1_1_menu_a357b9410cd1646849c0e0716945862f9}{multi\_dimensional}}\mbox{\hyperlink{classrenderer_1_1_menu_a2694565901ae99a1645cdc9d37a72e05}{multi\_dimensional}}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00406}00406\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[0]\ =\ menu\_items[0][slice\_start:\ slice\_end]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00407}00407\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items[1]\ =\ menu\_items[1][slice\_start:\ slice\_end]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00408}00408\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00409}00409\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ menu\_items\ =\ menu\_items[slice\_start:\ slice\_end]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00410}00410\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00411}00411\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ menu\_items}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00412}00412\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00413}00413\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00414}00414\ \textcolor{comment}{\#\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ Functions\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\ -\/\#}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00415}00415\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00416}00416\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00417}\mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{00417}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(item\_to\_print:\ str,\ wrap:\ WrapMode\ =\ WrapMode.TRUNCATE)\ -\/>\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00418}00418\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00419}00419\ \textcolor{stringliteral}{\ \ \ \ Prints\ the\ item\ }\textcolor{keywordflow}{in}\ between\ two\ divider\ symbols\ \textcolor{keywordflow}{and}\ wraps\ the\ text\ \textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ too\ long\ by\ default\ using\ Truncate\ but}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00420}00420\ \ \ \ \ will\ use\ whatever\ \textcolor{keywordflow}{is}\ passed\ \textcolor{keywordflow}{in}\ the\ wrap\ parameter.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00421}00421\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00422}00422\ \ \ \ \ \textcolor{preprocessor}{@param}\ item\_to\_print:\ The\ text\ to\ \textcolor{keywordflow}{print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00423}00423\ \ \ \ \ \textcolor{preprocessor}{@param}\ wrap:\ How\ the\ text\ should\ be\ wrapped\ \textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ too\ long\ (Truncate\ by\ default)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00424}00424\ \ \ \ \ \textcolor{preprocessor}{@return}:\ \textcolor{keywordtype}{None}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00425}00425\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00426}00426\ \textcolor{stringliteral}{\ \ \ \ text\_length\ =\ len(Colour.clean\_text(item\_to\_print))}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00427}00427\ \textcolor{stringliteral}{\ \ \ \ console\_space\_free\ =\ console\_width\ -\/\ (divider\_symbol\_size\ *\ 2)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00428}00428\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00429}00429\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{comment}{\#\ If\ the\ text\ is\ longer\ than\ the\ console\ width\ then\ wrap\ it}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00430}00430\ \ \ \ \ \textcolor{keywordflow}{if}\ text\_length\ >\ console\_space\_free:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00431}00431\ \ \ \ \ \ \ \ \ match\ wrap:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00432}00432\ \ \ \ \ \ \ \ \ \ \ \ \ case\ WrapMode.CHAR:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00433}00433\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Print\ the\ current\ text\ in\ the\ divider,\ cutting\ off\ the\ text\ at\ the\ console\ width}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00434}00434\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ print(divider\_symbol\ +\ item\_to\_print[:console\_space\_free]\ +\ divider\_symbol)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00435}00435\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00436}00436\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ text\ to\ print\ as\ adding\ a\ space\ for\ readability}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00437}00437\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ "{}}\ +\ item\_to\_print[console\_space\_free:]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00438}00438\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00439}00439\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Re-\/run\ the\ function\ as\ many\ times\ as\ needed\ and\ then\ return\ so\ the\ original,\ un\ wrapped,\ text\ isn't}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00440}00440\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ printed}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00441}00441\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(item\_to\_print,\ wrap)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00442}00442\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00443}00443\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00444}00444\ \ \ \ \ \ \ \ \ \ \ \ \ case\ WrapMode.WORD:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00445}00445\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Split\ the\ text\ into\ words}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00446}00446\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ words\ =\ item\_to\_print.split(\textcolor{stringliteral}{"{}\ "{}})}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00447}00447\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00448}00448\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ current\ size}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00449}00449\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_size\ =\ 0}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00450}00450\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00451}00451\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00452}00452\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00453}00453\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Loop\ through\ all\ the\ words}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00454}00454\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ word\ \textcolor{keywordflow}{in}\ words:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00455}00455\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ this\ word\ is\ bigger\ then\ the\ entire\ console\ then\ split\ it\ up}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00456}00456\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ len(word)\ >\ console\_space\_free:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00457}00457\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Join\ the\ words\ together}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00458}00458\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ "{}}.join(words)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00459}00459\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00460}00460\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Print\ the\ item\ in\ the\ divider,\ split\ at\ console\ width}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00461}00461\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ print(divider\_symbol\ +\ item\_to\_print[:console\_space\_free]\ +\ divider\_symbol)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00462}00462\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_size\ +=\ console\_space\_free}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00463}00463\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00464}00464\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ text\ to\ print\ as\ adding\ a\ space\ for\ readability.\ Cut\ off\ the\ text\ already\ written}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00465}00465\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ and\ ignore\ the\ padding\ space}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00466}00466\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ "{}}\ +\ item\_to\_print[current\_size:]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00467}00467\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00468}00468\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Re-\/run\ the\ function\ as\ many\ times\ as\ needed\ and\ then\ return\ so\ the\ original,\ un\ wrapped,}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00469}00469\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ text\ isn't\ printed}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00470}00470\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(item\_to\_print,\ wrap)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00471}00471\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00472}00472\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00473}00473\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ If\ the\ current\ size\ plus\ the\ word\ length\ is\ less\ than\ the\ console\ width}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00474}00474\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ current\_size\ +\ len(word)\ <\ console\_space\_free:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00475}00475\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ word\ to\ the\ current\ size}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00476}00476\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_size\ +=\ len(word)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00477}00477\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00478}00478\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ a\ space\ to\ the\ current\ size}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00479}00479\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ current\_size\ +=\ 1}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00480}00480\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00481}00481\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ the\ word\ to\ the\ text\ to\ print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00482}00482\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ +=\ word\ +\ \textcolor{stringliteral}{"{}\ "{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00483}00483\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00484}00484\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00485}00485\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ When\ here\ is\ reached\ then\ it\ is\ time\ to\ break\ out\ of\ the\ loop\ as\ the\ next\ word\ cant\ fit\ in}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00486}00486\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ the\ space\ left\ for\ this\ line}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00487}00487\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00488}00488\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Add\ spacing\ so\ the\ whole\ line\ is\ used}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00489}00489\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ +=\ \textcolor{stringliteral}{"{}\ "{}}\ *\ (console\_space\_free\ -\/\ current\_size)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00490}00490\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00491}00491\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Break\ out\ of\ the\ loop}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00492}00492\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00493}00493\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00494}00494\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Print\ the\ item\ in\ the\ divider}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00495}00495\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ print(divider\_symbol\ +\ item\_to\_print\ +\ divider\_symbol)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00496}00496\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00497}00497\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Join\ the\ words\ together}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00498}00498\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ "{}}.join(words)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00499}00499\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00500}00500\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Store\ the\ text\ to\ print\ as\ adding\ a\ space\ for\ readability.\ Cut\ off\ the\ text\ already\ written\ and}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00501}00501\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ ignore\ the\ padding\ space}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00502}00502\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ "{}}\ +\ item\_to\_print[current\_size:]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00503}00503\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00504}00504\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Re-\/run\ the\ function\ as\ many\ times\ as\ needed\ and\ then\ return\ so\ the\ original,\ un\ wrapped,\ text\ isn't}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00505}00505\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ printed}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00506}00506\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(item\_to\_print,\ wrap)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00507}00507\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00508}00508\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00509}00509\ \ \ \ \ \ \ \ \ \ \ \ \ case\ WrapMode.TRUNCATE:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00510}00510\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Slice\ the\ text\ at\ console\ width\ -\/\ 2\ (for\ the\ border)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00511}00511\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\ =\ item\_to\_print[:console\_space\_free]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00512}00512\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00513}00513\ \ \ \ \ \ \ \ \ \ \ \ \ case\ WrapMode.NONE:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00514}00514\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{pass}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00515}00515\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00516}00516\ \ \ \ \ \textcolor{comment}{\#\ The\ length\ of\ the\ text,\ minus\ console\ width,\ minus\ 2\ for\ the\ border}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00517}00517\ \ \ \ \ width\_left\ =\ console\_space\_free\ -\/\ text\_length}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00518}00518\ \ \ \ \ print(divider\_symbol\ +\ item\_to\_print\ +\ \textcolor{stringliteral}{"{}\ "{}}\ *\ width\_left\ +\ divider\_symbol)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00519}00519\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00520}00520\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00521}\mbox{\hyperlink{namespacerenderer_a7e4c00c65f166be3451cf4e24e57ed5a}{00521}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerenderer_a7e4c00c65f166be3451cf4e24e57ed5a}{show\_menu}}(menu\_items:\ list,\ wrap:\ WrapMode\ =\ WrapMode.TRUNCATE)\ -\/>\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00522}00522\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00523}00523\ \textcolor{stringliteral}{\ \ \ \ Prints\ a\ divider\ at\ the\ start\ }\textcolor{keywordflow}{and}\ end\ of\ the\ menu.\ Then\ prints\ the\ menu\ items\ \textcolor{keywordflow}{and}\ their\ index\ \textcolor{keywordflow}{in}\ the\ middle\ using}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00524}00524\ \ \ \ \ the\ text\_in\_divider\ function\ \textcolor{keywordflow}{for}\ each\ item\ \textcolor{keyword}{with}\ the\ wrap\ mode\ passed\ \textcolor{keywordflow}{in}.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00525}00525\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00526}00526\ \ \ \ \ \textcolor{preprocessor}{@param}\ wrap:\ How\ the\ text\ should\ be\ wrapped\ \textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ too\ long\ (Truncate\ by\ default)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00527}00527\ \ \ \ \ \textcolor{preprocessor}{@param}\ menu\_items:\ The\ list\ of\ menu\ items\ to\ \textcolor{keywordflow}{print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00528}00528\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00529}00529\ \textcolor{stringliteral}{\ \ \ \ print(divider)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00530}00530\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00531}00531\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{comment}{\#\ Loop\ through\ all\ the\ items\ in\ the\ menu}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00532}00532\ \ \ \ \ \textcolor{keywordflow}{for}\ x\ \textcolor{keywordflow}{in}\ range(len(menu\_items)):}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00533}00533\ \ \ \ \ \ \ \ \ item\_to\_print\ =\ \textcolor{stringliteral}{"{}\ ["{}}\ +\ str(x)\ +\ \textcolor{stringliteral}{"{}]"{}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ menu\_items[x]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00534}00534\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\_in\_divider}}(item\_to\_print,\ wrap)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00535}00535\ \ \ \ \ print(divider)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00536}00536\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00537}00537\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00538}\mbox{\hyperlink{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}{00538}}\ \textcolor{keyword}{def\ }\mbox{\hyperlink{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}{show\_menu\_double}}(menu\_items:\ list,\ wrap:\ WrapMode\ =\ WrapMode.TRUNCATE)\ -\/>\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00539}00539\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00540}00540\ \textcolor{stringliteral}{\ \ \ \ Prints\ the\ menu\ item\ }\textcolor{keyword}{from}\ the\ first\ array\ \textcolor{keywordflow}{and}\ its\ index\ on\ the\ left.\ On\ the\ right\ it\ prints\ the\ item\ \textcolor{keyword}{from}\ the}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00541}00541\ \ \ \ \ second\ array.\ This\ \textcolor{keywordflow}{is}\ sandwiched\ inbetween\ two\ dividers.\ The\ item\ \textcolor{keywordflow}{is}\ wrapped\ \textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ longer\ than}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00542}00542\ \ \ \ \ half\ the\ console\ width,\ allowing\ space\ \textcolor{keywordflow}{for}\ the\ divider\ \textcolor{keywordflow}{and}\ the\ value.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00543}00543\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00544}00544\ \ \ \ \ \textcolor{preprocessor}{@param}\ wrap:\ How\ the\ text\ should\ be\ wrapped\ \textcolor{keywordflow}{if}\ it\ \textcolor{keywordflow}{is}\ too\ long\ (Truncate\ by\ default)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00545}00545\ \ \ \ \ \textcolor{preprocessor}{@param}\ menu\_items:\ The\ list\ of\ menu\ items\ to\ \textcolor{keywordflow}{print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00546}00546\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00547}00547\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{comment}{\#\ TODO:\ Double\ Wrap}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00548}00548\ \ \ \ \ print(divider)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00549}00549\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00550}00550\ \ \ \ \ \textcolor{comment}{\#\ Loop\ through\ all\ the\ items\ in\ the\ menu}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00551}00551\ \ \ \ \ \textcolor{keywordflow}{for}\ x\ \textcolor{keywordflow}{in}\ range(len(menu\_items[0])):}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00552}00552\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00553}00553\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Create\ the\ two\ items\ to\ print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00554}00554\ \ \ \ \ \ \ \ \ item\_to\_print\_1\ =\ \textcolor{stringliteral}{"{}\ ["{}}\ +\ str(x)\ +\ \textcolor{stringliteral}{"{}]"{}}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ +\ menu\_items[0][x]}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00555}00555\ \ \ \ \ \ \ \ \ item\_to\_print\_2\ =\ \textcolor{stringliteral}{"{}("{}}\ +\ menu\_items[1][x]\ +\ \textcolor{stringliteral}{"{})\ "{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00556}00556\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00557}00557\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Truncate\ the\ text\ if\ it\ is\ too\ long}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00558}00558\ \ \ \ \ \ \ \ \ allowed\_width\ =\ int(console\_width\ /\ 2)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00559}00559\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00560}00560\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ len(Colour.clean\_text(item\_to\_print\_1))\ >\ allowed\_width:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00561}00561\ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\_1\ =\ item\_to\_print\_1[:allowed\_width\ -\/\ 2]\ \ \textcolor{comment}{\#\ Truncate\ the\ text\ to\ fit\ half\ the\ console\ width}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00562}00562\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00563}00563\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ len(Colour.clean\_text(item\_to\_print\_2))\ >\ allowed\_width:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00564}00564\ \ \ \ \ \ \ \ \ \ \ \ \ item\_to\_print\_2\ =\ item\_to\_print\_1[:allowed\_width\ -\/\ 2]\ \ \textcolor{comment}{\#\ Truncate\ the\ text\ to\ fit\ half\ the\ console\ width}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00565}00565\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00566}00566\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Spacing\ inbetween\ the\ two\ items\ (similar\ to\ how\ it\ is\ done\ in\ "{}text\_in\_divider"{}\ function)}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00567}00567\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ The\ length\ of\ the\ text,\ minus\ console\ width,\ minus\ 2\ for\ the\ border}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00568}00568\ \ \ \ \ \ \ \ \ width\_left\ =\ console\_width\ -\/\ len(Colour.clean\_text(item\_to\_print\_1))\ -\/\ len(}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00569}00569\ \ \ \ \ \ \ \ \ \ \ \ \ Colour.clean\_text(item\_to\_print\_2))\ -\/\ 2}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00570}00570\ \ \ \ \ \ \ \ \ spacing\ =\ \textcolor{stringliteral}{"{}\ "{}}\ *\ width\_left}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00571}00571\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00572}00572\ \ \ \ \ \ \ \ \ \textcolor{comment}{\#\ Combine\ the\ two\ items}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00573}00573\ \ \ \ \ \ \ \ \ final\_item\_to\_print\ =\ divider\_symbol\ +\ item\_to\_print\_1\ +\ spacing\ +\ item\_to\_print\_2\ +\ divider\_symbol}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00574}00574\ \ \ \ \ \ \ \ \ print(final\_item\_to\_print)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00575}00575\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00576}00576\ \ \ \ \ print(divider)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00577}00577\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00578}00578\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00579}\mbox{\hyperlink{namespacerenderer_a8f04096ba0117ead5c1a988a0946478c}{00579}}\ \textcolor{keyword}{def\ }print\_text\_on\_same\_line(text\_to\_print:\ str)\ -\/>\ \textcolor{keywordtype}{None}:}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00580}00580\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00581}00581\ \textcolor{stringliteral}{\ \ \ \ Prints\ the\ text\ on\ the\ same\ line\ }\textcolor{keyword}{as}\ the\ last\ text\ printed.\ It\ first\ writes\ a\ blank\ line\ the\ length\ of\ the\ console}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00582}00582\ \ \ \ \ to\ clear\ the\ line.\ Then\ it\ prints\ the\ text\ using\ the\ \textcolor{keywordflow}{return}\ character\ to\ overwrite\ the\ previous\ text.}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00583}00583\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00584}00584\ \ \ \ \ \textcolor{preprocessor}{@param}\ text\_to\_print:\ The\ text\ to\ \textcolor{keywordflow}{print}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00585}00585\ \ \ \ \ \textcolor{stringliteral}{"{}"{}"{}}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00586}00586\ \textcolor{stringliteral}{\ \ \ \ }\textcolor{comment}{\#\ Clear\ the\ line}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00587}00587\ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)r'}\ +\ \textcolor{stringliteral}{"{}\ "{}}\ *\ console\_width)}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00588}00588\ }
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00589}00589\ \ \ \ \ \textcolor{comment}{\#\ Print\ the\ text}}
+\DoxyCodeLine{\Hypertarget{renderer_8py_source_l00590}00590\ \ \ \ \ sys.stdout.write(\textcolor{stringliteral}{'\(\backslash\)r'}\ +\ text\_to\_print)}
+
+\end{DoxyCode}

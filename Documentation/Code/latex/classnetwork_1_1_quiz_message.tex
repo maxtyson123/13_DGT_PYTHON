@@ -1,0 +1,139 @@
+\hypertarget{classnetwork_1_1_quiz_message}{}\doxysection{network.\+Quiz\+Message Class Reference}
+\label{classnetwork_1_1_quiz_message}\index{network.QuizMessage@{network.QuizMessage}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{classnetwork_1_1_quiz_message_ad543cf99107c342352c60e4583c79f85}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str \mbox{\hyperlink{classnetwork_1_1_quiz_message_a5c8bf21c0fe2ff786a676157f38e2ef0}{message}}, str \mbox{\hyperlink{classnetwork_1_1_quiz_message_ac2e16d3ad0d542f67f7330967899528e}{sender}}, str \mbox{\hyperlink{classnetwork_1_1_quiz_message_ad5c2986dfd3cebf8f08299d1782f02f3}{recipient}}, str \mbox{\hyperlink{classnetwork_1_1_quiz_message_afaa6e90020de001f9a322485182718ed}{message\+\_\+type}})
+\item 
+def \mbox{\hyperlink{classnetwork_1_1_quiz_message_a7518cc8624832c6372d7bbc3ebdc7774}{\+\_\+\+\_\+str\+\_\+\+\_\+}} (self)
+\item 
+bytes \mbox{\hyperlink{classnetwork_1_1_quiz_message_ad719fa7fe6564e8de27429ed9b105d58}{to\+\_\+bytes}} (self)
+\item 
+object \mbox{\hyperlink{classnetwork_1_1_quiz_message_a6d4b2ebe8aaa56265261ef36603cb661}{from\+\_\+bytes}} (self, bytes data)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_message_a5c8bf21c0fe2ff786a676157f38e2ef0}{message}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_message_ac2e16d3ad0d542f67f7330967899528e}{sender}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_message_ad5c2986dfd3cebf8f08299d1782f02f3}{recipient}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_message_afaa6e90020de001f9a322485182718ed}{message\+\_\+type}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}A class to represent a message sent between the client and server
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00016}{16}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_ad543cf99107c342352c60e4583c79f85}\label{classnetwork_1_1_quiz_message_ad543cf99107c342352c60e4583c79f85}} 
+\index{network.QuizMessage@{network.QuizMessage}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def network.\+Quiz\+Message.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{str}]{message,  }\item[{str}]{sender,  }\item[{str}]{recipient,  }\item[{str}]{message\+\_\+type }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}@param message: The message
+@param sender: The sender of the message
+@param recipient: The recipient of the message
+@param message_type: The type of the message
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00021}{21}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_a7518cc8624832c6372d7bbc3ebdc7774}\label{classnetwork_1_1_quiz_message_a7518cc8624832c6372d7bbc3ebdc7774}} 
+\index{network.QuizMessage@{network.QuizMessage}!\_\_str\_\_@{\_\_str\_\_}}
+\index{\_\_str\_\_@{\_\_str\_\_}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{\_\_str\_\_()}{\_\_str\_\_()}}
+{\footnotesize\ttfamily def network.\+Quiz\+Message.\+\_\+\+\_\+str\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00033}{33}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_a6d4b2ebe8aaa56265261ef36603cb661}\label{classnetwork_1_1_quiz_message_a6d4b2ebe8aaa56265261ef36603cb661}} 
+\index{network.QuizMessage@{network.QuizMessage}!from\_bytes@{from\_bytes}}
+\index{from\_bytes@{from\_bytes}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{from\_bytes()}{from\_bytes()}}
+{\footnotesize\ttfamily  object network.\+Quiz\+Message.\+from\+\_\+bytes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{bytes}]{data }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Update this objects attributes from the bytes (JSON encoded in utf-8)
+@param data: The data to decode
+@return: This object
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00050}{50}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_ad719fa7fe6564e8de27429ed9b105d58}\label{classnetwork_1_1_quiz_message_ad719fa7fe6564e8de27429ed9b105d58}} 
+\index{network.QuizMessage@{network.QuizMessage}!to\_bytes@{to\_bytes}}
+\index{to\_bytes@{to\_bytes}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{to\_bytes()}{to\_bytes()}}
+{\footnotesize\ttfamily  bytes network.\+Quiz\+Message.\+to\+\_\+bytes (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Creates a JSON object from the attributes of this object and encodes it in utf-8
+@return: The message as bytes (JSON encoded in utf-8)
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00036}{36}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_a5c8bf21c0fe2ff786a676157f38e2ef0}\label{classnetwork_1_1_quiz_message_a5c8bf21c0fe2ff786a676157f38e2ef0}} 
+\index{network.QuizMessage@{network.QuizMessage}!message@{message}}
+\index{message@{message}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{message}{message}}
+{\footnotesize\ttfamily network.\+Quiz\+Message.\+message}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00028}{28}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_afaa6e90020de001f9a322485182718ed}\label{classnetwork_1_1_quiz_message_afaa6e90020de001f9a322485182718ed}} 
+\index{network.QuizMessage@{network.QuizMessage}!message\_type@{message\_type}}
+\index{message\_type@{message\_type}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{message\_type}{message\_type}}
+{\footnotesize\ttfamily network.\+Quiz\+Message.\+message\+\_\+type}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00031}{31}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_ad5c2986dfd3cebf8f08299d1782f02f3}\label{classnetwork_1_1_quiz_message_ad5c2986dfd3cebf8f08299d1782f02f3}} 
+\index{network.QuizMessage@{network.QuizMessage}!recipient@{recipient}}
+\index{recipient@{recipient}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{recipient}{recipient}}
+{\footnotesize\ttfamily network.\+Quiz\+Message.\+recipient}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00030}{30}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_message_ac2e16d3ad0d542f67f7330967899528e}\label{classnetwork_1_1_quiz_message_ac2e16d3ad0d542f67f7330967899528e}} 
+\index{network.QuizMessage@{network.QuizMessage}!sender@{sender}}
+\index{sender@{sender}!network.QuizMessage@{network.QuizMessage}}
+\doxysubsubsection{\texorpdfstring{sender}{sender}}
+{\footnotesize\ttfamily network.\+Quiz\+Message.\+sender}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00029}{29}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Maxs\+\_\+\+Modules/\mbox{\hyperlink{network_8py}{network.\+py}}\end{DoxyCompactItemize}

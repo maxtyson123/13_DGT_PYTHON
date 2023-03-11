@@ -1,7 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import time
 
-from Maxs_Modules.debug import error, show_debug_menu, in_ide
+from Maxs_Modules.debug import error, debug_cli, in_ide
 
 # - - - - - - - Variables - - - - - - -#
 imported_timeout = False
@@ -13,7 +13,8 @@ imported_timeout = False
 def sort_multi_array(data: list, descending: bool = False) -> list:
     """
     Sorts a multi-dimensional array by the second value in each array using lambda shorthand, returns a copy of the list
-    instead of sorting the original incase caller wants to keep the original list
+    instead of sorting the original incase caller wants to keep the original list. If the descending parameter is set
+    then the data will be sorted in reverse order. The second array in the list must be a list of numbers.
 
     @param data: The list to be sorted
     @param descending: Weather to sort in descending order or not. By default, this is False.
@@ -33,18 +34,21 @@ def sort_multi_array(data: list, descending: bool = False) -> list:
     return result
 
 
-def strBool(text: str) -> bool:
+def string_bool(text: str) -> bool:
     """
     A replacement for the built-in bool function that allows for the conversion of a string with the text
-    "True/False" to a bool
+    "True/False" to a bool. It will raise a ValueError if the text is not "True" or "False" otherwise it will return
+    the value.
+
+    @note string_bool is a replacement for the built-in bool function as when using bool() to convert a string to a
+    bool it will return True if there is any text in the string and False if there isn't, however I need it to return
+    True if the string is "True" and False if the string is "False"
+
+    @note: Do not use this when loading from JSON as the JSON module will convert the string to a bool
 
     @param text: The text to convert to a bool
     @return: The bool value of the text. Value Error if the text is not "True" or "False"
     """
-    # Note: strBool is a replacement for the built-in bool function as when using bool() to convert a string to a
-    # bool it will return True if there is any text in the string and False if there isn't, however I need it to
-    # return True if the string is "True" and False if the string is "False"
-    # Note: Do not use this when loading from JSON as the JSON module will convert the string to a bool
     if text == "True":
         return True
     elif text == "False":
@@ -53,9 +57,11 @@ def strBool(text: str) -> bool:
         raise ValueError()
 
 
-def ipAdress(text: str) -> Exception or str:
+def ip_address(text: str) -> Exception or str:
     """
-    A function to check for a valid IP address
+    A type to use to check if the string is a valid IP address, if it is then the string will be returned,
+    if it isn't than a ValueError will be raised. Must adhere to the IP address format of V4.
+
     @param text:  The text to check
     @return: True if the text is a valid IP address, False if it isn't
     """
@@ -79,7 +85,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                            allow_these: list = None, max_time: int = 0) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
-     until they do.
+    until they do.
 
 
     @param type_to_convert: The type to convert the input to
@@ -100,7 +106,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
         # running in the IDE
         if max_time != 0 and not in_ide:
 
-            # Dont continuously import inputimeout, and there is no need to install it and import it if there is no
+            # Don't continuously import inputimeout, and there is no need to install it and import it if there is no
             # need for it yet
             install_package("inputimeout")
 
@@ -129,7 +135,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
             if len(command) > 1:
                 command.pop(0)
 
-            show_debug_menu(command)
+            debug_cli(command)
             continue
 
         # Check if the user inputted an allowed string
@@ -166,7 +172,7 @@ def set_if_none(variable: object, value: object) -> object:
     return variable
 
 
-def try_convert(variable: object, type_to_convert: object, supress_errors: bool = False) -> object:
+def try_convert(variable: object, type_to_convert: type, supress_errors: bool = False) -> object:
     """
     Try to convert a variable to a type, if it fails then return None
 
@@ -195,6 +201,7 @@ def install_package(package: str) -> None:
     """
     try:
         import pip
-        pip.main(['install', package])
+        print("Installing package: " + package + "...")
+        pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
     except Exception as e:
-        error("Failed to install package: " + package)
+        error("Failed to install package: " + package + " (" + str(e) + ")")

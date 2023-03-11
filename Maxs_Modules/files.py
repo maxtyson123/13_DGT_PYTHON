@@ -18,7 +18,7 @@ def load_questions_from_file() -> dict:
     Loads a json array of questions from the offline questions file specified in the offline_questions_file variable.
     This is just a downloaded JSON api response from the Open Trivia Database API.
 
-    @return: JSON array of questions
+    @return: JSON object of questions
     """
     # Open the file in read mode
     with open(offline_questions_file, "r") as file:
@@ -53,7 +53,11 @@ class SaveFile:
 
     def load(self) -> None:
         """
-        Loads the data from the save file into the save_data dictionary
+        Loads the data from the save file into the save_data dictionary. If the file is corrupt or does not exist
+        then the save_data dictionary will remain the same as its previous state. The caller of this function needs to
+        manually load the varibles from the save_data dictionary, it is also good practice to check if the types are
+        correct as JSON can be manipulated.
+
         @return: None, this function will return if the file is corrupt or does not exist
         """
         debug_message("Loading file from " + self.save_file, "save_file")
@@ -85,7 +89,10 @@ class SaveFile:
 
     def save(self) -> None:
         """
-        Saves the data from the save_data dictionary to the save file
+        Saves the data from the save_data dictionary to the save file. If the file does not exist then it will be
+        created. The save_data dictionary needs to be set before this function is called, do this by setting the
+        save_data dictionary to the __dict__ of the subclass. Note: do not need to remove the save_data dictionary
+        from the save_data dictionary as this is done automatically.
         """
         debug_message("Saving file to " + self.save_file, "save_file")
 

@@ -6,8 +6,8 @@ import html
 import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
-from Maxs_Modules.network import get_ip, QuizGameServer, QuizClient, QuizGameClient
-from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, strBool, sort_multi_array
+from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
+from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line
 
@@ -15,11 +15,11 @@ from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line
 data_folder = "UserData/Games/"
 category_offset = 9
 max_number_of_questions = 50
-quiz_categories = ["General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games",
+quiz_categories = ("General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games",
                    "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography",
                    "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets",
-                   "Japanese Anime & Manga", "Cartoon & Animations"]
-host_a_server_by_default = True
+                   "Japanese Anime & Manga", "Cartoon & Animations")
+host_a_server_by_default = False
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -27,8 +27,9 @@ host_a_server_by_default = True
 
 def generate_new_save_file():
     """
-    Generates a new save file name by searching through the data folder for a name that is not already taken
-    (most likely: Game_X.json)
+    Generates a new save file name by searching through the data folder for a name that is not already taken in the
+    format of "Game_0.json" (where 0 is the number of the save file). If more than 1000 save files are found, then an
+    exception is raised to prevent infinite looping as most likely something has gone wrong.
 
     @return: The name of the save file
     """
@@ -73,10 +74,9 @@ def get_saved_games():
 
 # - - - - - - - Classes - - - - - - -#
 
-
 class Question:
     category = None
-    type = None  # Although type is a reserved word, it is used in the API and is therefore used here
+    question_type = None
     difficulty = None
     question = None
     correct_answer = None
@@ -85,13 +85,19 @@ class Question:
     def __init__(self) -> None:
         pass
 
-    def load(self, data: dict) -> None:
+    # Note uses the string representation of Question class as it has not been defined therfore cant use it in type the
+    # hints
+    def load(self, data: dict) -> "Question":
         """
-        Loads the data from the API into the question object
-        @param data: The data from the API
+        Takes a dictionary of data and loads it into the question object. The data is also html character unescaped
+        when loaded
+
+        @param data: The dict to load the data from. Needs to have the following keys: category, type, difficulty,
+        question, correct_answer, incorrect_answers
+        @return: The question object
         """
         self.category = data.get("category")
-        self.type = data.get("type")
+        self.question_type = data.get("type")
         self.difficulty = data.get("difficulty")
         self.question = html.unescape(data.get("question"))
 
@@ -101,6 +107,8 @@ class Question:
         # Unescape the incorrect answers
         for answer_index in range(len(self.incorrect_answers)):
             self.incorrect_answers[answer_index] = html.unescape(self.incorrect_answers[answer_index])
+
+        return self
 
 
 class User:
@@ -143,6 +151,12 @@ class User:
         self.icon = icon
 
     def load(self, data: dict) -> None:
+        """
+        Loads the data from a dictionary into the user object, if the data is None, then the default value is used.
+
+        @param data: A dictionary of data to load into the user object. May contain the following keys: name, colour,
+        icon, points, correct, incorrect, streak, highest_streak, questions_missed, answers, times, has_answered
+        """
         # Game Variables
         self.name = data.get("name")
         self.colour = data.get("colour")
@@ -183,7 +197,8 @@ class User:
     def calculate_stats(self) -> None:
         """
         Calculates the stats for the user, this saves time as the stats only need to be calculated when the user selects
-        to display them
+        to display them. The stats are stored in the following variables: questions_answered, accuracy, average_time,
+        average_time_correct, average_time_incorrect, average_time_missed
         """
 
         # Simple stats
@@ -221,10 +236,10 @@ class User:
 
     def show_stats(self) -> None:
         """
-        Prints the collected stats variables to the console
+        Calculates and then prints the stats for the user.
         """
 
-        # Calculate any stats that arent just supplied by the game
+        # Calculate any stats that aren't just supplied by the game
         self.calculate_stats()
 
         # Print the stats
@@ -246,7 +261,7 @@ class User:
     def reset(self) -> None:
         """
         Removes all the set answers, 0s out the points, correct, incorrect, steak, questions_missed variables. Name,
-        icon and colour are kept
+        icon and colour are kept.
         """
 
         # Clear the arrays
@@ -265,6 +280,7 @@ class User:
     def styled_name(self) -> str:
         """
         Returns the name of the user with the colour (includes reset char)
+
         @return: The name of the user with the colour (includes reset char)
         """
         return self.colour + self.name + Colour.RESET
@@ -276,6 +292,7 @@ class Bot(User):
     def __int__(self, name: str, colour: str, icon: str, accuracy: float) -> None:
         """
         Creates a new bot and assigns it a name, colour and icon
+
         @param name: The name of the bot
         @param colour: The colour of the bot
         @param icon: The path to the icon of the bot
@@ -287,20 +304,32 @@ class Bot(User):
         super().__int__(name, colour, icon)
 
     def load(self, data: dict) -> None:
+        """
+        Loads the data from the dictionary into the bot using the function provided by the User class with the added
+        variable of accuracy. The defaults are then loaded.
+
+        @param data: The dictionary containing the data to load, should contain the same keys as the User.load()
+        function with an added accuracy key
+        """
         super().load(data)
         self.accuracy = data.get("accuracy")
         self.load_defaults()
 
     def load_defaults(self) -> None:
+        """
+        Loads the default values for the bot, the defaults are the same as the User class with the addition of an
+        default accuracy of 0.5 (50%). Also sets the player_type to "Bot"
+        """
         super().load_defaults()
         self.accuracy = set_if_none(self.accuracy, 0.5)
         self.player_type = "Bot"
 
     def show_stats(self) -> None:
         """
-        Prints the collected stats variables to the console
+        Prints the collected stats variables to the console. The actual accuracy is printed and the expected accuracy
+        is also printed.
         """
-        # Ensure that calculations dont mess with accuracy
+        # Ensure that calculations don't mess with accuracy
         save_accuracy = self.accuracy
 
         # Calculate the stats
@@ -380,10 +409,12 @@ class Game(SaveFile):
 
     def __init__(self, quiz_save: str = None) -> None:
         """
-        Creates a new game. If the quiz save is not none, then load the quiz save because the user wants to continue a
-        game otherwise generate a new save file.
+        Creates a new game. If the quiz_save is not none, then load the quiz save because the user wants to continue a
+        game otherwise generate a new save file. After the save file is loaded, the default settings are set and then
+        converted into their relevant classes.
 
-        @param quiz_save:
+        @param quiz_save: The name of the save file to load, if none then a new save file will be generated. (Default:
+        None)
         """
         # Call the super class and pass the save file name, this will automatically load the settings
 
@@ -496,54 +527,33 @@ class Game(SaveFile):
 
     def set_settings(self) -> None:
         """
-        Shows the user various menus related to settings, allowing them to change the settings
+        Shows the user various menus related to settings, allowing them to change the settings. Starts with the main
+        gameplay settings menu
         """
         self.settings_gameplay()
 
-    def convert_users(self) -> None:
+    def convert_to_object(self, dicts: list, object_type: object) -> None:
         """
-        Converts the users list from a list of dicts to a list of User objects
-        
-        @return: This function returns if the list is empty or if the first item is already a User object
+        Converts the dicts list from a list of item to a list of object_type objects. It will only attempt convert
+        the item if it is not already a object_type object, therefore this function can be called without knowing the
+        state of each item in the list
         """
-        # Check if the users list is empty
-        if len(self.users) == 0:
-            return
-
         # For each user in the list of users convert the dict to a User object using the load() function
-        for x in range(len(self.users)):
+        for x in range(len(dicts)):
             # Check if the user is already a User object
-            if type(self.users[x]) is User:
+            if type(dicts[x]) is object_type:
                 continue
 
             # Load
-            user_object = User()
-            user_object.load(self.users[x])
-            self.users[x] = user_object
+            new_object = object_type()
+            new_object.load(dicts[x])
+            dicts[x] = new_object
 
-    def convert_bots(self) -> None:
+    def set_players(self) -> None:
         """
-        Converts the bots list from a list of dicts to a list of Bot objects
-
-        @return: This function returns if the list is empty or if the first item is already a Bot object
-        """
-        # Check if the bots list is empty
-        if len(self.bots) == 0:
-            return
-
-        # Check if the bot is already a Bot object
-        if type(self.bots[0]) is Bot:
-            return
-
-        # For each bot in the list of bots convert the dict to a Bot object using the load() function
-        for x in range(len(self.bots)):
-            bot_object = Bot()
-            bot_object.load(self.bots[x])
-            self.bots[x] = bot_object
-
-    def set_users(self) -> None:
-        """
-        Gets the user to enter the names and colours for each user and then creates each bot
+        Clears the list of users and bots, and then gets a colour and name for each user. The amount of users is set in
+        the settings menu. After the users have been set the bots are then created. The amount of bots is set in the
+        settings menu
         """
         # Clear the users and bots lists
         self.users = []
@@ -569,7 +579,7 @@ class Game(SaveFile):
             user.colour = Colour.colours_list[Colour.colours_names_list.index(colour_menu.user_input)]
 
             if user.name == "Max":
-                user.colour += Colour.BLINK
+                user.colour += Colour.ITALIC
 
             # Add to list of users
             self.users.append(user)
@@ -614,7 +624,7 @@ class Game(SaveFile):
         debug_message("Questions: " + str(self.questions), "Game")
 
         # Convert the data into a list of Question objects
-        self.convert_questions()
+        self.convert_to_object(self.questions, Question)
 
     def convert_question_settings_to_api(self) -> None:
         """
@@ -629,8 +639,6 @@ class Game(SaveFile):
             # Add the offset to the index. This is because the api starts at 9 and not 0 (ends at 32)
             self.api_category = category_index + category_offset
 
-        print("Category: " + str(self.api_category))
-
         # Convert the type if it is not any
         if self.question_type != "Any":
 
@@ -640,35 +648,15 @@ class Game(SaveFile):
                 case "True/False":
                     self.api_type = "boolean"
 
-    def convert_questions(self) -> None:
-        """
-        Converts the questions list from a list of dicts to a list of Question objects
-
-        @return: This function returns if the list is empty or if the first item is already a Question object
-        """
-        # Check if there are any questions
-        if len(self.questions) == 0:
-            return
-
-        # Check if the questions are already in the correct format
-        if type(self.questions[0]) is Question:
-            return
-
-        # For each question in the list of questions convert the dict to a Question object using the load() function
-        for x in range(len(self.questions)):
-            question_object = Question()
-            question_object.load(self.questions[x])
-            self.questions[x] = question_object
-
     # __ GAME FUNCTIONS __
 
     def begin(self) -> None:
         """
-        Starts the game by printing all the users and then getting the questions if there are none
+        Starts the game. It first gets the questions if there are none, then shuffles the questions if the user wants
+        (only if the game is a new one as when continuing the game the questions should be in the same order). If the
+        game is set to be hosted then a server is started up. Afterwards the game is checked to see if it is finished
+        othewise it will continue to play from the current state
         """
-        for user in self.users:
-            print(user.styled_name())
-
         # If there are no questions then get them
         if len(self.questions) == 0:
             self.get_questions()
@@ -691,7 +679,8 @@ class Game(SaveFile):
 
     def show_scores(self) -> None:
         """
-        Shows the scores of all the players, and then shows the stats of the player selected
+        Shows the scores of all the players in a menu with the points beside them sorted from highest to lowest. If the
+        user selects a player their individual stats are show i.e accuracy and time etc.
         """
         # Array to store the names and scores
         score_menu_players = []
@@ -718,7 +707,7 @@ class Game(SaveFile):
             score_menu_multi[1][x] = str(score_menu_multi[1][x])
 
         # Add the next option (has to be after sort as "Game Finished/Next Question" is added to the end and also
-        # causes errors becuase they are not ints)
+        # causes errors because they are not ints)
         score_menu_multi[0].append("Next")
         if self.game_finished:
             score_menu_multi[1].append("Game Finished")
@@ -756,8 +745,9 @@ class Game(SaveFile):
 
     def show_question_markings(self) -> None:
         """
-        Shows the answer each player submited for the questions. It begins at current_question and then goes through each
-        question after that, so when called best practice is to set current_question to 0
+        Shows the answer each player submitted for the questions. It begins at current_question and then goes through each
+        question after that, so when called best practice is to set current_question to 0. It will call itself in a
+        loop until it reaches the end of the questions array
         """
 
         # Get the current question
@@ -797,10 +787,9 @@ class Game(SaveFile):
 
         # Show the menu
         marking_menu = Menu("Question: " + question.question, [marking_menu_players, marking_menu_answers], True)
-        marking_menu.get_input()
 
         # Note to self, because python is python with its syntax, the "_" is what default is
-        match marking_menu.user_input:
+        match marking_menu.get_input():
             case "Next Question":
                 if self.current_question == len(self.questions) - 1:
                     return
@@ -847,10 +836,12 @@ class Game(SaveFile):
 
     def mark_question(self, user_input, current_user) -> None:
         """
-        Marks the question and updates the user class based on the mark
+        Marks the question and updates the user class based on the mark. The marking (Correct, Incorrect, Missed) is
+        added on to the current valued stored in the user's, answers array therefore before calling the marking
+        function set the string to be "" or "Missed_".
 
-        @param user_input: The answer submitted by the user
-        @param current_user: The user that answered the question, and where the points will be added to
+        @param user_input: The answer submitted by the player, this is what will be checked against the correct answer
+        @param current_user: The user that answered the question, and where the points will be added to.
         """
         # Get the current question
         question = self.questions[self.current_question]
@@ -910,9 +901,10 @@ class Game(SaveFile):
 
     def play(self) -> None:
         """
-        Shows the user the question and then gets the user to answer it in the specified time by using a different
-        thread for the user input. Then it marks the question and calculates the score for the player. Afterwards it
-        runs the next question
+        Shows the user the question in a menu and gets the user to answer it, utilising the Menu class's time_limit
+        to force the user to answer in the specified amount of time. Then it marks the question and calculates the
+        score for the player. Afterwards it runs the next question. The start time and end time of this function is
+        calculated and then stored for later use to work out the timings for the stats.
         """
 
         # Save the users progress
@@ -934,7 +926,7 @@ class Game(SaveFile):
         question_menu = Menu(question.question, options)
 
         # Clear the screen
-        question_menu.clear()
+        clear()
 
         # Print some info
         print(divider)
@@ -1007,7 +999,10 @@ class Game(SaveFile):
 
     def next_question(self) -> None:
         """
-        Moves onto the next question. If the game has finished then it shows the results.
+        Increases the current question by 1 and then checks if the game is over or not. If the game is over then it
+        will run the game_end() function. If the game is not over then it show the scores if specified so in
+        show_score_after_question_or_game and then will run the next question. If this is a network game then it will
+        wait for all the players to answer or for the server to move on.
         """
         # Move onto the next question
         self.current_question += 1
@@ -1059,7 +1054,7 @@ class Game(SaveFile):
 
         # If this is a client then wait for the server to sync and all players to answer
         elif is_client:
-            # Check that the server hasnt closed
+            # Check that the server hasn't closed
             if self.check_server_error(): return
 
             # Send the users answer to the server
@@ -1084,18 +1079,19 @@ class Game(SaveFile):
             # Show the score
             self.show_scores()
 
-        # Check that the server hasnt closed
+        # Check that the server hasn't closed
         if is_client:
             if self.check_server_error(): return
-
 
         # Move onto the question
         self.play()
 
     def check_game_finished(self) -> bool:
         """
-        Checks if the game has finished
-        @return: True if the game has finished
+        Checks if the game has finished and then will update the game_finished state. If the game has finished but
+        there are multiple players (locally) then it will reset the question counter and increase the current user
+        playing and then call play()
+        @return: True if the game has finished, False if not.
         """
 
         debug_message("Checking if game has finished: " + str(self.current_question) + " of " + str(
@@ -1114,6 +1110,8 @@ class Game(SaveFile):
                 # Move onto the next question
                 self.play()
                 self.game_finished = False
+                # TODO: Setting game finished here seems weird, could cause a bug (i.e continue game after all
+                #  players have had turn as caller gets this false), fix later
             else:
                 self.game_finished = True
         else:
@@ -1123,17 +1121,16 @@ class Game(SaveFile):
 
     def game_end(self) -> None:
         """
-        Runs when the game ends
+        Shows a menu allowing for the final scores to be show or to compare the answers of the users.
         """
         # Save that the game has ended
         self.save()
 
         # Create the game end menu
         game_end_menu = Menu("Game Finished", ["Compare Scores", "Compare User Answers", "Finish"])
-        game_end_menu.get_input()
 
         # Check what the user selected
-        match game_end_menu.user_input:
+        match game_end_menu.get_input():
             case "Compare Scores":
                 self.show_scores()
                 self.game_end()
@@ -1147,7 +1144,7 @@ class Game(SaveFile):
     def reset(self) -> None:
         """
         Resets the game back to a state that allows the game to be played again from the start. This will clear all user
-         data but all settings and questions will be kept
+         data but all settings and questions will be kept. The questions will be reshuffled is specified so
         """
 
         # Reset the current question
@@ -1155,9 +1152,11 @@ class Game(SaveFile):
         self.current_user_playing = 0
         self.game_finished = False
 
-        # Reset the users
+        # Reset the users and bots
         for user in self.users:
             user.reset()
+        for bot in self.bots:
+            bot.reset()
 
         # Shuffle the questions
         if self.randomise_questions:
@@ -1169,13 +1168,15 @@ class Game(SaveFile):
     def prepare_save_data(self) -> None:
         """
         Prepares the save data for the game by converting the classes to dicts and removing the socket and thread
+        from the dictionary. Similar to convert_to_object() the state of each item is not needed to be the same as it
+        is compared using isinstance().
         """
         # Create the save data for the UserSettings object
         self.save_data = self.__dict__.copy()
 
         # Convert the user class to a dict
         for user_index in range(len(self.users)):
-            # Check if the user is not already a dict (have to use isinstance as if it is a dict then user_index wont
+            # Check if the user is not already a dict (have to use isinstance as if it is a dict then user_index won't
             # work)
             if isinstance(self.users[user_index], User):
                 # Convert the user to a dict
@@ -1187,7 +1188,7 @@ class Game(SaveFile):
             if type(self.questions[question_index]) == Question:
                 self.save_data["questions"][question_index] = self.questions[question_index].__dict__
 
-        # Conver the bots to a dict
+        # Convert the bots to a dict
         for bot_index in range(len(self.bots)):
             # Check if the bot is a class
             if type(self.bots[bot_index]) == Bot:
@@ -1206,8 +1207,8 @@ class Game(SaveFile):
 
     def save(self) -> None:
         """
-        Saves the game data to the file. Converts the user and question objects to dicts before saving and then
-        converts them back once written to the JSON file
+        Saves the game data to the file. Calls the prepare_save_data() function so the game can be in any-state when
+        the caller is calling this function. After it has been written to the file the data is converted back.
         """
         self.prepare_save_data()
 
@@ -1218,9 +1219,13 @@ class Game(SaveFile):
         self.convert_all_from_save_data()
 
     def convert_all_from_save_data(self) -> None:
-        self.convert_users()
-        self.convert_questions()
-        self.convert_bots()
+        """
+        Using the convert_to_object function the users, questions and bots are all attempted to be converted to their
+        relative classes
+        """
+        self.convert_to_object(self.users, User)
+        self.convert_to_object(self.questions, Question)
+        self.convert_to_object(self.bots, Bot)
 
     # __ MENUS __
 
@@ -1233,18 +1238,16 @@ class Game(SaveFile):
         single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
 
         while True:
-            single_player_menu.get_input()
 
-            match single_player_menu.user_input:
+            match single_player_menu.get_input():
                 case "How many players":
                     self.how_many_players = get_user_input_of_type(int, "How many players")
                 case "Next":
-                    self.set_users()
+                    self.set_players()
                     break
                 case "Back":
                     self.settings_gameplay()
                     break
-
 
     def settings_networking(self) -> None:
         """
@@ -1259,8 +1262,7 @@ class Game(SaveFile):
 
         while True:
 
-            networking_menu.get_input()
-            match networking_menu.user_input:
+            match networking_menu.get_input():
 
                 case "Server Name":
                     self.server_name = get_user_input_of_type(str, "Server Name")
@@ -1285,12 +1287,12 @@ class Game(SaveFile):
 
         # Menu options get updated so menu setup has to be in a loop
         while True:
-            game_play_menu_options = ["Host a server", "Time limit", "Question Amount", "Category", "Difficulty", "Type",
-                                      "Show score after Question/Game", "Show correct answer after Question/Game",
-                                      "Points for correct answer", "Points for incorrect answer",
-                                      "Points for no answer", "Points multiplier for a streak",
-                                      "Compounding amount for a streak", "Randomise questions",
-                                      "Randomise answer placement",
+            game_play_menu_options = ["Host a server", "Time limit", "Question Amount", "Category", "Difficulty",
+                                      "Type", "Show score after Question/Game",
+                                      "Show correct answer after Question/Game", "Points for correct answer",
+                                      "Points for incorrect answer", "Points for no answer",
+                                      "Points multiplier for a streak", "Compounding amount for a streak",
+                                      "Randomise questions", "Randomise answer placement",
                                       "Pick random question when run out of time",
                                       "Bot difficulty", "Number of bots", "Next", "Back"]
 
@@ -1300,7 +1302,8 @@ class Game(SaveFile):
                                      str(self.show_correct_answer_after_question_or_game),
                                      str(self.points_for_correct_answer), str(self.points_for_incorrect_answer),
                                      str(self.points_for_no_answer),
-                                     str(self.points_multiplier_for_a_streak), str(self.compounding_amount_for_a_streak),
+                                     str(self.points_multiplier_for_a_streak),
+                                     str(self.compounding_amount_for_a_streak),
                                      str(self.randomise_questions), str(self.randomise_answer_placement),
                                      str(self.pick_random_question),
                                      str(self.bot_difficulty), str(self.how_many_bots)]
@@ -1315,11 +1318,10 @@ class Game(SaveFile):
             game_play_menu_values.append("Main Menu")
 
             gameplay_menu = Menu("Game Settings: Gameplay", [game_play_menu_options, game_play_menu_values], True)
-            gameplay_menu.get_input()
 
-            match gameplay_menu.user_input:
+            match gameplay_menu.get_input():
                 case "Host a server":
-                    self.host_a_server = get_user_input_of_type(strBool,
+                    self.host_a_server = get_user_input_of_type(string_bool,
                                                                 "Host a server (" + Colour.true_or_false_styled() + ")")
 
                 case "Time limit":
@@ -1334,8 +1336,8 @@ class Game(SaveFile):
                     self.quiz_category = category_menu.user_input
 
                 case "Difficulty":
-                    self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Easy, Medium, Hard)", ["Easy", "Medium",
-                                                                                                           "Hard"])
+                    self.quiz_difficulty = get_user_input_of_type(str, "Difficulty (Easy, Medium, Hard)",
+                                                                  ["Easy", "Medium", "Hard"])
 
                 case "Type":
                     self.question_type = get_user_input_of_type(str, "Type (Multiple, True/False)", ["Multiple",
@@ -1365,19 +1367,20 @@ class Game(SaveFile):
                     self.points_multiplier_for_a_streak = get_user_input_of_type(int, "Points multiplier for a streak")
 
                 case "Compounding amount for a streak":
-                    self.compounding_amount_for_a_streak = get_user_input_of_type(int, "Compounding amount for a streak")
+                    self.compounding_amount_for_a_streak = get_user_input_of_type(int,
+                                                                                  "Compounding amount for a streak")
 
                 case "Randomise questions":
-                    self.randomise_questions = get_user_input_of_type(strBool, "Randomise questions ("
+                    self.randomise_questions = get_user_input_of_type(string_bool, "Randomise questions ("
                                                                       + Colour.true_or_false_styled() + ")")
 
                 case "Randomise answer placement":
-                    self.randomise_answer_placement = get_user_input_of_type(strBool,
+                    self.randomise_answer_placement = get_user_input_of_type(string_bool,
                                                                              "Randomise answer placement ("
                                                                              + Colour.true_or_false_styled() + ")")
 
                 case "Pick random question when run out of time":
-                    self.pick_random_question = get_user_input_of_type(strBool, "Pick random question (" +
+                    self.pick_random_question = get_user_input_of_type(string_bool, "Pick random question (" +
                                                                        Colour.true_or_false_styled() + ")")
 
                 case "Bot difficulty":
@@ -1399,14 +1402,17 @@ class Game(SaveFile):
 
     def wait_for_players(self):
         """
-        Waits for players to join the server
+        Creates a new server and sets it to the backend of this class. If there are no players then the user is asked
+        to set the host player, otherwise whatever player is at index 0 will be set to the host. A menu is then
+        shown, showing all the players currently in the game, it refreshes itself every 3 seconds via manipulation
+        of the time_limit in the Menu class. When the host decides to start the game any old unconnected users will
+        be removed from the game and the game will start. The server will then sync the game data with the clients
+        and play() will be called.
         """
-
-        print(self.game_loaded)
 
         # Set up the host (if there isn't one already) (host is always the first user in the list)
         if len(self.users) == 0:
-            self.set_users()
+            self.set_players()
         self.users[0].is_host = True
         self.users[0].is_connected = True
 
@@ -1432,7 +1438,7 @@ class Game(SaveFile):
             players = [ip_text]
 
             # Convert any users that have been added in
-            self.convert_users()
+            self.convert_to_object(self.users, User)
 
             # Loop through all the users
             for user in self.users:
@@ -1443,9 +1449,9 @@ class Game(SaveFile):
 
             players_menu = Menu("Players", players)
             players_menu.time_limit = 3
-            players_menu.get_input()
 
-            match players_menu.user_input:
+
+            match players_menu.get_input():
                 case "Start game":
                     if len(self.users) > 1:
                         break
@@ -1506,7 +1512,7 @@ class Game(SaveFile):
         self.server_thread.start()
 
         # Set up the user
-        self.set_users()
+        self.set_players()
         self.current_user_playing_net_name = self.users[0].name
         self.prepare_save_data()
 

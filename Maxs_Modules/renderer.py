@@ -5,7 +5,7 @@ import os
 import sys
 import time
 
-from Maxs_Modules.debug import error, use_debug, debugger, show_debug_menu, debug_message, in_ide
+from Maxs_Modules.debug import error, debug_cli, debug_message, in_ide
 from Maxs_Modules.tools import try_convert, install_package
 
 # - - - - - - - Variables - - - - - - -#
@@ -33,7 +33,8 @@ class WrapMode:
 
 class Colour:
     """
-    A class that stores the colour codes for the different colours. Note: from https://en.wikipedia.org/wiki/ANSI_escape_code
+    A class that stores the colour codes for the different colours.
+    Note: from https://en.wikipedia.org/wiki/ANSI_escape_code
     """
     # Colours
     BLACK = "\033[30m"
@@ -46,8 +47,8 @@ class Colour:
     WHITE = "\033[37m"
     GREY = "\033[90m"
 
-    colours_list = [BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, GREY]
-    colours_names_list = ["Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White", "Grey"]
+    colours_list = (BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, GREY)
+    colours_names_list = ("Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White", "Grey")
 
     # Styles
     BOLD = "\033[1m"
@@ -58,8 +59,8 @@ class Colour:
     INVERT = "\033[7m"
     STRIKETHROUGH = "\033[9m"
 
-    styles_list = [BOLD, DIM, ITALIC, UNDERLINE, BLINK, INVERT, STRIKETHROUGH]
-    styles_names_list = ["Bold", "Dim", "Italic", "Underline", "Blink", "Invert", "Strikethrough"]
+    styles_list = (BOLD, DIM, ITALIC, UNDERLINE, BLINK, INVERT, STRIKETHROUGH)
+    styles_names_list = ("Bold", "Dim", "Italic", "Underline", "Blink", "Invert", "Strikethrough")
 
     # Reset
     RESET = "\033[0m"
@@ -73,7 +74,7 @@ class Colour:
     @staticmethod
     def text_with_colour(text: str, colour: str) -> str:
         """
-        Returns the text with the colour code before and after it
+        Returns the text with the colour code before and the reset code after it
 
         @param text: The text to colour
         @param colour: The colour code
@@ -126,6 +127,13 @@ class MenuManager:
 menu_manager = MenuManager()
 
 
+def clear() -> None:
+    """
+    Clears the screen
+    """
+    os.system("cls")
+
+
 class Menu:
     # Note for future, the print should be changed to a render() function that allows for the menu to be rendered in
     # different ways (CLI, GUI)
@@ -143,12 +151,12 @@ class Menu:
     items_per_page = max_menu_items_per_page
     time_limit = 0
 
-    def __init__(self, title: str, items: list, multi_dimensional: bool = False) -> None:
+    def __init__(self, title: str, items: list | tuple, multi_dimensional: bool = False) -> None:
         """
         Creates a menu object
 
         @param title: The title of the menu
-        @param items: The items in the menu
+        @param items: The items in the menu, if multi_dimensional is True then the items should be a list of lists
         @param multi_dimensional: If the menu items array is multi-dimensional (i.e. has a value for each item)
         """
         self.title = title
@@ -156,15 +164,10 @@ class Menu:
         self.multi_dimensional = multi_dimensional
         menu_manager.menu_history_names.append(title)
 
-    def clear(self) -> None:
-        """
-        Clears the screen
-        """
-        os.system("cls")
-
     def show_menu(self) -> list:
         """
-        Prints the menu to a clear screen
+        Prints the menu to a clear screen. Automatically uses the multi_dimensional variable to determine if the menu
+        should use show_menu_double or show_menu
         """
         # Store menu_items as a local variable as it can be changed if the menu is split into pages
         menu_items = self.get_pages()
@@ -172,7 +175,7 @@ class Menu:
         # Check if the screen should be cleared
         if self.clear_screen:
             # Clear the screen
-            self.clear()
+            clear()
 
         # Print the menu
         print(divider)
@@ -184,10 +187,18 @@ class Menu:
 
         return menu_items
 
-    def get_input(self, user_input: str = None) -> None:
+    def get_input(self, user_input: str = None) -> str:
         """
         Prints the menu to a clear screen and then gets the user input as an index of the menu items. Then stores the
-        item in the user_input variable
+        item in the user_input variable. If the user input is invalid then it will ask the user to try again until it
+        is valid. Valid input is an integer between 0 and the length of the menu items array, or a string that is in
+        the menu items array. If input is passed in then it will not ask the user for input and will instead use the
+        input passed in (if it is not valid then it will ask). If the time_limit is set to a value greater than 0 then
+        it will return after the time limit has been reached (if the user has not input anything before that).
+        Pre-input allows for the user to input a list of indexes that will be automatically used as the user input.
+
+        @param user_input: The user input to use instead of getting input from the user.
+        @return: The option the user selected (the item in the menu items array)
         """
 
         menu_items = self.show_menu()
@@ -222,7 +233,7 @@ class Menu:
                 menu_manager.menu_history_input.append(self.user_input)
 
                 # Return
-                return
+                return None
 
             else:
                 # Print an error
@@ -245,7 +256,7 @@ class Menu:
 
             # If there is no input then get the input
             if user_input is None:
-                input_promt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
+                input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
 
                 # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
                 # running in the IDE
@@ -257,19 +268,19 @@ class Menu:
                     # Check if the time limit has been reached
                     if time.time() - start_time > self.time_limit:
                         self.user_input = None
-                        return
+                        return None
 
                     # Calculate the time left
                     time_left = self.time_limit - (time.time() - start_time)
 
                     # Get the user input
                     try:
-                        user_input = inputimeout(prompt=input_promt, timeout=time_left)
+                        user_input = inputimeout(prompt=input_prompt, timeout=time_left)
                     except TimeoutOccurred:
                         self.user_input = None
-                        return
+                        return None
                 else:
-                    user_input = input(input_promt)
+                    user_input = input(input_prompt)
 
             # If there is a type error then its returned as None otherwise it is the converted value
             if try_convert(user_input, int, True) is not None:  # Is an int
@@ -283,7 +294,7 @@ class Menu:
                     error("Invalid input, please enter one of these: " + str(options))
                     user_input = None
 
-            # Not a int, so try
+            # Not an int, so try
             else:
                 # Check if it is a debug command
                 if "debug" in user_input:
@@ -293,11 +304,11 @@ class Menu:
                     if len(command) > 1:
                         command.pop(0)
 
-                    show_debug_menu(command)
+                    debug_cli(command)
                     user_input = None
                     continue
 
-                # Check if the user is wanting to do pre-input (i.e a list of indexs "1,4,3,2")
+                # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
                 if "," in user_input:
                     # Split the string into a list
                     user_input = user_input.split(",")
@@ -326,7 +337,7 @@ class Menu:
                         menu_manager.menu_history_input.append(self.user_input)
 
                         # Return
-                        return
+                        return self.user_input
 
                     else:
                         error("Invalid pre-input, please enter a list of numbers separated by commas")
@@ -341,18 +352,22 @@ class Menu:
                     error("Invalid input")
                     user_input = None
                     continue
+
         menu_manager.menu_history_input.append(self.user_input)
+        return self.user_input
 
     def get_pages(self) -> list:
         """
-        Splits the menu items into pages if there are more than the max menu items in the list of items
+        Splits the menu items into pages if there are more than the max menu items in the list of items. Curently not
+        working will be fixed or removed later
+
         @return: The current page of menu items (a list of 10 options, including previous and next page)
         """
 
-        # Will finish pages later if i have time but right now they are not working
+        # TODO: Will finish pages later if I have time but right now they are not working
         return self.items
 
-        # Store menu_items as a local variable as dont want to change the original
+        # Store menu_items as a local variable as don't want to change the original
         menu_items = self.items.copy()
         menu_items_count = len(menu_items)
         if self.multi_dimensional:
@@ -385,7 +400,7 @@ class Menu:
 
                 slice_end += 1
 
-            # If the menu is multi dimensional, then the items are stored in a list of lists and both arrays need to be
+            # If the menu is multidimensional, then the items are stored in a list of lists and both arrays need to be
             # sliced
             if self.multi_dimensional:
                 menu_items[0] = menu_items[0][slice_start: slice_end]
@@ -401,11 +416,12 @@ class Menu:
 
 def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
-    Prints the text in the divider
+    Prints the item in between two divider symbols and wraps the text if it is too long by default using Truncate but
+    will use whatever is passed in the wrap parameter.
 
     @param item_to_print: The text to print
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
-    @return: The text in the divider
+    @return: None
     """
     text_length = len(Colour.clean_text(item_to_print))
     console_space_free = console_width - (divider_symbol_size * 2)
@@ -504,7 +520,9 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
 
 def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
-    Prints the menu items and their index. This is wrapped inbetween two dividers
+    Prints a divider at the start and end of the menu. Then prints the menu items and their index in the middle using
+    the text_in_divider function for each item with the wrap mode passed in.
+
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
@@ -519,13 +537,14 @@ def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
 
 def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
-    Prints the menu items and their index on the left. On the right it prints the item's value. This is wrapped
-    inbetween two dividers. The item is automatically truncated if it is longer than half the console width,
-    allowing space for the divider and the value.
+    Prints the menu item from the first array and its index on the left. On the right it prints the item from the
+    second array. This is sandwiched inbetween two dividers. The item is wrapped if it is longer than
+    half the console width, allowing space for the divider and the value.
 
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
+    # TODO: Double Wrap
     print(divider)
 
     # Loop through all the items in the menu
@@ -557,7 +576,13 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
     print(divider)
 
 
-def print_text_on_same_line(text_to_print):
+def print_text_on_same_line(text_to_print: str) -> None:
+    """
+    Prints the text on the same line as the last text printed. It first writes a blank line the length of the console
+    to clear the line. Then it prints the text using the return character to overwrite the previous text.
+
+    @param text_to_print: The text to print
+    """
     # Clear the line
     sys.stdout.write('\r' + " " * console_width)
 

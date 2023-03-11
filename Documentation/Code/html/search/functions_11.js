@@ -1,0 +1,28 @@
+var searchData=
+[
+  ['save_0',['save',['../classfiles_1_1_save_file.html#ae49569528151a4bf6501a47fdbdb765e',1,'files.SaveFile.save()'],['../classfiles_1_1_user_data.html#a82156b80be40754233e11b404855e475',1,'files.UserData.save()'],['../classgame_1_1_game.html#ae1d24df2fdda913bd46e7c2d3fc3ddaf',1,'game.Game.save()']]],
+  ['send_5fmessage_1',['send_message',['../classnetwork_1_1_quiz_server.html#aafd23096200e9f58846d4c46794295e9',1,'network.QuizServer.send_message()'],['../classnetwork_1_1_quiz_client.html#a59a637415adcbf9faf028140a43c9f19',1,'network.QuizClient.send_message()']]],
+  ['send_5fmessage_5fto_5fall_2',['send_message_to_all',['../classnetwork_1_1_quiz_server.html#aadf7b638da058d0a7ec0df6b45b61589',1,'network::QuizServer']]],
+  ['send_5fself_3',['send_self',['../classnetwork_1_1_quiz_game_client.html#acf6bcab3604ad478ade8e14c86b7a4e6',1,'network::QuizGameClient']]],
+  ['service_5fconnection_4',['service_connection',['../classnetwork_1_1_quiz_server.html#ade1af4cbf089ccf28ede819bb678f20a',1,'network::QuizServer']]],
+  ['set_5fif_5fnone_5',['set_if_none',['../namespacetools.html#a21e2e5dd541a06f21a2ccf1eaf496b63',1,'tools']]],
+  ['set_5fplayers_6',['set_players',['../classgame_1_1_game.html#aaec45b667349f6e51795d791988988da',1,'game::Game']]],
+  ['set_5fsettings_7',['set_settings',['../classgame_1_1_game.html#ae274d78c1a3bf48dcf2b32820f3c8d80',1,'game::Game']]],
+  ['set_5fsettings_5fdefault_8',['set_settings_default',['../classgame_1_1_game.html#a7156578df6d9b7f6cb24580206013913',1,'game::Game']]],
+  ['settings_9',['settings',['../namespacemain.html#ae2aadfa8b0fd98b5b9a2c4ba4f9fabd5',1,'main']]],
+  ['settings_5fgameplay_10',['settings_gameplay',['../classgame_1_1_game.html#aac21adfec9fa8d9cfd15cf4e84f31b3d',1,'game::Game']]],
+  ['settings_5flocal_11',['settings_local',['../classgame_1_1_game.html#a8eca1dd74022f64b33347132eb11aa4a',1,'game::Game']]],
+  ['settings_5fnetworking_12',['settings_networking',['../classgame_1_1_game.html#a1d5420475d101f2bde42b1be7b2f528a',1,'game::Game']]],
+  ['setup_5ftcp_5fserver_13',['setup_tcp_server',['../namespacenetwork.html#a3086a92c222431f6072f073177287ff7',1,'network']]],
+  ['show_5fmenu_14',['show_menu',['../classrenderer_1_1_menu.html#a6f8c5615ca5df7f346b2369a4f40bdd0',1,'renderer.Menu.show_menu()'],['../namespacerenderer.html#a7e4c00c65f166be3451cf4e24e57ed5a',1,'renderer.show_menu(list menu_items, WrapMode wrap=WrapMode.TRUNCATE)']]],
+  ['show_5fmenu_5fdouble_15',['show_menu_double',['../namespacerenderer.html#a1f9909cb99ab50fb1d8e172f59ebe7af',1,'renderer']]],
+  ['show_5fquestion_5fmarkings_16',['show_question_markings',['../classgame_1_1_game.html#aff1bf3b5f3ff0f9817257a18d5a6bee9',1,'game::Game']]],
+  ['show_5fscores_17',['show_scores',['../classgame_1_1_game.html#ae90f58826adaed0ec26211ec8c9e9d16',1,'game::Game']]],
+  ['show_5fstats_18',['show_stats',['../classgame_1_1_user.html#a86e01daac5227c786c18312d1cf9cef9',1,'game.User.show_stats()'],['../classgame_1_1_bot.html#a6d0d31d735aeafb9f03d1abc19e6324b',1,'game.Bot.show_stats()']]],
+  ['sort_5fmulti_5farray_19',['sort_multi_array',['../namespacetools.html#a141f5fafdc6b30640267805c54258e39',1,'tools']]],
+  ['string_5fbool_20',['string_bool',['../namespacetools.html#afded606fc148964fa32041a8e69e1a14',1,'tools']]],
+  ['styled_5fname_21',['styled_name',['../classgame_1_1_user.html#a146f72434fcd748070acef9cd82c972e',1,'game::User']]],
+  ['sync_5fbots_22',['sync_bots',['../classnetwork_1_1_quiz_game_server.html#a392d81624cb8db4b1687b05311ed4b80',1,'network::QuizGameServer']]],
+  ['sync_5fgame_23',['sync_game',['../classnetwork_1_1_quiz_game_server.html#a91d5674a99bab3e57b1aa8fc16e763a9',1,'network::QuizGameServer']]],
+  ['sync_5fplayers_24',['sync_players',['../classnetwork_1_1_quiz_game_server.html#a575be936a5704ed34ebc2bc57e635bc3',1,'network::QuizGameServer']]]
+];

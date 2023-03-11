@@ -1,0 +1,213 @@
+.TH "debug" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+debug
+.SH SYNOPSIS
+.br
+.PP
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fBinit_debug\fP ()"
+.br
+.ti -1c
+.RI "None \fBclose_debug_session\fP ()"
+.br
+.ti -1c
+.RI "None \fBdebug_cli\fP (list command)"
+.br
+.ti -1c
+.RI "None \fBdebug_message\fP (str message, str log_type='info')"
+.br
+.ti -1c
+.RI "None \fBerror\fP (str error_message)"
+.br
+.ti -1c
+.RI "str or None \fBhandle_arg\fP (str arg, bool get_value=False)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "None \fBmaxs_debugger\fP = None"
+.br
+.ti -1c
+.RI "list \fBsession_message_log\fP = []"
+.br
+.ti -1c
+.RI "list \fBsession_error_log\fP = []"
+.br
+.ti -1c
+.RI "tuple \fBin_ide\fP = (\fBhandle_arg\fP('\-\-ide') == '\-\-ide')"
+.br
+.ti -1c
+.RI "tuple \fBuse_debug\fP = (\fBhandle_arg\fP('\-\-debug') == '\-\-debug')"
+.br
+.ti -1c
+.RI "\fBlog_ignore\fP"
+.br
+.ti -1c
+.RI "\fBfull_message_log\fP"
+.br
+.ti -1c
+.RI "\fBfull_error_log\fP"
+.br
+.ti -1c
+.RI "\fBstore_logs\fP"
+.br
+.ti -1c
+.RI "\fBmax_log_history\fP"
+.br
+.ti -1c
+.RI "\fBsave_logs_location\fP"
+.br
+.ti -1c
+.RI "\fBindividual_log_files\fP"
+.br
+.ti -1c
+.RI "\fBlocal_db\fP"
+.br
+.ti -1c
+.RI "\fBhandlers\fP"
+.br
+.ti -1c
+.RI "\fBsave_data\fP"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS " None debug\&.close_debug_session ()"
+
+.PP
+.nf
+Run the close_debug_session() function of the debugger, if it is initialized
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB379\fP of file \fBdebug\&.py\fP\&.
+.SS " None debug\&.debug_cli (list command)"
+
+.PP
+.nf
+If the debugger is initialized and debug is enabled, handle the command passed
+@param command: The command to handle and args to pass to the handler (as a list)
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB387\fP of file \fBdebug\&.py\fP\&.
+.SS " None debug\&.debug_message (str message, str  log_type = \fC'info'\fP)"
+
+.PP
+.nf
+If the debugger is initialized and debug is enabled, print a debug message via the log() function of the debugger
+class
+@param message: The debug message to print
+@param log_type: The type of log to print
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB396\fP of file \fBdebug\&.py\fP\&.
+.SS " None debug\&.error (str error_message)"
+
+.PP
+Definition at line \fB407\fP of file \fBdebug\&.py\fP\&.
+.SS " str or None debug\&.handle_arg (str arg, bool  get_value = \fCFalse\fP)"
+
+.PP
+.nf
+Handles the args passed to the program and returns the arg if it is found, if get_value is True it will return the
+following argument
+@param arg: The arg to check for
+@param get_value: True if the following argument should be returned, False if not (default: False)
+@return: The arg or value if it is found, None if not
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB421\fP of file \fBdebug\&.py\fP\&.
+.SS " None debug\&.init_debug ()"
+
+.PP
+.nf
+Sets the debugger variable to an instance of the Debug class if the use_debug variable is True
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB16\fP of file \fBdebug\&.py\fP\&.
+.SH "Variable Documentation"
+.PP 
+.SS "debug\&.full_error_log"
+
+.PP
+Definition at line \fB61\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.full_message_log"
+
+.PP
+Definition at line \fB60\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.handlers"
+
+.PP
+Definition at line \fB72\fP of file \fBdebug\&.py\fP\&.
+.SS "tuple debug\&.in_ide = (\fBhandle_arg\fP('\-\-ide') == '\-\-ide')"
+
+.PP
+Definition at line \fB444\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.individual_log_files"
+
+.PP
+Definition at line \fB65\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.local_db"
+
+.PP
+Definition at line \fB66\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.log_ignore"
+
+.PP
+Definition at line \fB59\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.max_log_history"
+
+.PP
+Definition at line \fB63\fP of file \fBdebug\&.py\fP\&.
+.SS "None debug\&.maxs_debugger = None"
+
+.PP
+Definition at line \fB9\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.save_data"
+
+.PP
+Definition at line \fB329\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.save_logs_location"
+
+.PP
+Definition at line \fB64\fP of file \fBdebug\&.py\fP\&.
+.SS "list debug\&.session_error_log = []"
+
+.PP
+Definition at line \fB12\fP of file \fBdebug\&.py\fP\&.
+.SS "list debug\&.session_message_log = []"
+
+.PP
+Definition at line \fB11\fP of file \fBdebug\&.py\fP\&.
+.SS "debug\&.store_logs"
+
+.PP
+Definition at line \fB62\fP of file \fBdebug\&.py\fP\&.
+.SS "tuple debug\&.use_debug = (\fBhandle_arg\fP('\-\-debug') == '\-\-debug')"
+
+.PP
+Definition at line \fB445\fP of file \fBdebug\&.py\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

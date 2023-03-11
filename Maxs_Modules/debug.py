@@ -6,8 +6,7 @@ from datetime import datetime
 
 # - - - - - - - Variables - - - - - - -#
 
-initialised_debug = False
-debugger = None
+maxs_debugger = None
 
 session_message_log = []
 session_error_log = []
@@ -16,14 +15,22 @@ session_error_log = []
 # - - - - - - - Classes - - - - - - -#
 def init_debug() -> None:
     """
-    Sets the debugger variable to a instance of the Debug class if the use_debug variable is True
+    Sets the debugger variable to an instance of the Debug class if the use_debug variable is True
     """
 
-    global debugger, initialised_debug, in_ide, use_debug
+    # No point in importing the debug class if the debugger is not being used
+    if not use_debug:
+        return
 
+    # Make sure to be able to update the debugger variable, as using it as a global varible it has my name on it to
+    # prevent it shadowing other modules
+    global maxs_debugger
+
+    # Import here to prevent circular imports
     from Maxs_Modules.tools import try_convert, set_if_none
     from Maxs_Modules.files import SaveFile
 
+    # Create the debugger
     class Debug(SaveFile):
 
         # Logs
@@ -37,12 +44,13 @@ def init_debug() -> None:
         local_db = False
 
         # Commands
-        commands = ["help", "logs", "errors", "server", "database"]
+        commands = ("help", "logs", "errors", "server", "database")
         handlers = [None, None, None, None, None]
 
         def __init__(self) -> None:
             """
-            Create a new Debug object, loaded from debug.json
+            Create a new Debug object, loaded from debug.json. The default values are loaded if the data is not found
+            and then the handlers for the commands are set.
             """
             # Load from file
             super().__init__("ProgramData/debug.json")
@@ -78,24 +86,43 @@ def init_debug() -> None:
             self.individual_log_files = set_if_none(self.individual_log_files, False)
 
         def log(self, message: str, log_type: str = "info") -> None:
+            """
+            Logs a debug message of the given type with the current time to the console and the session logs. If
+            the log type is in the log_ignore list it will not be logged
+            @param message: The text to be displayed in the log
+            @param log_type: The type of log this message is, this is used to determine the if the log should be ignored
+            @return: None, this function does not return anything
+            """
+
+            # Import colour
             from Maxs_Modules.renderer import Colour
 
-            """
-            Print a debug message if the log type is not in the debug_ignore array and appends the message to the log
-            @param debug_message: The debug message to print
-            @param log_type: The type of log to print
-            """
+            # Check if the log type is ignored
+            if log_type in self.log_ignore:
+                return
 
-            if log_type not in self.log_ignore:
-                print(Colour.warning + "[DEBUG] (" + log_type + ")" + Colour.RESET + " : " + message)
-                session_message_log.append(message)
+            # Get the time
+            time_now = datetime.now().strftime("%H:%M:%S")
+
+            # Print the message
+            print(f"{Colour.warning}[{time_now}]{Colour.BOLD}[{log_type}]{Colour.RESET} {message}")
+
+            # Add the message to the session logs
+            session_message_log.append(f"[{time_now}][{log_type}] {message}")
 
         def command_database(self, *args: tuple) -> None:
-
+            """
+            Handles the database command. This will be updated in the future when the local database is implemented
+            @param args: A tuple of arguments to be passed to the handler, to get a list of viable arguments use -h
+            """
+            # If there is no arguments, add the help argument as the default
             if len(args) == 0:
                 args = ["-h"]
 
+            # Loop through the arguments
             for arg in args:
+
+                # Handle the arguments
                 match arg:
                     case "-h":
                         print("Params:")
@@ -105,29 +132,28 @@ def init_debug() -> None:
                         print(" -clear: Clear the local database?")
 
         def command_server(self, *args: tuple) -> None:
+            """
+            Handles the server command. Currently only supports -h, -ip.
+            @param args: A tuple of arguments to be passed to the handler, to get a list of viable arguments use -h
+            """
+            from Maxs_Modules.network import get_ip
 
-            from Maxs_Modules.network import test_echo_server, test_echo_client, get_ip
-
+            # If there is no arguments, add the help argument as the default
             if len(args) == 0:
                 args = ["-h"]
 
+            # Loop through the arguments
             for arg in args:
+
+                # Handle the arguments
                 match arg:
                     case "-h":
                         print("Params:")
                         print(" -h: Shows this help message")
                         print(" -ip: Gets this devices ip address")
-                        print(" -echo-server: Starts a test echo server")
-                        print(" -echo-client: Starts a test echo client")
 
                     case "-ip":
                         print("IP: " + get_ip())
-
-                    case "-echo-server":
-                        test_echo_server()
-
-                    case "-echo-client":
-                        test_echo_client()
 
                     case _:
                         print("Unknown arg: " + arg)
@@ -143,9 +169,12 @@ def init_debug() -> None:
                 print("Some commands may support -h for more info")
                 print("Commands:")
                 for command in self.commands:
-                    print(" - " + command)
+                    print(" * " + command)
 
+            # Loop through the args
             for arg in args:
+
+                # If the arg is a command, run the command with the -h arg
                 if arg in self.commands:
                     self.handlers[self.commands.index(arg)]("-h")
                 else:
@@ -153,16 +182,19 @@ def init_debug() -> None:
 
         def command_logs(self, *args: tuple) -> None:
             """
-            Allows the user to view the logs, and change the settings. The default behaviour is to list the logs
-            @param args: The args to pass to the command 
+            Allows the user to view the logs, and change the log settings. The default behaviour is to list the logs
+            @param args: The args to pass to the command, to get a list of viable arguments use -h
             """
-            from Maxs_Modules.tools import get_user_input_of_type, strBool
+
+            # Import the modules
+            from Maxs_Modules.tools import get_user_input_of_type, string_bool
             from Maxs_Modules.renderer import Colour, menu_manager
 
             # Default behaviour for no args
             if len(args) == 0:
                 args = ["-list"]
 
+            # Loop through each arg handling it
             for arg in args:
                 match arg:
                     case "-h":
@@ -212,13 +244,13 @@ def init_debug() -> None:
                             print(" - " + str(log))
 
                     case "-store":
-                        self.store_logs = get_user_input_of_type(strBool, "Store the logs on file?  " +
+                        self.store_logs = get_user_input_of_type(string_bool, "Store the logs on file?  " +
                                                                  Colour.true_or_false_styled())
                     case "-store-location":
                         self.save_logs_location = get_user_input_of_type(str, "Location to store the logs: ")
 
                     case "-store-individual":
-                        self.individual_log_files = get_user_input_of_type(strBool,
+                        self.individual_log_files = get_user_input_of_type(string_bool,
                                                                            "Store the logs in individual files?  " +
                                                                            Colour.true_or_false_styled())
 
@@ -248,6 +280,7 @@ def init_debug() -> None:
             if len(args) == 0:
                 args = ["-h"]
 
+            # Loop through each arg handling it
             for arg in args:
                 match arg:
                     case "-h":
@@ -276,6 +309,7 @@ def init_debug() -> None:
         def handle(self, user_input: list) -> None:
             """
             Attempts to run the handler for the command, and passes the args to the handler (as a tuple)
+            @param user_input: The commands and args to pass to the handler
             """
 
             # Get the first word of the command
@@ -285,15 +319,12 @@ def init_debug() -> None:
             args = user_input[1:]
 
             if command in self.commands:
-                # Get the index of the command
-                command_index = self.commands.index(command)
-
                 # Run the handler for the command and pass the args
-                self.handlers[command_index](*args)
+                self.handlers[self.commands.index(command)](*args)
 
         def save(self) -> None:
             """
-            Save the debug data to the save file
+            Save the debug data to the save file via the SaveFile.save() function
             """
             self.save_data = self.__dict__
             self.save_data.pop("handlers")
@@ -302,7 +333,7 @@ def init_debug() -> None:
 
         def close_debug_session(self):
             """
-            Save the logs and then save to the file.
+            Closes the debug session, saving the logs if needed either to their individual files or the main debug file
             """
             if self.store_logs:
 
@@ -318,7 +349,7 @@ def init_debug() -> None:
                     log_name = "/log_" + str(datetime.now()).replace(":", "-").replace(" ", "_") + ".txt"
 
                     # Save the logs to the individual files
-                    with open(self.save_logs_location + log_name, "w") as file:
+                    with open(str(self.save_logs_location) + log_name, "w") as file:
                         file.write("Message log:\n"
                                    + str(session_message_log)
                                    + "\n\nError log:\n"
@@ -339,43 +370,44 @@ def init_debug() -> None:
 
             self.save()
 
-    if use_debug:
-        initialised_debug = True
-        debugger = Debug()
+    # Set the debugger to the debug class
+    maxs_debugger = Debug()
 
 
 # - - - - - - - Functions - - - - - - -#
 
 def close_debug_session() -> None:
     """
-    Save the logs and then save to the file.
+    Run the close_debug_session() function of the debugger, if it is initialized
     """
-    if initialised_debug and debugger is not None:
-        debugger.close_debug_session()
+    if maxs_debugger is not None:
+        maxs_debugger.close_debug_session()
 
 
-def show_debug_menu(command: list) -> None:
+def debug_cli(command: list) -> None:
     """
-    If the debugger is initialized and debug is enabled, show the debug menu
+    If the debugger is initialized and debug is enabled, handle the command passed
+    @param command: The command to handle and args to pass to the handler (as a list)
     """
-    if initialised_debug and debugger is not None:
-        debugger.handle(command)
+    if maxs_debugger is not None:
+        maxs_debugger.handle(command)
 
 
 def debug_message(message: str, log_type: str = "info") -> None:
     """
-    If the debugger is initialized and debug is enabled, print a debug message
+    If the debugger is initialized and debug is enabled, print a debug message via the log() function of the debugger
+    class
     @param message: The debug message to print
     @param log_type: The type of log to print
     """
-    if initialised_debug and debugger is not None:
-        debugger.log(message, log_type)
+    if maxs_debugger is not None:
+        maxs_debugger.log(message, log_type)
 
 
 def error(error_message: str) -> None:
     from Maxs_Modules.renderer import Colour
     """
-    Print an error message and then wait 2 seconds
+    Print an error message in red and then wait 2 seconds
     @param error_message: The error message to print
     """
     print(Colour.error + "ERROR: " + error_message + Colour.RESET)
@@ -387,6 +419,13 @@ def error(error_message: str) -> None:
 
 
 def handle_arg(arg: str, get_value: bool = False) -> str or None:
+    """
+    Handles the args passed to the program and returns the arg if it is found, if get_value is True it will return the
+    following argument
+    @param arg: The arg to check for
+    @param get_value: True if the following argument should be returned, False if not (default: False)
+    @return: The arg or value if it is found, None if not
+    """
     program_args = sys.argv[1:]
     for index in range(len(program_args)):
         if arg == program_args[index]:

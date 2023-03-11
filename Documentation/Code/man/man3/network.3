@@ -1,0 +1,107 @@
+.TH "network" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+network
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBQuizClient\fP"
+.br
+.ti -1c
+.RI "class \fBQuizGameClient\fP"
+.br
+.ti -1c
+.RI "class \fBQuizGameServer\fP"
+.br
+.ti -1c
+.RI "class \fBQuizMessage\fP"
+.br
+.ti -1c
+.RI "class \fBQuizServer\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "list \fBapi_get_questions\fP (int amount, int category, str difficulty, str question_type)"
+.br
+.ti -1c
+.RI "socket\&.socket \fBconnect_to_server\fP (str server_ip, int port)"
+.br
+.ti -1c
+.RI "socket\&.socket \fBsetup_tcp_server\fP (int port)"
+.br
+.ti -1c
+.RI "str \fBget_ip\fP ()"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS " list network\&.api_get_questions (int amount, int category, str difficulty, str question_type)"
+
+.PP
+.nf
+Gets questions from the API at https://opentdb\&.com/api\&.php and returns them as a list of dictionaries
+
+@param amount: How many questions to get (Max 50)
+@param category: The category of the questions (index, offset by 9)
+@param difficulty: The difficulty of the questions
+@param question_type: The type of the questions
+@return: A list of dictionaries containing the questions
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB746\fP of file \fBnetwork\&.py\fP\&.
+.SS " socket\&.socket network\&.connect_to_server (str server_ip, int port)"
+
+.PP
+.nf
+Connect to a server using a socket
+
+@param server_ip: The IP of the server (IPv4)
+@param port: The port of the server\&. Note: use any port higher than 1024 for un-privileged users
+@return: The socket object
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB815\fP of file \fBnetwork\&.py\fP\&.
+.SS " str network\&.get_ip ()"
+
+.PP
+.nf
+Gets the IP of the computer using the socket library
+
+@return: The IP of the computer
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB862\fP of file \fBnetwork\&.py\fP\&.
+.SS " socket\&.socket network\&.setup_tcp_server (int port)"
+
+.PP
+.nf
+Sets up a TCP server on the local machine\&.
+
+@param port: The port to listen on
+@return: The socket object
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB834\fP of file \fBnetwork\&.py\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

@@ -1,0 +1,231 @@
+.TH "network.QuizGameServer" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+network.QuizGameServer
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits \fBnetwork\&.QuizServer\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fBhandle_data_received\fP (self, socket sock, object key_data, bytes recv_data)"
+.br
+.ti -1c
+.RI "None \fBsync_game\fP (self)"
+.br
+.ti -1c
+.RI "None \fBsync_players\fP (self)"
+.br
+.ti -1c
+.RI "None \fBsync_bots\fP (self)"
+.br
+.ti -1c
+.RI "None \fBhandle_error\fP (self, socket sock, object key_data, Exception error_response)"
+.br
+.ti -1c
+.RI "None \fBclose_connection\fP (self, socket sock)"
+.br
+.in -1c
+
+Public Member Functions inherited from \fBnetwork\&.QuizServer\fP
+.in +1c
+.ti -1c
+.RI "def \fB__init__\fP (self, str \fBhost\fP, int \fBport\fP)"
+.br
+.ti -1c
+.RI "None \fBrun\fP (self)"
+.br
+.ti -1c
+.RI "None \fBaccept_connection\fP (self, socket sock)"
+.br
+.ti -1c
+.RI "None \fBclose_connection\fP (self, socket sock)"
+.br
+.ti -1c
+.RI "None \fBservice_connection\fP (self, object key, object mask)"
+.br
+.ti -1c
+.RI "None \fBhandle_data_received\fP (self, socket sock, object key_data, bytes recv_data)"
+.br
+.ti -1c
+.RI "None \fBhandle_data_send\fP (self, socket sock, object key_data, bytes send_data)"
+.br
+.ti -1c
+.RI "None \fBsend_message\fP (self, socket sock, str message, str message_type)"
+.br
+.ti -1c
+.RI "None \fBsend_message_to_all\fP (self, str message, str message_type)"
+.br
+.ti -1c
+.RI "None \fBkill\fP (self)"
+.br
+.ti -1c
+.RI "None \fBhandle_error\fP (self, socket sock, object key_data, Exception error_response)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBrunning\fP"
+.br
+.in -1c
+
+Public Attributes inherited from \fBnetwork\&.QuizServer\fP
+.in +1c
+.ti -1c
+.RI "\fBhost\fP"
+.br
+.ti -1c
+.RI "\fBport\fP"
+.br
+.ti -1c
+.RI "\fBselector\fP"
+.br
+.ti -1c
+.RI "\fBclients\fP"
+.br
+.ti -1c
+.RI "\fBclient_names\fP"
+.br
+.ti -1c
+.RI "\fBserver\fP"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "None \fBgame\fP = None"
+.br
+.ti -1c
+.RI "bool \fBrunning\fP = False"
+.br
+.ti -1c
+.RI "None \fBerror\fP = None"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line \fB407\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " None network\&.QuizGameServer\&.close_connection ( self, socket sock)"
+
+.PP
+.nf
+Close a connection from a client by removing it from the selector and the list of clients\&. The user is also
+removed from the games list of players\&.
+
+@param sock: The socket to close the connection on\&.
+
+.fi
+.PP
+ 
+.PP
+Reimplemented from \fBnetwork\&.QuizServer\fP\&.
+.PP
+Definition at line \fB587\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizGameServer\&.handle_data_received ( self, socket sock, object key_data, bytes recv_data)"
+
+.PP
+.nf
+Handle data received from a client\&. This function can handle the client_join message type and the sync_player
+message\&. Both of these actions involve updating the game's users array with the new user data if the request
+was handled without error\&. Upon handling the messages the server will send a error response to the socket if
+the game is full or has already started or if the username is already taken\&.  If the game has already started
+then the server will only allow the client to join if they have a name that is already in the game's users
+but not connected, which is treated as a reconnect\&.
+
+@param sock: The socket to handle the data from
+@param key_data: The data from the selector key
+@param recv_data: The data received from the client (same as key_data\&.receive_bytes but kept for convenience)
+
+.fi
+.PP
+ 
+.PP
+Reimplemented from \fBnetwork\&.QuizServer\fP\&.
+.PP
+Definition at line \fB412\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizGameServer\&.handle_error ( self, socket sock, object key_data, Exception error_response)"
+
+.PP
+.nf
+Handle an error from a client and then close the client\&. Uses the super class to handle the error and then sets
+the running variable to false
+
+@param sock: The socket that the error occurred on
+@param key_data: The key data for the socket
+@param error_response: The exception that was raised that caused the error
+
+.fi
+.PP
+ 
+.PP
+Reimplemented from \fBnetwork\&.QuizServer\fP\&.
+.PP
+Definition at line \fB575\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizGameServer\&.sync_bots ( self)"
+
+.PP
+.nf
+Sync the bot data to all clients\&.
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB556\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizGameServer\&.sync_game ( self)"
+
+.PP
+.nf
+Sync the game data to all clients\&. This will send all the game data, so it is best practice to save any
+variables that need to be saved before handling this\&. As games can be quite large (30kb with 50 questions,
+50 players) this function should be used sparingly, instead send the data that needs to be updated,
+i\&.e use sync_players when showing the scoreboard\&.
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB514\fP of file \fBnetwork\&.py\fP\&.
+.SS " None network\&.QuizGameServer\&.sync_players ( self)"
+
+.PP
+.nf
+Sync the player data to all clients\&. This will send all the player data, so it is best practice to save the
+position of the local player before handling this\&. 
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB536\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "None network\&.QuizGameServer\&.error = None\fC [static]\fP"
+
+.PP
+Definition at line \fB410\fP of file \fBnetwork\&.py\fP\&.
+.SS "None network\&.QuizGameServer\&.game = None\fC [static]\fP"
+
+.PP
+Definition at line \fB408\fP of file \fBnetwork\&.py\fP\&.
+.SS "bool network\&.QuizGameServer\&.running = False\fC [static]\fP"
+
+.PP
+Definition at line \fB409\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizGameServer\&.running"
+
+.PP
+Definition at line \fB585\fP of file \fBnetwork\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

@@ -1,0 +1,203 @@
+.TH "MyLibrary::Example" 3 "Sat Mar 11 2023" "Version 0.54" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+MyLibrary::Example \- \fBExample\fP class to demonstrate the features of the custom CSS\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <example\&.hpp>\fP
+.PP
+Inherited by \fBMyLibrary::SubclassExample< TemplatedClass >\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "std::string \fBtest\fP (const std::string &test)"
+.br
+.RI "brief summary "
+.ti -1c
+.RI "virtual int \fBvirtualfunc\fP ()=0"
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static bool \fBstaticfunc\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+\fBExample\fP class to demonstrate the features of the custom CSS\&. 
+
+
+.PP
+\fBAuthor\fP
+.RS 4
+jothepro 
+.RE
+.PP
+
+.PP
+Definition at line \fB14\fP of file \fBexample\&.hpp\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "static bool MyLibrary::Example::staticfunc ()\fC [static]\fP"
+
+.SS "std::string MyLibrary::Example::test (const std::string & test)"
+
+.PP
+brief summary doxygen test documentation
+.PP
+\fBParameters\fP
+.RS 4
+\fItest\fP this is the only parameter of this test function\&. It does nothing!
+.RE
+.PP
+.SH "Supported elements"
+.PP
+These elements have been tested with the custom CSS\&.
+.SS "Tables"
+The table content is scrollable if the table gets too wide\&.
+.PP
+first_column   second_column   third_column   fourth_column   fifth_column   sixth_column   seventh_column   eighth_column   ninth_column    1   2   3   4   5   6   7   8   9   
+.PP
+A table can contain images:
+.PP
+Column 1   Column 2       ← the image should not be inverted in dark-mode   
+.PP
+Complex \fCDoxygen tables\fP are also supported as seen in \fBthis example\fP:
+.PP
+Column 1 Column 2 Column 3 cell row=1+2,col=1cell row=1,col=2cell row=1,col=3 cell row=2+3,col=2 cell row=2,col=3 cell row=3,col=1 cell row=3+4,col=3 cell row=4,col=1+2 cell row=5,col=1 cell row=5,col=2+3 cell row=6+7,col=1+2 cell row=6,col=3 cell row=7,col=3 cell row=8,col=1 cell row=8,col=2
+.br
+ Inner cell row=1,col=1Inner cell row=1,col=2 Inner cell row=2,col=1Inner cell row=2,col=2 cell row=8,col=3 
+.PD 0
+
+.IP "\(bu" 2
+Item 1 
+.IP "\(bu" 2
+Item 2 
+.PP
+.PP
+A table can be centered with the \fC<center>\fP html tag:  Foo   Bar   Baz   FooBar    Lorem imsum   dolor sit amet   cenectetur adipisici elit   At vero eos   
+.PP
+Embedded Graphviz graphs support dark mode and can be scrolled once they get too wide: 
+.SS "Lists"
+.IP "\(bu" 2
+element 1
+.IP "\(bu" 2
+element 2
+.PP
+.IP "1." 4
+element 1 
+.PP
+.nf
+code in lists
+
+.fi
+.PP
+
+.IP "2." 4
+element 2
+.PP
+.SS "Quotes"
+.RS 4
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\&. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque viverra\&. Velit sed ullamcorper morbi tincidunt ornare\&.
+.PP
+Lorem ipsum dolor sit amet consectetur adipiscing elit duis\&. 
+.RE
+.PP
+\fI- jothepro\fP
+.SS "Code block"
+.PP
+.nf
+auto x = "code within md fences (```)";
+.fi
+.PP
+.PP
+.PP
+.nf
+// code within @code block
+while(true) {
+   auto example = std::make_shared<Example>(5);
+   example\->test("test");
+}
+.fi
+.PP
+ 
+.PP
+.nf
+// code within indented code block
+auto test = std::shared_ptr<Example(5);
+
+.fi
+.PP
+.PP
+Inline \fCcode\fP elements in a text\&. \fILorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua\&.\fP This also works within multiline text and does not break the \fClayout\fP\&.
+.SS "Special hints"
+\fBWarning\fP
+.RS 4
+this is a warning only for demonstration purposes
+.RE
+.PP
+\fBNote\fP
+.RS 4
+this is a note to show that notes work\&. They can also include \fCcode\fP: 
+.PP
+.nf
+void this_looks_awesome();
+
+.fi
+.PP
+.RE
+.PP
+\fBBug\fP
+.RS 4
+example bug
+.RE
+.PP
+.PP
+\fBDeprecated\fP
+.RS 4
+None of this will be deprecated, because it's beautiful!
+.RE
+.PP
+.PP
+\fBInvariant\fP
+.RS 4
+This is an invariant
+.RE
+.PP
+\fBPrecondition\fP
+.RS 4
+This is a precondition
+.RE
+.PP
+\fBPostcondition\fP
+.RS 4
+This is a postcondition
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+This theme is never finished!
+.RE
+.PP
+.PP
+\fBRemarks\fP
+.RS 4
+This is awesome! 
+.RE
+.PP
+
+.SS "virtual int MyLibrary::Example::virtualfunc ()\fC [pure virtual]\fP"
+
+.PP
+Implemented in \fBMyLibrary::SubclassExample< TemplatedClass >\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

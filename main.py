@@ -3,7 +3,7 @@
 # [x] Modules
 # [x] Base Game Setup: Settings, questions from API/Local, etc
 # [x] Clean Up
-# [x] Extended user experience: Colours, mulitpage menus
+# [x] Extended user experience: Colours, multi-page menus
 # [x] Easier debugging
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
 # [x] Multiplayer Game Logic: Scores sync questions sync
@@ -14,7 +14,7 @@
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 import inspect
-# TODO: Clean up debugger, Remove any global variables, Clean up code and comments, More Error Handling and unxepected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+# TODO:  comments, Code rewrite for better techniques or effeiency, More Error Handling and unexpected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
 
 
 import os
@@ -26,7 +26,7 @@ from Maxs_Modules.renderer import Menu, Colour
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
-from Maxs_Modules.tools import get_user_input_of_type, strBool, ipAdress, install_package
+from Maxs_Modules.tools import get_user_input_of_type, string_bool, ip_address, install_package
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -39,20 +39,30 @@ data_folder = "UserData/"
 
 def game_finished(game: Game) -> None:
     """
-    Once the game is finished ask the user if they want to play again or quit
+    Shows a menu that allows the user to play again or return to the main menu, if the game does not have the
+    game_finished variable set to True, it will only return to the main menu without letting the user choosing an option
+    . Play again resets the game and calls the game.begin() function, once the reset game is finished the input loop
+    will run again (using the same game object). When returning to the main menu the game.save_file will be deleted if
+    it exists
 
-    @param game: The game object, used for resetting the game when replaying
+    @param game: The Game object to use.
+    @return: None, the function will break the loop when the user selects an option that leaves the menu
     """
 
-    game_finished_menu = Menu("Game Finished", ["Play Again", "Main Menu"])
+    # Create the game finished menu, set the default choice to Main Menu
+    game_finished_menu = Menu("Game Finished", ("Play Again", "Main Menu"))
     game_finished_menu.user_input = "Main Menu"
 
-    # Only allow for playing again if the game was completed
+    # Loop until the user selects an option that leaves this menu
     while True:
+
+        # Only allow for playing again if the game was completed, otherwise just return to the main menu
         if game.game_finished:
             game_finished_menu.get_input()
 
+        # Handle the input
         match game_finished_menu.user_input:
+
             case "Play Again":
 
                 # Replay the game
@@ -65,19 +75,21 @@ def game_finished(game: Game) -> None:
                     debug_message("Deleting save file", "game_finished")
                     os.remove(game.save_file)
 
-                # Return to the main menu
+                # Return to the main menu by breaking the loop
                 break
 
 
 def continue_game() -> None:
     """
-    Show the user the continue game menu
+    Shows a menu that allows the user to continue a game, It allows the user to select a game from the saved games
+    folder, if the user selects a previously joined multiplayer game it will delete the save file and join the game
+    instead of continuing
     """
+
     # Get all the saved files and create a menu
     saves = get_saved_games()
 
     # Sort the files
-    user_data = UserData()
     install_package("natsort")
     from natsort import natsorted
     saves = natsorted(saves)
@@ -85,6 +97,7 @@ def continue_game() -> None:
     # Add back to the menu
     saves.append("Back")
 
+    # Show the menu, no need for a loop as this menu doesnt get repeated
     continue_menu = Menu("Continue Game", saves)
     continue_menu.get_input()
 
@@ -97,7 +110,7 @@ def continue_game() -> None:
 
     # Check if this is previous multiplayer game
     if quiz.joined_game:
-        # Delete this game save as contining a multiplayer game is server side
+        # Delete this game save as continuing a multiplayer game is server side
         debug_message(f"Deleting {quiz.save_file}", "quiz_load_game")
         os.remove(quiz.save_file)
 
@@ -114,7 +127,7 @@ def continue_game() -> None:
 
 def new_game() -> None:
     """
-    Show the user a menu to create a new game
+    Creates a new game object, runs the settings setup and then starts the game (if not cancelled during settings)
     """
     # Create a new game object
     quiz = Game()
@@ -122,11 +135,8 @@ def new_game() -> None:
     # Get the user to configure the game
     quiz.set_settings()
 
-    # Check if the user has cancelled the game
+    # Check if the user has cancelled the game, otherwise start the game
     if not quiz.cancelled:
-        print("Starting Game")
-
-        # Start the game
         quiz.begin()
 
     # Show the game finished menu
@@ -135,8 +145,10 @@ def new_game() -> None:
 
 def join_game() -> None:
     """
-    Show the user a menu to join a game
+    Shows the user a menu to join a game, the user can enter the ip and port of the server to join. The default values
+    are the local ip and port 1234 as that is the default port for the server.
     """
+    # Set the default server values, this makes it easier for joining a local game
     ip = get_ip()
     port = 1234
 
@@ -146,15 +158,14 @@ def join_game() -> None:
     join_menu = Menu("Join Game", [join_menu_options, join_menu_values], True)
 
     while True:
+        # Make sure that if the values were updated that they are still in string form for the menu
         join_menu_values[0] = str(ip)
         join_menu_values[1] = str(port)
 
         # Get the user to input the ip and port
-        join_menu.get_input()
-
-        match join_menu.user_input:
+        match join_menu.get_input():
             case "IP":
-                ip = get_user_input_of_type(ipAdress, "Please enter the IP: ")
+                ip = get_user_input_of_type(ip_address, "Please enter the IP: ")
 
             case "Port":
                 port = get_user_input_of_type(int, "Please enter the port: ")
@@ -178,25 +189,26 @@ def settings() -> None:
     """
     Show the user a menu that allows them to change their already specified settings
     """
+    # Get the current settings
     usersettings = UserData()
 
-    settings_options = ["Display Mode", "Network", "Fix API", "Back"]
-    settings_values = [str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
-                       "Main Menu"]
-
+    # Create the settings menu, using the current settings as the values displayed
+    settings_options = ("Display Mode", "Network", "Fix API", "Back")
+    settings_values = (str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
+                       "Main Menu")
     settings_menu = Menu("Settings", [settings_options, settings_values], True)
 
-    # Input loop
+    # Loop this menu until the user selects an option that leaves this menu
     while True:
-        settings_menu.get_input()
-
-        match settings_menu.user_input:
+        # Show and get input from the menu
+        # Update the settings based on the user input
+        match settings_menu.get_input():
             case "Display Mode":
                 usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
-                                                                   ["CLI", "GUI"])
+                                                                   ("CLI", "GUI"))
 
             case "Network":
-                usersettings.network = get_user_input_of_type(strBool,
+                usersettings.network = get_user_input_of_type(string_bool,
                                                               "Do you want to use the network? (" +
                                                               Colour.true_or_false_styled() + "): ")
 
@@ -205,7 +217,7 @@ def settings() -> None:
                       "this can fix errors where there arent enough questions of that type in the database, however it "
                       "can mean that the question types arent the same as the ones you selected.")
 
-                usersettings.auto_fix_api = get_user_input_of_type(strBool,
+                usersettings.auto_fix_api = get_user_input_of_type(string_bool,
                                                                    "Do you want to auto fix the API if an error "
                                                                    "occurs? (" + Colour.true_or_false_styled() +
                                                                    "): ")
@@ -217,10 +229,14 @@ def settings() -> None:
 
 def game_main_menu() -> None:
     """
-    Show the user the main menu
+    Show the user the main menu, allowing them to continue a game, start a new game, join a game, view the tutorial or
+    quit
     """
+
+    # Create the main menu
     game_menu = Menu("Game Menu", ["Continue Game", "New Game", "Tutorial", "Settings", "Quit"])
 
+    # If the user is not connected to the network then don't add the join game option
     usersettings = UserData()
     if usersettings.network is not None:
         if usersettings.network:
@@ -229,11 +245,11 @@ def game_main_menu() -> None:
         else:
             debug_message("Network is disabled", "network")
 
+    # Loop this menu until the user selects an option that leaves this menu
     while True:
 
-        game_menu.get_input()
-
-        match game_menu.user_input:
+        # Show and get input from the menu
+        match game_menu.get_input():
             case "Continue Game":
                 continue_game()
 
@@ -254,6 +270,9 @@ def game_main_menu() -> None:
 
 
 def tutorial() -> None:
+    """
+    Show the user a tutorial on how to use the menus, host a game and join a game
+    """
     tut_menu = Menu("Tutorial", [""])
 
     # Intro
@@ -261,28 +280,28 @@ def tutorial() -> None:
     print("- This tutorial will show you how to play the game and how to use the menus")
     print("- To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
 
     # Game Settings Menu
     print("- The first menu you will see when creating a game is the game settings menu, this menu allows you to "
           "configure the game.")
     print(
         "- The current value of each setting is shown in brackets, to change the value of a setting choose the setting "
-        "and then you will be promted to enter a new value.")
+        "and then you will be promoted to enter a new value.")
     print("- To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
     print("- Here is an example of the game settings menu")
     print("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
           "the option")
     tut_menu.multi_dimensional = True
-    tut_menu.items = [["Number of Questions", "Question Types", "Difficulty", "Time Limit", "..."],
-                      ["10", "All", "All", "No Time Limit", "..."]]
+    tut_menu.items = (("Number of Questions", "Question Types", "Difficulty", "Time Limit"),
+                      ("10", "All", "All", "No Time Limit"))
     tut_menu.get_input()
     print("-  You chose: " + tut_menu.user_input + ", here you would be able to change the value of the setting")
     print("-  To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
 
     # Play a game
     print("- Now that you know how to configure the game you can play a game")
@@ -294,45 +313,57 @@ def tutorial() -> None:
     print("- When in the scores menu you can choose a player to see their stats")
     print("- To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
 
     # Network
-    print(" No MULTIPLAYER YET so press enter to continue")
+    print("- The game also supports playing over a network, this allows you to play the game with your friends")
+    print("- To play over a network you need to enable the network in the settings menu, if not already enabled")
+    print("- To play a networked game one player has to host a game by creating a game and then selecting the host a "
+          "game setting and setting it to true. The other players then join the game by selecting the join game option "
+          "and then pass the port and ip address of the host (displayed as option 0 on the host a game menu). Note: "
+          "when playing over a network you may need to forward the port you are using to the computer you are using to"
+          " be able to play the game over a non local network.")
+    print("- To continue a game the host can continue it like any other game, however the other players will need to "
+          "use the same nicknames they used before to continue the game, additonally no new players can join the game.")
+    print("- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
+          "not the host of the game.")
+    print("- To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
 
     # End
     print("- That is the end of the tutorial, you can now play the game")
     print("- To continue press enter")
     input()
-    tut_menu.clear()
+    clear()
 
 
 def main() -> None:
     """
     The main function, initialise the program and show the main menu
     """
+    # Get the pre-inputted user input
     user_input = handle_arg('--pass_input', True)
 
     # Show the main menu
-    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ["Quit", "Continue"])
-    main_menu.get_input(user_input)
+    main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ("Quit", "Continue"))
 
-    match main_menu.user_input:
+    # Run the selected option
+    match main_menu.get_input(user_input):
         case "Quit":
             sys.exit()
         case "Continue":
             game_main_menu()
 
-    print("Done")
+    print("Thank you for playing Quiz Game by Max Tyson (13 DGT)")
 
 
 if __name__ == "__main__":
     # Set up the program
     init_debug()
+
     # Run the main program and catch the exit to stop the debug session
     try:
         main()
     finally:
-        inspect.stack()
         close_debug_session()
