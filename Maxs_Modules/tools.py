@@ -81,8 +81,8 @@ def ip_address(text: str) -> Exception or str:
     return text
 
 
-def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list = None,
-                           allow_these: list = None, max_time: int = 0) -> object:
+def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list | tuple = None,
+                           allow_these: list | tuple = None, max_time: int = 0) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
     until they do.
@@ -152,7 +152,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 if user_input in must_be_one_of_these:
                     return user_input
                 else:
-                    error("Invalid input, please enter one of these: " + str(must_be_one_of_these))
+                    error("Invalid input")
             else:
                 return user_input
         # Side note: No need to error here as the error will be called in the try_convert function
@@ -191,7 +191,7 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
             error("Invalid input")
         return None
 
-
+packages_isntalled_this_session = []
 def install_package(package: str) -> None:
     """
     Install a package using pip
@@ -200,8 +200,11 @@ def install_package(package: str) -> None:
     @return: None
     """
     try:
+        if package in packages_isntalled_this_session:
+            return
         import pip
         print("Installing package: " + package + "...")
         pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
+        packages_isntalled_this_session.append(package)
     except Exception as e:
         error("Failed to install package: " + package + " (" + str(e) + ")")

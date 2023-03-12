@@ -1,0 +1,1 @@
+Boundary error when trying to enter a port higher thant 65535, fixed by using the range 0-65535 when asking for the port number.

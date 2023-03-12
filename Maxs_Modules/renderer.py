@@ -169,8 +169,7 @@ class Menu:
         Prints the menu to a clear screen. Automatically uses the multi_dimensional variable to determine if the menu
         should use show_menu_double or show_menu
         """
-        # Store menu_items as a local variable as it can be changed if the menu is split into pages
-        menu_items = self.get_pages()
+        menu_items = self.items
 
         # Check if the screen should be cleared
         if self.clear_screen:
@@ -291,7 +290,7 @@ class Menu:
                     self.user_input = input_items[user_input]
                     break
                 else:
-                    error("Invalid input, please enter one of these: " + str(options))
+                    error("Invalid input")
                     user_input = None
 
             # Not an int, so try
@@ -355,60 +354,6 @@ class Menu:
 
         menu_manager.menu_history_input.append(self.user_input)
         return self.user_input
-
-    def get_pages(self) -> list:
-        """
-        Splits the menu items into pages if there are more than the max menu items in the list of items. Curently not
-        working will be fixed or removed later
-
-        @return: The current page of menu items (a list of 10 options, including previous and next page)
-        """
-
-        # TODO: Will finish pages later if I have time but right now they are not working
-        return self.items
-
-        # Store menu_items as a local variable as don't want to change the original
-        menu_items = self.items.copy()
-        menu_items_count = len(menu_items)
-        if self.multi_dimensional:
-            menu_items_count = len(menu_items[0])
-
-        # Check if the items have to be split into pages
-        if menu_items_count > self.items_per_page:
-            # Get the items for the current page
-            slice_start = (self.page_number - 1) * self.items_per_page
-            slice_end = (self.page_number * self.items_per_page)
-
-            # Check if the "Previous Page" option is going to be added, if so need to remove one from the slice end
-            # to ensure the max items per page is not exceeded
-            if self.page_number > 1:
-                slice_start -= 1
-
-                if self.multi_dimensional:
-                    menu_items[0].insert(slice_start, "Previous Page")
-                    menu_items[1].insert(slice_start, str(self.page_number - 1))
-                else:
-                    menu_items.insert(slice_start, "Previous Page")
-
-            # Check if the "Next Page" option is going to be added, if so need to minus 1 from the slice end
-            if menu_items_count > slice_end:
-                if self.multi_dimensional:
-                    menu_items[0].insert(slice_end, "Next Page")
-                    menu_items[1].insert(slice_end, str(self.page_number + 1))
-                else:
-                    menu_items.insert(slice_end, "Next Page")
-
-                slice_end += 1
-
-            # If the menu is multidimensional, then the items are stored in a list of lists and both arrays need to be
-            # sliced
-            if self.multi_dimensional:
-                menu_items[0] = menu_items[0][slice_start: slice_end]
-                menu_items[1] = menu_items[1][slice_start: slice_end]
-            else:
-                menu_items = menu_items[slice_start: slice_end]
-
-        return menu_items
 
 
 # - - - - - - - Functions - - - - - - -#

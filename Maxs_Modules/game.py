@@ -9,7 +9,7 @@ from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
 from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
-from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line
+from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -69,6 +69,7 @@ def get_saved_games():
         if not file.endswith(".json"):
             files.remove(file)
 
+    # Return the files
     return files
 
 
@@ -85,7 +86,7 @@ class Question:
     def __init__(self) -> None:
         pass
 
-    # Note uses the string representation of Question class as it has not been defined therfore cant use it in type the
+    # Note uses the string representation of Question class as it has not been defined therefore cant use it in type the
     # hints
     def load(self, data: dict) -> "Question":
         """
@@ -655,7 +656,7 @@ class Game(SaveFile):
         Starts the game. It first gets the questions if there are none, then shuffles the questions if the user wants
         (only if the game is a new one as when continuing the game the questions should be in the same order). If the
         game is set to be hosted then a server is started up. Afterwards the game is checked to see if it is finished
-        othewise it will continue to play from the current state
+        otherwise it will continue to play from the current state
         """
         # If there are no questions then get them
         if len(self.questions) == 0:
@@ -1069,10 +1070,17 @@ class Game(SaveFile):
             if is_client:
                 self.backend.send_self()
 
+        # Store the current user as check_game_finished() will change it
+        is_last_user = self.current_user_playing == (len(self.users) - 1)
+
         # Check if the game has finished
         if self.check_game_finished():
-            # If the game has finished then show the results
-            self.game_end()
+
+            # Only the last user should show the game over menu
+            if is_last_user:
+                # If the game has finished then show the results
+                print("Game finished")
+                self.game_end()
             return
 
         if self.show_score_after_question_or_game == "Question":
@@ -1109,9 +1117,7 @@ class Game(SaveFile):
 
                 # Move onto the next question
                 self.play()
-                self.game_finished = False
-                # TODO: Setting game finished here seems weird, could cause a bug (i.e continue game after all
-                #  players have had turn as caller gets this false), fix later
+                return self.check_game_finished()
             else:
                 self.game_finished = True
         else:
@@ -1241,7 +1247,7 @@ class Game(SaveFile):
 
             match single_player_menu.get_input():
                 case "How many players":
-                    self.how_many_players = get_user_input_of_type(int, "How many players")
+                    self.how_many_players = get_user_input_of_type(int, "How many players", range(1, 11))
                 case "Next":
                     self.set_players()
                     break
@@ -1268,10 +1274,10 @@ class Game(SaveFile):
                     self.server_name = get_user_input_of_type(str, "Server Name")
 
                 case "Server Port":
-                    self.server_port = get_user_input_of_type(int, "Server Port")
+                    self.server_port = get_user_input_of_type(int, "Server Port", range(1, 65535))
 
                 case "Max Players":
-                    self.max_players = get_user_input_of_type(int, "Max Players")
+                    self.max_players = get_user_input_of_type(int, "Max Players", range(1, 11))
 
                 case "Next":
                     break
@@ -1325,7 +1331,7 @@ class Game(SaveFile):
                                                                 "Host a server (" + Colour.true_or_false_styled() + ")")
 
                 case "Time limit":
-                    self.time_limit = get_user_input_of_type(int, "Time limit (seconds)")
+                    self.time_limit = get_user_input_of_type(int, "Time limit (seconds)", range(1, 61))
 
                 case "Question Amount":
                     self.question_amount = get_user_input_of_type(int, "Question Amount (1-50)", range(1, 51))
@@ -1387,7 +1393,7 @@ class Game(SaveFile):
                     self.bot_difficulty = get_user_input_of_type(int, "Bot difficulty (%)", range(1, 101))
 
                 case "Number of bots":
-                    self.how_many_bots = get_user_input_of_type(int, "Number of bots")
+                    self.how_many_bots = get_user_input_of_type(int, "Number of bots", range(1, 11))
 
                 case "Next":
                     if self.host_a_server:

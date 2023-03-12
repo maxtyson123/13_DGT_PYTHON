@@ -10,19 +10,17 @@
 # [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
 # [.] Clean Up aka more efficient and correct commenting
 # [ ] GUI Base, port the current render to a simple GUI
-# [ ] GUI Extended, Buttons instead of based, css and other styling
+# [ ] GUI Extended, Buttons instead of text based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
-import inspect
-# TODO:  comments, Code rewrite for better techniques or effeiency, More Error Handling and unexpected input, Testing, Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+# TODO: Testing. Make any input be part of the menu that wants it, allowing for pre-input with any type of input
 
-
-import os
 # - - - - - - - Imports - - - - - - -#
+import os
 import sys
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour
+from Maxs_Modules.renderer import Menu, Colour, clear
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
@@ -72,7 +70,7 @@ def game_finished(game: Game) -> None:
             case "Main Menu":
                 # Delete the game save if it exists
                 if os.path.exists(game.save_file) and game.game_finished:
-                    debug_message("Deleting save file", "game_finished")
+                    debug_message(f"Deleting save file: {game.save_file}", "game_finished")
                     os.remove(game.save_file)
 
                 # Return to the main menu by breaking the loop
@@ -97,7 +95,7 @@ def continue_game() -> None:
     # Add back to the menu
     saves.append("Back")
 
-    # Show the menu, no need for a loop as this menu doesnt get repeated
+    # Show the menu, no need for a loop as this menu doesn't get repeated
     continue_menu = Menu("Continue Game", saves)
     continue_menu.get_input()
 
@@ -168,18 +166,12 @@ def join_game() -> None:
                 ip = get_user_input_of_type(ip_address, "Please enter the IP: ")
 
             case "Port":
-                port = get_user_input_of_type(int, "Please enter the port: ")
+                port = get_user_input_of_type(int, "Please enter the port: ", range(1, 65535))
 
             case "Join Game":
-
-                # Check if the user has entered an ip and port
-                if ip == "" or port == "":
-                    error("Please enter an IP and port")
-
-                else:
-                    # Create a new game object
-                    quiz = Game()
-                    quiz.join_game(ip, port)
+                # Create a new game object and join the game
+                quiz = Game()
+                quiz.join_game(ip, port)
 
             case "Back":
                 break
@@ -189,19 +181,21 @@ def settings() -> None:
     """
     Show the user a menu that allows them to change their already specified settings
     """
-    # Get the current settings
-    usersettings = UserData()
 
-    # Create the settings menu, using the current settings as the values displayed
-    settings_options = ("Display Mode", "Network", "Fix API", "Back")
-    settings_values = (str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
-                       "Main Menu")
-    settings_menu = Menu("Settings", [settings_options, settings_values], True)
-
-    # Loop this menu until the user selects an option that leaves this menu
+    # Loop this menu until the user selects an option that leaves this menu (Loop has to be before menu creation as it
+    # gets updated)
     while True:
+
+        # Get the current settings
+        usersettings = UserData()
+
+        # Create the settings menu, using the current settings as the values displayed
+        settings_options = ("Display Mode", "Network", "Fix API", "Back")
+        settings_values = (str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
+                           "Main Menu")
+        settings_menu = Menu("Settings", [settings_options, settings_values], True)
+
         # Show and get input from the menu
-        # Update the settings based on the user input
         match settings_menu.get_input():
             case "Display Mode":
                 usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
@@ -223,8 +217,10 @@ def settings() -> None:
                                                                    "): ")
 
             case "Back":
-                usersettings.save()
                 break
+
+        # Save the modified settings
+        usersettings.save()
 
 
 def game_main_menu() -> None:
@@ -273,9 +269,7 @@ def tutorial() -> None:
     """
     Show the user a tutorial on how to use the menus, host a game and join a game
     """
-    tut_menu = Menu("Tutorial", [""])
-
-    # Intro
+     # Intro
     print("- Welcome to the tutorial!")
     print("- This tutorial will show you how to play the game and how to use the menus")
     print("- To continue press enter")
@@ -294,6 +288,7 @@ def tutorial() -> None:
     print("- Here is an example of the game settings menu")
     print("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
           "the option")
+    tut_menu = Menu("Tutorial", [""])
     tut_menu.multi_dimensional = True
     tut_menu.items = (("Number of Questions", "Question Types", "Difficulty", "Time Limit"),
                       ("10", "All", "All", "No Time Limit"))
@@ -324,7 +319,7 @@ def tutorial() -> None:
           "when playing over a network you may need to forward the port you are using to the computer you are using to"
           " be able to play the game over a non local network.")
     print("- To continue a game the host can continue it like any other game, however the other players will need to "
-          "use the same nicknames they used before to continue the game, additonally no new players can join the game.")
+          "use the same nicknames they used before to continue the game, additionally no new players can join the game.")
     print("- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
           "not the host of the game.")
     print("- To continue press enter")

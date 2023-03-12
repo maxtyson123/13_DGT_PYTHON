@@ -22,7 +22,7 @@ def init_debug() -> None:
     if not use_debug:
         return
 
-    # Make sure to be able to update the debugger variable, as using it as a global varible it has my name on it to
+    # Make sure to be able to update the debugger variable, as using it as a global variable it has my name on it to
     # prevent it shadowing other modules
     global maxs_debugger
 
@@ -37,10 +37,10 @@ def init_debug() -> None:
         log_ignore = []
         full_message_log = []
         full_error_log = []
-        store_logs = False  # Weather or not to store the logs on file (under full...)
-        max_log_history = 100  # The maximum amount of logs to store
+        store_logs = False
+        max_log_history = 100
         save_logs_location = "ProgramData/Logs"
-        individual_log_files = False  # Weather or not to save the logs in individual files
+        individual_log_files = False
         local_db = False
 
         # Commands
@@ -356,12 +356,10 @@ def init_debug() -> None:
                                    + str(session_error_log))
 
                 else:
-                    # Check if the logs are full
+                    # Check if the logs are full and if so remove the oldest log
                     if len(self.full_message_log) > self.max_log_history:
-                        # Remove the oldest log
                         self.full_message_log.pop(0)
                     if len(self.full_error_log) > self.max_log_history:
-                        # Remove the oldest log
                         self.full_error_log.pop(0)
 
                     # Add the session logs to the full logs
@@ -380,6 +378,7 @@ def close_debug_session() -> None:
     """
     Run the close_debug_session() function of the debugger, if it is initialized
     """
+    # Only run if the debugger is initialized
     if maxs_debugger is not None:
         maxs_debugger.close_debug_session()
 
@@ -389,6 +388,7 @@ def debug_cli(command: list) -> None:
     If the debugger is initialized and debug is enabled, handle the command passed
     @param command: The command to handle and args to pass to the handler (as a list)
     """
+    # Only run if the debugger is initialized
     if maxs_debugger is not None:
         maxs_debugger.handle(command)
 
@@ -400,21 +400,25 @@ def debug_message(message: str, log_type: str = "info") -> None:
     @param message: The debug message to print
     @param log_type: The type of log to print
     """
+    # Only run if the debugger is initialized
     if maxs_debugger is not None:
         maxs_debugger.log(message, log_type)
 
 
 def error(error_message: str) -> None:
-    from Maxs_Modules.renderer import Colour
     """
     Print an error message in red and then wait 2 seconds
     @param error_message: The error message to print
     """
+    # Print the coloured error message
+    from Maxs_Modules.renderer import Colour
     print(Colour.error + "ERROR: " + error_message + Colour.RESET)
 
-    if use_debug:
+    # Add the error to the error log if debug is enabled
+    if maxs_debugger is not None:
         session_error_log.append(error_message)
 
+    # Give the user time to read the error message
     time.sleep(2)
 
 
@@ -426,10 +430,16 @@ def handle_arg(arg: str, get_value: bool = False) -> str or None:
     @param get_value: True if the following argument should be returned, False if not (default: False)
     @return: The arg or value if it is found, None if not
     """
+    # Get the args passed to the program
     program_args = sys.argv[1:]
+
+    # Loop through each arg and check if it matches the arg passed
     for index in range(len(program_args)):
         if arg == program_args[index]:
+
+            # If the arg is found, check if the value should be returned
             if get_value:
+
                 # Check if there is a value after this arg
                 if index != len(program_args):
                     return program_args[index + 1]
@@ -439,7 +449,6 @@ def handle_arg(arg: str, get_value: bool = False) -> str or None:
             return arg
 
     return None
-
 
 in_ide = (handle_arg("--ide") == "--ide")
 use_debug = (handle_arg("--debug") == "--debug")

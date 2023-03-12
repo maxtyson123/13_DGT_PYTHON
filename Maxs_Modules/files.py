@@ -55,7 +55,7 @@ class SaveFile:
         """
         Loads the data from the save file into the save_data dictionary. If the file is corrupt or does not exist
         then the save_data dictionary will remain the same as its previous state. The caller of this function needs to
-        manually load the varibles from the save_data dictionary, it is also good practice to check if the types are
+        manually load the variables from the save_data dictionary, it is also good practice to check if the types are
         correct as JSON can be manipulated.
 
         @return: None, this function will return if the file is corrupt or does not exist
@@ -106,6 +106,7 @@ class SaveFile:
             except KeyError:
                 pass
 
+            # Save the data to the file and close the file
             json.dump(save_dict, file)
             file.close()
 
@@ -135,7 +136,7 @@ class UserData(SaveFile):
         Load the default values for the user data if they are not found
         """
         self.display_mode = set_if_none(self.display_mode, "CLI")
-        self.network = set_if_none(self.network, False)
+        self.network = set_if_none(self.network, True)
         self.auto_fix_api = set_if_none(self.auto_fix_api, True)
 
     def save(self) -> None:
