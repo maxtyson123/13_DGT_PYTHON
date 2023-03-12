@@ -82,11 +82,10 @@ def ip_address(text: str) -> Exception or str:
 
 
 def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list | tuple = None,
-                           allow_these: list | tuple = None, max_time: int = 0) -> object:
+                           allow_these: list | tuple = None, max_time: int = 0, pre_input: str = None) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
     until they do.
-
 
     @param type_to_convert: The type to convert the input to
     @param input_message: The message to display to the user (then " > ") (By default: "")
@@ -94,6 +93,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     @param allow_these: Allow input of these items (Not type specific) (checked first so 'must_be_one_of_these' doesn't
                          apply to these items) (By default: None)
     @param max_time: The maximum time the user has to enter input (in seconds) (0, for no limit) (By default: 0)
+    @param pre_input: If there is string that should be treated as input on the first loop
     @return: The user input converted to the type specified
     """
 
@@ -101,31 +101,34 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     start_time = time.time()
 
     while True:
+        if pre_input is None:
+            # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
+            # running in the IDE
+            if max_time != 0 and not in_ide:
 
-        # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
-        # running in the IDE
-        if max_time != 0 and not in_ide:
+                try:
+                    from inputimeout import inputimeout, TimeoutOccurred
+                except ImportError:
+                    install_package("inputimeout")
+                    from inputimeout import inputimeout, TimeoutOccurred
 
-            try:
-                from inputimeout import inputimeout, TimeoutOccurred
-            except ImportError:
-                install_package("inputimeout")
-                from inputimeout import inputimeout, TimeoutOccurred
+                # Check if the time limit has been reached
+                if time.time() - start_time > max_time:
+                    return None
 
-            # Check if the time limit has been reached
-            if time.time() - start_time > max_time:
-                return None
+                # Calculate the time left
+                time_left = max_time - (time.time() - start_time)
 
-            # Calculate the time left
-            time_left = max_time - (time.time() - start_time)
-
-            # Get the user input
-            try:
-                user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
-            except TimeoutOccurred:
-                return None
+                # Get the user input
+                try:
+                    user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
+                except TimeoutOccurred:
+                    return None
+            else:
+                user_input = input(input_message + " > ")
         else:
-            user_input = input(input_message + " > ")
+            user_input = pre_input
+            pre_input = None
 
         # Check if it is a debug command
         if "debug" in user_input:
@@ -152,7 +155,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 if user_input in must_be_one_of_these:
                     return user_input
                 else:
-                    error("Invalid input")
+                    error(f"Invalid input ({user_input})")
             else:
                 return user_input
         # Side note: No need to error here as the error will be called in the try_convert function
@@ -188,7 +191,8 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
         return type_to_convert(variable)
     except ValueError:
         if not supress_errors:
-            error("Invalid input")
+            error(f"Incorrect input type ({variable}) should be "
+                  f"{str(type_to_convert).replace('<class ', '').replace('>', '')}")
         return None
 
 

@@ -202,44 +202,14 @@ class Menu:
 
         menu_items = self.show_menu()
 
-        # Store the start time
-        start_time = time.time()
+        used_pre_input = False
 
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
-
             debug_message(f"Using pre-input ({menu_manager.pre_input[0]}) from {menu_manager.pre_input}")
-
-            valid = menu_manager.pre_input[0] < len(menu_items)
-
-            # Check if the pre-input is a valid option index for this menu (multi-dimensional)
-            if self.multi_dimensional:
-                valid = menu_manager.pre_input[0] < len(menu_items[0])
-
-            # Check if the pre-input is a valid option index for this menu
-            if valid:
-
-                # Store the input
-                if self.multi_dimensional:
-                    self.user_input = menu_items[0][menu_manager.pre_input[0]]
-                else:
-                    self.user_input = menu_items[menu_manager.pre_input[0]]
-
-                # Remove the pre-input
-                menu_manager.pre_input.pop(0)
-
-                # Add the input to the input history
-                menu_manager.menu_history_input.append(self.user_input)
-
-                # Return
-                return None
-
-            else:
-                # Print an error
-                error("The pre-input (" + str(menu_manager.pre_input[0]) + ") was not a valid option for this menu ")
-
-                # Clear the pre-input
-                menu_manager.pre_input = []
+            user_input = menu_manager.pre_input[0]
+            used_pre_input = True
+            menu_manager.pre_input.pop(0)
 
         # Calculate the possible options
         if self.multi_dimensional:
@@ -249,48 +219,89 @@ class Menu:
 
         options = [*range(len(input_items))]
 
-        input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
-        # First input allow for the user to input a list of indexes that will be automatically used as the user input
-        user_input = input(input_prompt)
+        input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")"
+        # First input allows for the user to input a list of indexes that will be automatically used as the user input
+        if not used_pre_input:
 
-        # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
-        if "," in user_input:
-            # Split the string into a list
-            user_input = user_input.split(",")
+            # Check that input has been passed in
+            if user_input is None:
+                user_input = input(input_prompt)
 
-            # Convert the list to ints
-            user_input = [try_convert(item, int, True) for item in user_input]
+            # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
+            if "," in user_input:
+                # Split the string into a list
+                user_input = user_input.split(",")
 
-            # Check if the list is valid
-            if None not in user_input:
                 # Store the pre-input
                 menu_manager.pre_input = user_input
 
-                # Store the first input
-                if menu_manager.pre_input[0] < len(input_items):
-                    self.user_input = input_items[menu_manager.pre_input[0]]
-                else:
-                    error("Invalid pre-input, not an option")
-                    menu_manager.pre_input = []
-                    user_input = None
+                # Re-Run with the first pre-input
+                return self.get_input()
 
-                # Remove the first input from the pre-input
-                menu_manager.pre_input.pop(0)
+        user_input = get_user_input_of_type(int, input_prompt, options, input_items, self.time_limit, user_input)
 
-                # Add the input to the input history
-                menu_manager.menu_history_input.append(self.user_input)
+        # Convert any indexes to the actual item
+        if user_input in options:
+            user_input = input_items[user_input]
 
-                # Return
-                return self.user_input
-
-            else:
-                error("Invalid pre-input, please enter a list of numbers separated by commas")
-                user_input = None
-
-        user_input = get_user_input_of_type(str, input_prompt, options, input_items, self.time_limit)
-
+        # Store the input
         self.user_input = user_input
+
+        # Add the input to the input history
+        menu_manager.menu_history_input.append(self.user_input)
+
         return self.user_input
+
+    def get_input_option(self, type_to_convert: object, input_message: str = "",
+                         must_be_one_of_these: list | tuple = None,
+                         allow_these: list | tuple = None, max_time: int = 0) -> object:
+        """
+        Get user input of a specific type, if the input is not of the correct type then the user will be asked to
+        re-enter until they do. Will check the menu for pre-input, if there is pre-input then it will use that
+        instead of asking the user. Does not allow for pre input to start here, only to continue.
+
+        @param type_to_convert: The type to convert the input to
+        @param input_message: The message to display to the user (then " > ") (By default: "")
+        @param must_be_one_of_these: If the input must be one of these values then enter them here (By default: None)
+        @param allow_these: Allow input of these items (Not type specific) (checked first so 'must_be_one_of_these'
+                doesn't apply to these items) (By default: None)
+        @param max_time: The maximum time the user has to enter input (in seconds) (0, for no limit) (By default: 0)
+        @return:
+        """
+        user_input = None
+
+        # Check if the menu has a pre-input
+        if len(menu_manager.pre_input) > 0:
+            debug_message(f"Using pre-input ({menu_manager.pre_input[0]}) from {menu_manager.pre_input}")
+            user_input = menu_manager.pre_input[0]
+            menu_manager.pre_input.pop(0)
+
+        # First input allows for the user to input a list of indexes that will be automatically used as the user input
+        if user_input is None:
+            user_input = input(input_message)
+
+            # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
+            if "," in user_input:
+                # Split the string into a list
+                user_input = user_input.split(",")
+
+                # Store the pre-input
+                menu_manager.pre_input = user_input
+
+                # Re-Run with the first pre-input
+                return self.get_input_option()
+
+        user_input = get_user_input_of_type(type_to_convert, input_message, must_be_one_of_these, allow_these,
+                                            self.time_limit, user_input)
+
+        # Store the input
+        self.user_input = user_input
+
+        # Add the input to the input history
+        menu_manager.menu_history_input.append(self.user_input)
+
+        return self.user_input
+
 
 
 

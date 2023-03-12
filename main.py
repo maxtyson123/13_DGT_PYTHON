@@ -8,12 +8,12 @@
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
 # [x] Multiplayer Game Logic: Scores sync questions sync
 # [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
-# [.] Clean Up aka more efficient and correct commenting
+# [x] Clean Up aka more efficient and correct commenting
 # [ ] GUI Base, port the current render to a simple GUI
 # [ ] GUI Extended, Buttons instead of text based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
-# TODO: Testing. Make any input be part of the menu that wants it, allowing for pre-input with any type of input
+
 
 # - - - - - - - Imports - - - - - - -#
 # - - - - - - - Imports - - - - - - -#
@@ -167,10 +167,10 @@ def join_game() -> None:
         # Get the user to input the ip and port
         match join_menu.get_input():
             case "IP":
-                ip = get_user_input_of_type(ip_address, "Please enter the IP: ")
+                ip = join_menu.get_input_option(ip_address, "Please enter the IP: ")
 
             case "Port":
-                port = get_user_input_of_type(int, "Please enter the port: ", range(1, 65535))
+                port = join_menu.get_input_option(int, "Please enter the port: ", range(1, 65535))
 
             case "Join Game":
                 # Create a new game object and join the game
@@ -202,11 +202,11 @@ def settings() -> None:
         # Show and get input from the menu
         match settings_menu.get_input():
             case "Display Mode":
-                usersettings.display_mode = get_user_input_of_type(str, "Please enter the display mode (CLI, GUI): ",
-                                                                   ("CLI", "GUI"))
+                usersettings.display_mode = settings_menu.get_input_option(str, "Please enter the display mode (CLI, "
+                                                                                "GUI): ", ("CLI", "GUI"))
 
             case "Network":
-                usersettings.network = get_user_input_of_type(string_bool,
+                usersettings.network = settings_menu.get_input_option(string_bool,
                                                               "Do you want to use the network? (" +
                                                               Colour.true_or_false_styled() + "): ")
 
@@ -215,7 +215,7 @@ def settings() -> None:
                       "this can fix errors where there arent enough questions of that type in the database, however it "
                       "can mean that the question types arent the same as the ones you selected.")
 
-                usersettings.auto_fix_api = get_user_input_of_type(string_bool,
+                usersettings.auto_fix_api = settings_menu.get_input_option(string_bool,
                                                                    "Do you want to auto fix the API if an error "
                                                                    "occurs? (" + Colour.true_or_false_styled() +
                                                                    "): ")
@@ -343,6 +343,7 @@ def main() -> None:
     """
     # Get the pre-inputted user input
     user_input = handle_arg('--pass_input', True)
+    print(user_input)
 
     # Show the main menu
     main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ("Quit", "Continue"))
