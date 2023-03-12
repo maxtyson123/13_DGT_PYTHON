@@ -6,7 +6,7 @@ import sys
 import time
 
 from Maxs_Modules.debug import error, debug_cli, debug_message, in_ide
-from Maxs_Modules.tools import try_convert, install_package
+from Maxs_Modules.tools import try_convert, install_package, get_user_input_of_type
 
 # - - - - - - - Variables - - - - - - -#
 
@@ -249,111 +249,49 @@ class Menu:
 
         options = [*range(len(input_items))]
 
-        # Get the user input and validate it, note cant use the get_user_input_of_type function as the menu also
-        # allows for "pre-input" and choosing an item index or the item itself
-        while True:
+        input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
+        # First input allow for the user to input a list of indexes that will be automatically used as the user input
+        user_input = input(input_prompt)
 
-            # If there is no input then get the input
-            if user_input is None:
-                input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ") > "
+        # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
+        if "," in user_input:
+            # Split the string into a list
+            user_input = user_input.split(",")
 
-                # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
-                # running in the IDE
-                if self.time_limit != 0 and not in_ide:
+            # Convert the list to ints
+            user_input = [try_convert(item, int, True) for item in user_input]
 
-                    install_package("inputimeout")
-                    from inputimeout import inputimeout, TimeoutOccurred
+            # Check if the list is valid
+            if None not in user_input:
+                # Store the pre-input
+                menu_manager.pre_input = user_input
 
-                    # Check if the time limit has been reached
-                    if time.time() - start_time > self.time_limit:
-                        self.user_input = None
-                        return None
-
-                    # Calculate the time left
-                    time_left = self.time_limit - (time.time() - start_time)
-
-                    # Get the user input
-                    try:
-                        user_input = inputimeout(prompt=input_prompt, timeout=time_left)
-                    except TimeoutOccurred:
-                        self.user_input = None
-                        return None
+                # Store the first input
+                if menu_manager.pre_input[0] < len(input_items):
+                    self.user_input = input_items[menu_manager.pre_input[0]]
                 else:
-                    user_input = input(input_prompt)
-
-            # If there is a type error then its returned as None otherwise it is the converted value
-            if try_convert(user_input, int, True) is not None:  # Is an int
-
-                # Convert the input to an int
-                user_input = try_convert(user_input, int)
-                if user_input in options:
-                    self.user_input = input_items[user_input]
-                    break
-                else:
-                    error("Invalid input")
+                    error("Invalid pre-input, not an option")
+                    menu_manager.pre_input = []
                     user_input = None
 
-            # Not an int, so try
+                # Remove the first input from the pre-input
+                menu_manager.pre_input.pop(0)
+
+                # Add the input to the input history
+                menu_manager.menu_history_input.append(self.user_input)
+
+                # Return
+                return self.user_input
+
             else:
-                # Check if it is a debug command
-                if "debug" in user_input:
-                    command = user_input.split(" ")
+                error("Invalid pre-input, please enter a list of numbers separated by commas")
+                user_input = None
 
-                    # Check if there is a command and if there is then remove the "debug" part and pass the rest to the
-                    if len(command) > 1:
-                        command.pop(0)
+        user_input = get_user_input_of_type(str, input_prompt, options, input_items, self.time_limit)
 
-                    debug_cli(command)
-                    user_input = None
-                    continue
-
-                # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
-                if "," in user_input:
-                    # Split the string into a list
-                    user_input = user_input.split(",")
-
-                    # Convert the list to ints
-                    user_input = [try_convert(item, int, True) for item in user_input]
-
-                    # Check if the list is valid
-                    if None not in user_input:
-                        # Store the pre-input
-                        menu_manager.pre_input = user_input
-
-                        # Store the first input
-                        if menu_manager.pre_input[0] < len(input_items):
-                            self.user_input = input_items[menu_manager.pre_input[0]]
-                        else:
-                            error("Invalid pre-input, not an option")
-                            menu_manager.pre_input = []
-                            user_input = None
-                            continue
-
-                        # Remove the first input from the pre-input
-                        menu_manager.pre_input.pop(0)
-
-                        # Add the input to the input history
-                        menu_manager.menu_history_input.append(self.user_input)
-
-                        # Return
-                        return self.user_input
-
-                    else:
-                        error("Invalid pre-input, please enter a list of numbers separated by commas")
-                        user_input = None
-                        continue
-
-                # Check if the user inputted an allowed string
-                if user_input in input_items:
-                    self.user_input = user_input
-                    break
-                else:
-                    error("Invalid input")
-                    user_input = None
-                    continue
-
-        menu_manager.menu_history_input.append(self.user_input)
+        self.user_input = user_input
         return self.user_input
+
 
 
 # - - - - - - - Functions - - - - - - -#

@@ -1,4 +1,5 @@
 # - - - - - - - Imports - - - - - - -#
+import base64
 import json
 import os
 from Maxs_Modules.debug import debug_message, error
@@ -67,10 +68,17 @@ class SaveFile:
             with open(self.save_file, "r") as file:
                 debug_message("File opened", "save_file")
 
+                # Decode the data from the file
+                data = file.read().encode('utf-8')
+                try:
+                    data = base64.b64decode(data)
+                except base64.binascii.Error:
+                    debug_message("File is not base64 encoded, must be an older save", "save_file")
+
                 # Try Load the data from the file and convert it to a dictionary, if it fails then warn the user and
                 # close the file then delete the file
                 try:
-                    self.save_data = json.load(file)
+                    self.save_data = json.loads(data.decode('utf-8'))
                 except json.decoder.JSONDecodeError:
                     error("File is corrupt, deleting file automatically")
                     file.close()
@@ -106,8 +114,10 @@ class SaveFile:
             except KeyError:
                 pass
 
-            # Save the data to the file and close the file
-            json.dump(save_dict, file)
+            # Encode and save the data, this makes it harder for the user to edit the file
+            data = json.dumps(save_dict, ensure_ascii=False).encode('utf-8')
+            data = base64.b64encode(data)
+            file.write(data.decode('utf-8'))
             file.close()
 
 

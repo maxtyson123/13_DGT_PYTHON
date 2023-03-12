@@ -16,6 +16,7 @@
 # TODO: Testing. Make any input be part of the menu that wants it, allowing for pre-input with any type of input
 
 # - - - - - - - Imports - - - - - - -#
+# - - - - - - - Imports - - - - - - -#
 import os
 import sys
 
@@ -88,8 +89,11 @@ def continue_game() -> None:
     saves = get_saved_games()
 
     # Sort the files
-    install_package("natsort")
-    from natsort import natsorted
+    try:
+        from natsort import natsorted
+    except ImportError:
+        install_package("natsort")
+        from natsort import natsorted
     saves = natsorted(saves)
 
     # Add back to the menu

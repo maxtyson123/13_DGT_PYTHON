@@ -106,11 +106,11 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
         # running in the IDE
         if max_time != 0 and not in_ide:
 
-            # Don't continuously import inputimeout, and there is no need to install it and import it if there is no
-            # need for it yet
-            install_package("inputimeout")
-
-            from inputimeout import inputimeout, TimeoutOccurred
+            try:
+                from inputimeout import inputimeout, TimeoutOccurred
+            except ImportError:
+                install_package("inputimeout")
+                from inputimeout import inputimeout, TimeoutOccurred
 
             # Check if the time limit has been reached
             if time.time() - start_time > max_time:
@@ -191,7 +191,7 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
             error("Invalid input")
         return None
 
-packages_isntalled_this_session = []
+
 def install_package(package: str) -> None:
     """
     Install a package using pip
@@ -200,11 +200,8 @@ def install_package(package: str) -> None:
     @return: None
     """
     try:
-        if package in packages_isntalled_this_session:
-            return
         import pip
         print("Installing package: " + package + "...")
         pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
-        packages_isntalled_this_session.append(package)
     except Exception as e:
         error("Failed to install package: " + package + " (" + str(e) + ")")

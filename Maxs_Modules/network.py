@@ -755,9 +755,12 @@ def api_get_questions(amount: int, category: int, difficulty: str, question_type
     """
 
     # Get the setup data
-    install_package("requests")
 
-    import requests
+    try:
+        import requests
+    except ImportError:
+        install_package("requests")
+        import requests
 
     redo = True
     api_fix = 0
