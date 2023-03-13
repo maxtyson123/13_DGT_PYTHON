@@ -3,21 +3,24 @@
 
 import os
 import sys
+import threading
 import time
 
-from Maxs_Modules.debug import error, debug_cli, debug_message, in_ide
-from Maxs_Modules.tools import try_convert, install_package, get_user_input_of_type
+from Maxs_Modules.debug import debug_message
+from Maxs_Modules.files import UserData
+from Maxs_Modules.tools import get_user_input_of_type, install_package
 
 # - - - - - - - Variables - - - - - - -#
 
 
 console_width = 100
-divider_symbol = "#"
+divider_symbol = "-"
 divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
 max_menu_items_per_page = 10
 imported_timeout = False
+display_type = UserData().display_mode
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -131,7 +134,11 @@ def clear() -> None:
     """
     Clears the screen
     """
-    os.system("cls")
+    # Check if GUI clear
+    if display_type == "GUI":
+        eel.clear_screen()
+    else:
+        os.system("cls")
 
 
 class Menu:
@@ -177,7 +184,7 @@ class Menu:
             clear()
 
         # Print the menu
-        print(divider)
+        render_text(divider)
         text_in_divider(" " + self.title, self.wrap_mode)
         if self.multi_dimensional:
             show_menu_double(menu_items, self.wrap_mode)
@@ -225,7 +232,7 @@ class Menu:
 
             # Check that input has been passed in
             if user_input is None:
-                user_input = input(input_prompt)
+                user_input = get_input(input_prompt)
 
             # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
             if "," in user_input:
@@ -278,7 +285,7 @@ class Menu:
 
         # First input allows for the user to input a list of indexes that will be automatically used as the user input
         if user_input is None:
-            user_input = input(input_message)
+            user_input = get_input(input_message)
 
             # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
             if "," in user_input:
@@ -303,8 +310,6 @@ class Menu:
         return self.user_input
 
 
-
-
 # - - - - - - - Functions - - - - - - -#
 
 
@@ -325,7 +330,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
         match wrap:
             case WrapMode.CHAR:
                 # Print the current text in the divider, cutting off the text at the console width
-                print(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
+                render_text(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
 
                 # Store the text to print as adding a space for readability
                 item_to_print = " " + item_to_print[console_space_free:]
@@ -352,7 +357,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                         item_to_print = " ".join(words)
 
                         # Print the item in the divider, split at console width
-                        print(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
+                        render_text(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
                         current_size += console_space_free
 
                         # Store the text to print as adding a space for readability. Cut off the text already written
@@ -386,7 +391,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                         break
 
                 # Print the item in the divider
-                print(divider_symbol + item_to_print + divider_symbol)
+                render_text(divider_symbol + item_to_print + divider_symbol)
 
                 # Join the words together
                 item_to_print = " ".join(words)
@@ -409,7 +414,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
 
     # The length of the text, minus console width, minus 2 for the border
     width_left = console_space_free - text_length
-    print(divider_symbol + item_to_print + " " * width_left + divider_symbol)
+    render_text(divider_symbol + item_to_print + " " * width_left + divider_symbol)
 
 
 def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
@@ -420,13 +425,13 @@ def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
-    print(divider)
+    render_text(divider)
 
     # Loop through all the items in the menu
     for x in range(len(menu_items)):
         item_to_print = " [" + str(x) + "]" + " " + menu_items[x]
         text_in_divider(item_to_print, wrap)
-    print(divider)
+    render_text(divider)
 
 
 def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
@@ -439,7 +444,7 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
     @param menu_items: The list of menu items to print
     """
     # TODO: Double Wrap
-    print(divider)
+    render_text(divider)
 
     # Loop through all the items in the menu
     for x in range(len(menu_items[0])):
@@ -465,9 +470,9 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
 
         # Combine the two items
         final_item_to_print = divider_symbol + item_to_print_1 + spacing + item_to_print_2 + divider_symbol
-        print(final_item_to_print)
+        render_text(final_item_to_print)
 
-    print(divider)
+    render_text(divider)
 
 
 def print_text_on_same_line(text_to_print: str) -> None:
@@ -482,3 +487,35 @@ def print_text_on_same_line(text_to_print: str) -> None:
 
     # Print the text
     sys.stdout.write('\r' + text_to_print)
+
+
+def render_text(text: str) -> None:
+    if display_type == "CLI":
+        print(text)
+    elif display_type == "GUI":
+        eel.print(Colour.clean_text(str(text)))
+
+
+def get_input(prompt):
+    if display_type == "CLI":
+        return input(prompt)
+    elif display_type == "GUI":
+        user_input = ""
+        while user_input == "":
+            user_input = eel.get_input(Colour.clean_text(prompt))()
+            time.sleep(.1)
+        eel.clear_input_buffer()
+        return user_input
+
+
+if display_type == "GUI":
+    try:
+        import eel
+    except ImportError:
+        install_package("eel")
+        import eel
+
+    eel.init("web")
+    # Thread index.html
+    threading.Thread(target=eel.start, args=("index.html",),
+                     kwargs={"width": 1800, "height": 600, "mode": "chrome"}).start()

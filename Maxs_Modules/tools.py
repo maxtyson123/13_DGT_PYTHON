@@ -3,6 +3,7 @@ import time
 
 from Maxs_Modules.debug import error, debug_cli, in_ide
 
+
 # - - - - - - - Variables - - - - - - -#
 imported_timeout = False
 
@@ -125,7 +126,8 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 except TimeoutOccurred:
                     return None
             else:
-                user_input = input(input_message + " > ")
+                from Maxs_Modules.renderer import get_input
+                user_input = get_input(input_message + " > ")
         else:
             user_input = pre_input
             pre_input = None
@@ -205,7 +207,7 @@ def install_package(package: str) -> None:
     """
     try:
         import pip
-        print("Installing package: " + package + "...")
+        render_text("Installing package: " + package + "...")
         pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
     except Exception as e:
         error("Failed to install package: " + package + " (" + str(e) + ")")

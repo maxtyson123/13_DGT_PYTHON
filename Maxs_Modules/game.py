@@ -9,7 +9,7 @@ from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
 from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
-from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear
+from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear, render_text, get_input
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -244,20 +244,20 @@ class User:
         self.calculate_stats()
 
         # Print the stats
-        print(self.styled_name() + "'s Stats: ")
-        print("Type: " + self.player_type)
-        print("Score: " + str(self.points))
-        print("Streak: " + str(self.streak))
-        print("Highest Streak: " + str(self.highest_streak))
-        print("Questions Answered: " + str(self.questions_answered))
-        print("Questions Correct: " + str(self.correct))
-        print("Questions Incorrect: " + str(self.incorrect))
-        print("Questions Skipped: " + str(self.questions_missed))
-        print("Average Time: " + str(self.average_time))
-        print("Average Time Correct: " + str(self.average_time_correct))
-        print("Average Time Incorrect: " + str(self.average_time_incorrect))
-        print("Average Time Skipped: " + str(self.average_time_missed))
-        print("Accuracy: " + str(self.accuracy * 100) + "%")
+        render_text(self.styled_name() + "'s Stats: ")
+        render_text("Type: " + self.player_type)
+        render_text("Score: " + str(self.points))
+        render_text("Streak: " + str(self.streak))
+        render_text("Highest Streak: " + str(self.highest_streak))
+        render_text("Questions Answered: " + str(self.questions_answered))
+        render_text("Questions Correct: " + str(self.correct))
+        render_text("Questions Incorrect: " + str(self.incorrect))
+        render_text("Questions Skipped: " + str(self.questions_missed))
+        render_text("Average Time: " + str(self.average_time))
+        render_text("Average Time Correct: " + str(self.average_time_correct))
+        render_text("Average Time Incorrect: " + str(self.average_time_incorrect))
+        render_text("Average Time Skipped: " + str(self.average_time_missed))
+        render_text("Accuracy: " + str(self.accuracy * 100) + "%")
 
     def reset(self) -> None:
         """
@@ -340,7 +340,7 @@ class Bot(User):
         self.accuracy = save_accuracy
 
         # Print the stats
-        print("Accuracy (EXPECTED): " + str(self.accuracy * 100) + "%")
+        render_text("Accuracy (EXPECTED): " + str(self.accuracy * 100) + "%")
 
     def answer(self, question: Question) -> str:
         """
@@ -572,7 +572,7 @@ class Game(SaveFile):
 
             # Get name and check if it is valid
             while user.name is None:
-                user.name = try_convert(input("Enter the name for user " + str(user_id) + ": "), str)
+                user.name = try_convert(get_input("Enter the name for user " + str(user_id) + ": "), str)
 
             # Get colour
             colour_menu = Menu("Choose a colour for " + user.name, Colour.colours_names_list)
@@ -602,7 +602,7 @@ class Game(SaveFile):
         # Check if the user is online
         if self.online_enabled:
 
-            print("Getting questions from the internet...")
+            render_text("Getting questions from the internet...")
 
             # Import the api_get_questions function, this is only imported if the user is online as it is not needed
             # if the user is offline and don't want to run the requests installation
@@ -617,7 +617,7 @@ class Game(SaveFile):
 
         else:
 
-            print("Loading questions from file...")
+            render_text("Loading questions from file...")
 
             # Load the question from the saved questions
             self.questions = load_questions_from_file()
@@ -730,7 +730,7 @@ class Game(SaveFile):
                     user.show_stats()
 
                     # Give time for the user to read the stats
-                    input("Press enter to continue...")
+                    get_input("Press enter to continue...")
                     self.show_scores()
 
             # Find the bot selected
@@ -741,7 +741,7 @@ class Game(SaveFile):
                     bot.show_stats()
 
                     # Give time for the user to read the stats
-                    input("Press enter to continue...")
+                    get_input("Press enter to continue...")
                     self.show_scores()
 
     def show_question_markings(self) -> None:
@@ -801,15 +801,15 @@ class Game(SaveFile):
                     self.show_question_markings()
 
             case "Correct Answer":
-                print("These players got the question correct: ")
+                render_text("These players got the question correct: ")
 
                 # Show all the users that got the question correct
                 for user in self.users:
                     if user.answers[self.current_question] == question.correct_answer:
-                        print(user.styled_name())
+                        render_text(user.styled_name())
 
                 # Give time for the user to read the correct users
-                input("Press enter to continue...")
+                get_input("Press enter to continue...")
                 self.show_question_markings()
 
             case _:
@@ -821,7 +821,7 @@ class Game(SaveFile):
                         user.show_stats()
 
                         # Give time for the user to read the stats
-                        input("Press enter to continue...")
+                        get_input("Press enter to continue...")
                         self.show_question_markings()
 
                 # Find the bot selected
@@ -832,7 +832,7 @@ class Game(SaveFile):
                         bot.show_stats()
 
                         # Give time for the user to read the stats
-                        input("Press enter to continue...")
+                        get_input("Press enter to continue...")
                         self.show_question_markings()
 
     def mark_question(self, user_input, current_user) -> None:
@@ -854,7 +854,7 @@ class Game(SaveFile):
 
             # Tell the user that the answer is correct
             if current_user.player_type == "User":
-                print("Correct!")
+                render_text("Correct!")
 
             # Add the answer to the user
             current_user.answers[len(current_user.answers) - 1] += "Correct"
@@ -883,9 +883,9 @@ class Game(SaveFile):
 
         else:
             if current_user.player_type == "User":
-                print("Incorrect.")
+                render_text("Incorrect.")
                 if self.show_correct_answer_after_question_or_game:
-                    print("The correct answer was: " + question.correct_answer)
+                    render_text("The correct answer was: " + question.correct_answer)
 
             # Add the answer to the user
             current_user.answers[len(current_user.answers) - 1] += "Incorrect"
@@ -930,10 +930,10 @@ class Game(SaveFile):
         clear()
 
         # Print some info
-        print(divider)
-        print("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
-        print("User: " + current_user.styled_name())
-        print("Time Limit: " + str(self.time_limit) + " seconds")
+        render_text(divider)
+        render_text("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
+        render_text("User: " + current_user.styled_name())
+        render_text("Time Limit: " + str(self.time_limit) + " seconds")
 
         # Don't clear the screen as information is printed before the menu
         question_menu.clear_screen = False
@@ -960,7 +960,7 @@ class Game(SaveFile):
 
                 # Get a random option
                 random_option = random.choice(options)
-                print("Auto picking: " + random_option)
+                render_text("Auto picking: " + random_option)
                 self.mark_question(random_option, current_user)
 
             else:
@@ -971,7 +971,7 @@ class Game(SaveFile):
             # Add missed question to the user
             current_user.questions_missed += 1
 
-            print("\nTime's up!")
+            render_text("\nTime's up!")
 
         # Store the time data
         end_time = time.time() - start_time
@@ -1017,7 +1017,7 @@ class Game(SaveFile):
 
         # If this is the server then sync the game
         if is_server:
-            print("Waiting for all players to answer...")
+            render_text("Waiting for all players to answer...")
 
             # Wait for all players to answer
             loading_amount = 1
@@ -1061,7 +1061,7 @@ class Game(SaveFile):
             # Send the users answer to the server
             self.backend.send_self()
 
-            print("Waiting for server to move on...")
+            render_text("Waiting for server to move on...")
             # Wait for all players to answer
             self.backend.wait_for_move_on()
 
@@ -1079,7 +1079,7 @@ class Game(SaveFile):
             # Only the last user should show the game over menu
             if is_last_user:
                 # If the game has finished then show the results
-                print("Game finished")
+                render_text("Game finished")
                 self.game_end()
             return
 
@@ -1506,7 +1506,7 @@ class Game(SaveFile):
         """
         # Create a socket
         try:
-            print("Connecting to server...")
+            render_text("Connecting to server...")
             self.backend = QuizGameClient(ip, port)
             self.backend.game = self
         except OSError:
@@ -1536,8 +1536,8 @@ class Game(SaveFile):
 
         # Wait for the server to start the game
         os.system("cls")
-        print(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
-        print("Waiting for server to start the game...")
+        render_text(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
+        render_text("Waiting for server to start the game...")
 
         # Wait for the server to start the game or socket to close
         self.backend.wait_for_move_on()
@@ -1566,7 +1566,7 @@ class Game(SaveFile):
             if self.backend.error is not None:
                 os.system("cls")
                 error(self.backend.error)
-                input("Press enter to continue...")
+                get_input("Press enter to continue...")
                 self.backend.error = None
             return True
         return False

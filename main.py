@@ -21,7 +21,7 @@ import os
 import sys
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour, clear
+from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
@@ -211,7 +211,7 @@ def settings() -> None:
                                                               Colour.true_or_false_styled() + "): ")
 
             case "Fix API":
-                print("Note: Fixing the API involves removing parameters from the API call until it goes though, "
+                render_text("Note: Fixing the API involves removing parameters from the API call until it goes though, "
                       "this can fix errors where there arent enough questions of that type in the database, however it "
                       "can mean that the question types arent the same as the ones you selected.")
 
@@ -274,66 +274,66 @@ def tutorial() -> None:
     Show the user a tutorial on how to use the menus, host a game and join a game
     """
      # Intro
-    print("- Welcome to the tutorial!")
-    print("- This tutorial will show you how to play the game and how to use the menus")
-    print("- To continue press enter")
-    input()
+    render_text("- Welcome to the tutorial!")
+    render_text("- This tutorial will show you how to play the game and how to use the menus")
+    render_text("- To continue press enter")
+    get_input()
     clear()
 
     # Game Settings Menu
-    print("- The first menu you will see when creating a game is the game settings menu, this menu allows you to "
+    render_text("- The first menu you will see when creating a game is the game settings menu, this menu allows you to "
           "configure the game.")
-    print(
+    render_text(
         "- The current value of each setting is shown in brackets, to change the value of a setting choose the setting "
         "and then you will be promoted to enter a new value.")
-    print("- To continue press enter")
-    input()
+    render_text("- To continue press enter")
+    get_input()
     clear()
-    print("- Here is an example of the game settings menu")
-    print("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
+    render_text("- Here is an example of the game settings menu")
+    render_text("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
           "the option")
     tut_menu = Menu("Tutorial", [""])
     tut_menu.multi_dimensional = True
     tut_menu.items = (("Number of Questions", "Question Types", "Difficulty", "Time Limit"),
                       ("10", "All", "All", "No Time Limit"))
     tut_menu.get_input()
-    print("-  You chose: " + tut_menu.user_input + ", here you would be able to change the value of the setting")
-    print("-  To continue press enter")
-    input()
+    render_text("-  You chose: " + tut_menu.user_input + ", here you would be able to change the value of the setting")
+    render_text("-  To continue press enter")
+    get_input()
     clear()
 
     # Play a game
-    print("- Now that you know how to configure the game you can play a game")
-    print("- The game will display the question and then you will be prompted to enter your answer, you have until the "
+    render_text("- Now that you know how to configure the game you can play a game")
+    render_text("- The game will display the question and then you will be prompted to enter your answer, you have until the "
           "time limit (default 10 seconds) to enter your answer and then if no answer is selected a option will be "
           "automatically selected (if configured so)")
-    print("- After that the game will show you the correct answer (if configured so) and then move on to the next "
+    render_text("- After that the game will show you the correct answer (if configured so) and then move on to the next "
           "question will be displayed or show the scores list depending on the game configuration")
-    print("- When in the scores menu you can choose a player to see their stats")
-    print("- To continue press enter")
-    input()
+    render_text("- When in the scores menu you can choose a player to see their stats")
+    render_text("- To continue press enter")
+    get_input()
     clear()
 
     # Network
-    print("- The game also supports playing over a network, this allows you to play the game with your friends")
-    print("- To play over a network you need to enable the network in the settings menu, if not already enabled")
-    print("- To play a networked game one player has to host a game by creating a game and then selecting the host a "
+    render_text("- The game also supports playing over a network, this allows you to play the game with your friends")
+    render_text("- To play over a network you need to enable the network in the settings menu, if not already enabled")
+    render_text("- To play a networked game one player has to host a game by creating a game and then selecting the host a "
           "game setting and setting it to true. The other players then join the game by selecting the join game option "
           "and then pass the port and ip address of the host (displayed as option 0 on the host a game menu). Note: "
           "when playing over a network you may need to forward the port you are using to the computer you are using to"
           " be able to play the game over a non local network.")
-    print("- To continue a game the host can continue it like any other game, however the other players will need to "
+    render_text("- To continue a game the host can continue it like any other game, however the other players will need to "
           "use the same nicknames they used before to continue the game, additionally no new players can join the game.")
-    print("- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
+    render_text("- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
           "not the host of the game.")
-    print("- To continue press enter")
-    input()
+    render_text("- To continue press enter")
+    get_input()
     clear()
 
     # End
-    print("- That is the end of the tutorial, you can now play the game")
-    print("- To continue press enter")
-    input()
+    render_text("- That is the end of the tutorial, you can now play the game")
+    render_text("- To continue press enter")
+    get_input()
     clear()
 
 
@@ -343,7 +343,7 @@ def main() -> None:
     """
     # Get the pre-inputted user input
     user_input = handle_arg('--pass_input', True)
-    print(user_input)
+    render_text(user_input)
 
     # Show the main menu
     main_menu = Menu("Max's Quiz Game (13 DGT) (Open Trivia DB)", ("Quit", "Continue"))
@@ -355,7 +355,7 @@ def main() -> None:
         case "Continue":
             game_main_menu()
 
-    print("Thank you for playing Quiz Game by Max Tyson (13 DGT)")
+    render_text("Thank you for playing Quiz Game by Max Tyson (13 DGT)")
 
 
 if __name__ == "__main__":

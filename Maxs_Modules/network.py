@@ -6,6 +6,7 @@ import types
 from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import install_package
 from Maxs_Modules.debug import debug_message, error
+from Maxs_Modules.renderer import render_text
 
 import socket
 import selectors
@@ -804,7 +805,7 @@ def api_get_questions(amount: int, category: int, difficulty: str, question_type
             case 1:
                 error("No results found")
                 if user_data.auto_fix_api:
-                    print("Auto fixing API error...")
+                    render_text("Auto fixing API error...")
                     api_fix += 1
                     continue
 

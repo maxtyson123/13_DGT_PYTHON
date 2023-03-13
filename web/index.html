@@ -1,0 +1,45 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Game UI (BETA)</title>
+    <style>
+      h1{
+        color: green;
+        text-align: center;
+      }
+      #output{
+        margin: 50px;
+        font-size: 20px;
+        text-align: center;
+        }
+      button{
+        display: block;
+        margin: 0 auto;
+      }
+
+      .input_div{
+        list-style-type: none;
+        text-align: center;
+        width: 100vw;
+      }
+
+      .input_div .inline{
+        display: inline-block;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1>Quiz Game</h1>
+    <pre  id="output" ></pre >
+    <div class="input_div">
+      <p class="inline" id="input_prompt">Prompt:</p>
+      <input class="inline" type="text" placeholder="Enter choice here" id="input"/>
+    </div>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

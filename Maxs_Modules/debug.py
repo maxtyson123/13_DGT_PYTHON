@@ -125,11 +125,12 @@ def init_debug() -> None:
                 # Handle the arguments
                 match arg:
                     case "-h":
-                        print("Params:")
-                        print(" -h: Shows this help message")
-                        print(" -store: Store the API data in a local database?")
-                        print(" -use: Use the local database?")
-                        print(" -clear: Clear the local database?")
+                        from Maxs_Modules.renderer import render_text
+                        render_text("Params:")
+                        render_text(" -h: Shows this help message")
+                        render_text(" -store: Store the API data in a local database?")
+                        render_text(" -use: Use the local database?")
+                        render_text(" -clear: Clear the local database?")
 
         def command_server(self, *args: tuple) -> None:
             """
@@ -148,15 +149,16 @@ def init_debug() -> None:
                 # Handle the arguments
                 match arg:
                     case "-h":
-                        print("Params:")
-                        print(" -h: Shows this help message")
-                        print(" -ip: Gets this devices ip address")
+                        from Maxs_Modules.renderer import render_text
+                        render_text("Params:")
+                        render_text(" -h: Shows this help message")
+                        render_text(" -ip: Gets this devices ip address")
 
                     case "-ip":
-                        print("IP: " + get_ip())
+                        render_text("IP: " + get_ip())
 
                     case _:
-                        print("Unknown arg: " + arg)
+                        render_text("Unknown arg: " + arg)
 
         def command_help(self, *args: tuple) -> None:
             """
@@ -166,10 +168,11 @@ def init_debug() -> None:
 
             # Default behaviour for no args
             if len(args) == 0:
-                print("Some commands may support -h for more info")
-                print("Commands:")
+                from Maxs_Modules.renderer import render_text
+                render_text("Some commands may support -h for more info")
+                render_text("Commands:")
                 for command in self.commands:
-                    print(" * " + command)
+                    render_text(" * " + command)
 
             # Loop through the args
             for arg in args:
@@ -178,7 +181,7 @@ def init_debug() -> None:
                 if arg in self.commands:
                     self.handlers[self.commands.index(arg)]("-h")
                 else:
-                    print("Unknown command: " + arg)
+                    render_text("Unknown command: " + arg)
 
         def command_logs(self, *args: tuple) -> None:
             """
@@ -198,21 +201,22 @@ def init_debug() -> None:
             for arg in args:
                 match arg:
                     case "-h":
-                        print("Params:")
-                        print(" -h: Shows this help message")
-                        print(" -ignore-add: Adds a log type to ignore")
-                        print(" -ignore-remove: Removes a log type to ignore")
-                        print(" -ignore-list: Lists the log types to ignore")
-                        print(" -ignore-clear: Clears the log types to ignore")
-                        print(" -list: Lists current the logs")
-                        print(" -list-full: List the full history of logs")
-                        print(" -clear-history: Clears the full history of logs")
-                        print(" -store: Sets weather or not to store the logs")
-                        print(" -store-location: Sets the location to store the logs")
-                        print(" -store-individual: Sets weather or not to store the logs in individual files")
-                        print(" -store-max: Sets the maximum amount of logs to store")
-                        print(" -menu-history: Shows a log of all the menus in the current session")
-                        print(" -menu-history-input: Shows a log of all the input in the menus in the current session")
+                        from Maxs_Modules.renderer import render_text
+                        render_text("Params:")
+                        render_text(" -h: Shows this help message")
+                        render_text(" -ignore-add: Adds a log type to ignore")
+                        render_text(" -ignore-remove: Removes a log type to ignore")
+                        render_text(" -ignore-list: Lists the log types to ignore")
+                        render_text(" -ignore-clear: Clears the log types to ignore")
+                        render_text(" -list: Lists current the logs")
+                        render_text(" -list-full: List the full history of logs")
+                        render_text(" -clear-history: Clears the full history of logs")
+                        render_text(" -store: Sets weather or not to store the logs")
+                        render_text(" -store-location: Sets the location to store the logs")
+                        render_text(" -store-individual: Sets weather or not to store the logs in individual files")
+                        render_text(" -store-max: Sets the maximum amount of logs to store")
+                        render_text(" -menu-history: Shows a log of all the menus in the current session")
+                        render_text(" -menu-history-input: Shows a log of all the input in the menus in the current session")
 
                     case "-ignore-add":
                         self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
@@ -223,25 +227,25 @@ def init_debug() -> None:
                             self.log_ignore.pop(
                                 self.log_ignore.index(get_user_input_of_type(str, "Log type to remove: ")))
                         except ValueError:
-                            print("Log type not found")
+                            render_text("Log type not found")
 
                     case "-ignore-list":
-                        print("Log types to ignore:")
+                        render_text("Log types to ignore:")
                         for log_type in self.log_ignore:
-                            print(" - " + log_type)
+                            render_text(" - " + log_type)
 
                     case "-ignore-clear":
                         self.log_ignore = []
 
                     case "-list":
-                        print("Current logs:")
+                        render_text("Current logs:")
                         for log in session_message_log:
-                            print(" - " + log)
+                            render_text(" - " + log)
 
                     case "-list-full":
-                        print("Full logs:")
+                        render_text("Full logs:")
                         for log in self.full_message_log:
-                            print(" - " + str(log))
+                            render_text(" - " + str(log))
 
                     case "-store":
                         self.store_logs = get_user_input_of_type(string_bool, "Store the logs on file?  " +
@@ -262,14 +266,14 @@ def init_debug() -> None:
 
                     case "-menu-history":
                         for menu in menu_manager.menu_history_names:
-                            print("- " + str(menu))
+                            render_text("- " + str(menu))
 
                     case "-menu-history-input":
                         for user_input in menu_manager.menu_history_input:
-                            print("- " + str(user_input))
+                            render_text("- " + str(user_input))
 
                     case _:
-                        print("Unknown command: " + arg)
+                        render_text("Unknown command: " + arg)
 
         def command_errors(self, *args: tuple) -> None:
             """
@@ -284,27 +288,28 @@ def init_debug() -> None:
             for arg in args:
                 match arg:
                     case "-h":
-                        print("Params:")
-                        print(" -h: Shows this help message")
-                        print(" -list: Lists current the errors")
-                        print(" -list-full: List the full history of errors")
-                        print(" -clear-history: Clears the past errors")
+                        from Maxs_Modules.renderer import render_text
+                        render_text("Params:")
+                        render_text(" -h: Shows this help message")
+                        render_text(" -list: Lists current the errors")
+                        render_text(" -list-full: List the full history of errors")
+                        render_text(" -clear-history: Clears the past errors")
 
                     case "-list":
-                        print("Current errors:")
+                        render_text("Current errors:")
                         for log_error in session_error_log:
-                            print(" - " + log_error)
+                            render_text(" - " + log_error)
 
                     case "-list-full":
-                        print("Full errors:")
+                        render_text("Full errors:")
                         for log_error in self.full_error_log:
-                            print(" - " + str(log_error))
+                            render_text(" - " + str(log_error))
 
                     case "-clear-history":
                         self.full_error_log = []
 
                     case _:
-                        print("Unknown command: " + arg)
+                        render_text("Unknown command: " + arg)
 
         def handle(self, user_input: list) -> None:
             """
@@ -411,8 +416,8 @@ def error(error_message: str) -> None:
     @param error_message: The error message to print
     """
     # Print the coloured error message
-    from Maxs_Modules.renderer import Colour
-    print(Colour.error + "ERROR: " + error_message + Colour.RESET)
+    from Maxs_Modules.renderer import Colour, render_text
+    render_text(Colour.error + "ERROR: " + error_message + Colour.RESET)
 
     # Add the error to the error log if debug is enabled
     if maxs_debugger is not None:
