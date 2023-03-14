@@ -9,8 +9,8 @@
 # [x] Multiplayer Game Logic: Scores sync questions sync
 # [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
 # [x] Clean Up aka more efficient and correct commenting
-# [ ] GUI Base, port the current render to a simple GUI
-# [ ] GUI Extended, Buttons instead of text based, css and other styling
+# [x] GUI Base, port the current render to a simple GUI
+# [.] GUI Extended, Buttons instead of text based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 

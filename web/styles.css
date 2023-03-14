@@ -1,0 +1,121 @@
+
+:root{
+    /* Default Colour Scheme */
+    --text-colour: #000000;
+    --font-weight: normal;
+    --opacity: 1;
+    --font-style: normal;
+    --text-decoration: none;
+    --animation: none;
+    --filter: none;
+}
+
+.colour-code-black{
+    color: black;
+}
+
+.colour-code-red{
+    color: red;
+}
+
+.colour-code-green{
+    color: green;
+}
+
+.colour-code-yellow{
+    color: yellow;
+}
+
+.colour-code-blue{
+    color: blue;
+}
+
+.colour-code-magenta{
+    color: magenta;
+}
+
+.colour-code-cyan{
+    color: cyan;
+}
+
+.colour-code-white{
+    color: white;
+}
+
+.colour-code-grey{
+    color: grey;
+}
+
+.colour-code-bold{
+    font-weight: bold;
+}
+
+.colour-code-dim{
+    opacity: 0.5;
+}
+
+.colour-code-italic{
+    font-style: italic;
+}
+
+.colour-code-underline{
+    text-decoration: underline;
+}
+
+.colour-code-blink{
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.colour-code-invert{
+    filter: invert(100%);
+}
+
+.colour-code-strikethrough{
+    text-decoration: line-through;
+}
+
+.colour-code-reset{
+    color: var(--text-colour);
+    font-weight: var(--font-weight);
+    opacity: var(--opacity);
+    font-style: var(--font-style);
+    text-decoration: var(--text-decoration);
+    animation: var(--animation);
+    filter: var(--filter);
+
+}
+
+
+
+
+
+
+h1{
+    color: blue;
+    text-align: center;
+}
+#output{
+    margin: 50px;
+    font-size: 20px;
+    text-align: center;
+}
+button{
+    display: block;
+    margin: 0 auto;
+}
+
+.input_div{
+    list-style-type: none;
+    text-align: center;
+    width: 100vw;
+}
+
+.input_div .inline{
+    display: inline-block;
+}

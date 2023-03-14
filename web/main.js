@@ -1,33 +1,39 @@
 
 const colour_codes = {
-   "BLACK":"\\x1b[30m",
-   "RED":"\\x1b[31m",
-   "GREEN":"\\x1b[32m",
-   "YELLOW":"\\x1b[33m",
-   "BLUE":"\\x1b[34m",
-   "MAGENTA":"\\x1b[35m",
-   "CYAN":"\\x1b[36m",
-   "WHITE":"\\x1b[37m",
-   "GREY":"\\x1b[90m",
-   "BOLD":"\\x1b[1m",
-   "DIM":"\\x1b[2m",
-   "ITALIC":"\\x1b[3m",
-   "UNDERLINE":"\\x1b[4m",
-   "BLINK":"\\x1b[5m",
-   "INVERT":"\\x1b[7m",
-   "STRIKETHROUGH":"\\x1b[9m",
-   "RESET":"\\x1b[0m",
-   "error":"\\x1b[31m",
-   "info":"\\x1b[34m",
-   "success":"\\x1b[32m",
-   "warning":"\\x1b[33m",
+   "BLACK":"[30m",
+   "RED":"[31m",
+   "GREEN":"[32m",
+   "YELLOW":"[33m",
+   "BLUE":"[34m",
+   "MAGENTA":"[35m",
+   "CYAN":"[36m",
+   "WHITE":"[37m",
+   "GREY":"[90m",
+   "BOLD":"[1m",
+   "DIM":"[2m",
+   "ITALIC":"[3m",
+   "UNDERLINE":"[4m",
+   "BLINK":"[5m",
+   "INVERT":"[7m",
+   "STRIKETHROUGH":"[9m",
+   "RESET":"[0m",
 }
+
+function translate_colours(text){
+    // Loop through the colour codes
+    for (const [key, value] of Object.entries(colour_codes)) {
+        while (text.includes(value)){
+            text = text.replace(value, `<span class="colour-code-${key.toLowerCase()}">`)
+            text += "</span>"
+        }
+    }
+    return text
+}
+
 function print(text){
     console.log(text);
 
-    var Convert = require('ansi-to-html');
-    var convert = new Convert();
-    console.log(convert.toHtml(text));
+    text = translate_colours(text)
 
     document.getElementById("output").innerHTML += text + "<br>";
 }
@@ -47,7 +53,7 @@ function get_input(prompt){
     const input_box = document.getElementById("input");
 
     // Set the prompt
-    input_prompt.innerHTML = prompt
+    input_prompt.innerHTML = translate_colours(prompt)
 
     // If not waiting for the user to press enter
     if (!is_inputting){

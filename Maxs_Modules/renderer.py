@@ -513,6 +513,4 @@ def get_input(prompt):
 
 if display_type == "GUI":
     eel.init("web")
-    # Thread index.html
-    threading.Thread(target=eel.start, args=("index.html",),
-                     kwargs={"width": 1800, "height": 600, "mode": "chrome"}).start()
+    eel.start("index.html", size=(console_width * 10, console_width * 100), block=False)
