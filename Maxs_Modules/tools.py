@@ -207,7 +207,7 @@ def install_package(package: str) -> None:
     """
     try:
         import pip
-        render_text("Installing package: " + package + "...")
+        print("Installing package: " + package + "...")
         pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
     except Exception as e:
         error("Failed to install package: " + package + " (" + str(e) + ")")

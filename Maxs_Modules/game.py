@@ -854,7 +854,7 @@ class Game(SaveFile):
 
             # Tell the user that the answer is correct
             if current_user.player_type == "User":
-                render_text("Correct!")
+                render_text(Colour.GREEN + "Correct!" + Colour.RESET)
 
             # Add the answer to the user
             current_user.answers[len(current_user.answers) - 1] += "Correct"
@@ -883,7 +883,7 @@ class Game(SaveFile):
 
         else:
             if current_user.player_type == "User":
-                render_text("Incorrect.")
+                render_text(Colour.RED + "Incorrect." + Colour.RESET)
                 if self.show_correct_answer_after_question_or_game:
                     render_text("The correct answer was: " + question.correct_answer)
 

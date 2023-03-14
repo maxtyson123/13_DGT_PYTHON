@@ -10,6 +10,11 @@ from Maxs_Modules.debug import debug_message
 from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import get_user_input_of_type, install_package
 
+try:
+    import eel
+except ImportError:
+    install_package("eel")
+    import eel
 # - - - - - - - Variables - - - - - - -#
 
 
@@ -119,8 +124,6 @@ class Colour:
         """
 
         return Colour.text_with_colour("True", Colour.success) + "/" + Colour.text_with_colour("False", Colour.error)
-
-
 class MenuManager:
     menu_history_names = []
     menu_history_input = []
@@ -493,7 +496,7 @@ def render_text(text: str) -> None:
     if display_type == "CLI":
         print(text)
     elif display_type == "GUI":
-        eel.print(Colour.clean_text(str(text)))
+        eel.print(str(text))
 
 
 def get_input(prompt):
@@ -502,19 +505,13 @@ def get_input(prompt):
     elif display_type == "GUI":
         user_input = ""
         while user_input == "":
-            user_input = eel.get_input(Colour.clean_text(prompt))()
+            user_input = eel.get_input(prompt)()
             time.sleep(.1)
         eel.clear_input_buffer()
         return user_input
 
 
 if display_type == "GUI":
-    try:
-        import eel
-    except ImportError:
-        install_package("eel")
-        import eel
-
     eel.init("web")
     # Thread index.html
     threading.Thread(target=eel.start, args=("index.html",),
