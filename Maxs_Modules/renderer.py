@@ -3,7 +3,6 @@
 
 import os
 import sys
-import threading
 import time
 
 from Maxs_Modules.debug import debug_message
@@ -124,6 +123,8 @@ class Colour:
         """
 
         return Colour.text_with_colour("True", Colour.success) + "/" + Colour.text_with_colour("False", Colour.error)
+
+
 class MenuManager:
     menu_history_names = []
     menu_history_input = []
@@ -230,25 +231,17 @@ class Menu:
         options = [*range(len(input_items))]
 
         input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")"
-        # First input allows for the user to input a list of indexes that will be automatically used as the user input
-        if not used_pre_input:
-
-            # Check that input has been passed in
-            if user_input is None:
-                user_input = get_input(input_prompt)
-
-            # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
-            if "," in user_input:
-                # Split the string into a list
-                user_input = user_input.split(",")
-
-                # Store the pre-input
-                menu_manager.pre_input = user_input
-
-                # Re-Run with the first pre-input
-                return self.get_input()
 
         user_input = get_user_input_of_type(int, input_prompt, options, input_items, self.time_limit, user_input)
+
+        # Check if the user input is an array
+        if isinstance(user_input, list):
+
+            # Store the pre-input
+            menu_manager.pre_input = user_input
+
+            # Re-Run with the first pre-input
+            return self.get_input()
 
         # Convert any indexes to the actual item
         if user_input in options:
@@ -286,23 +279,16 @@ class Menu:
             user_input = menu_manager.pre_input[0]
             menu_manager.pre_input.pop(0)
 
-        # First input allows for the user to input a list of indexes that will be automatically used as the user input
-        if user_input is None:
-            user_input = get_input(input_message)
-
-            # Check if the user is wanting to do pre-input (i.e a list of indexes "1,4,3,2")
-            if "," in user_input:
-                # Split the string into a list
-                user_input = user_input.split(",")
-
-                # Store the pre-input
-                menu_manager.pre_input = user_input
-
-                # Re-Run with the first pre-input
-                return self.get_input_option()
-
         user_input = get_user_input_of_type(type_to_convert, input_message, must_be_one_of_these, allow_these,
                                             self.time_limit, user_input)
+
+        # Check if the user input is an array
+        if isinstance(user_input, list):
+            # Store the pre-input
+            menu_manager.pre_input = user_input
+
+            # Re-Run with the first pre-input
+            return self.get_input_option(type_to_convert, input_message, must_be_one_of_these, allow_these, max_time)
 
         # Store the input
         self.user_input = user_input
@@ -500,17 +486,55 @@ def render_text(text: str) -> None:
 
 
 def get_input(prompt):
+    # If the display type is CLI then use the normal input function
     if display_type == "CLI":
         return input(prompt)
+
+    # If the display type is GUI then use the js function to get the input
     elif display_type == "GUI":
+        # Wait for the user to enter something
         user_input = ""
         while user_input == "":
+            # Check for the user to have entered something
             user_input = eel.get_input(prompt)()
             time.sleep(.1)
+
+        # Clear amd return the input
         eel.clear_input_buffer()
         return user_input
 
 
-if display_type == "GUI":
-    eel.init("web")
-    eel.start("index.html", size=(console_width * 10, console_width * 100), block=False)
+def get_gui_timed_input(prompt: str, timeout: int):
+    # Store start info
+    user_input = ""
+    start_time = time.time()
+
+    # Loop until the user has entered something or the time has been reached
+    while user_input == "" and time.time() - start_time < timeout:
+        user_input = eel.get_input(prompt)()
+        time.sleep(.1)
+
+    # Grab and clear the input buffer
+    user_input = eel.force_get_input()()
+    eel.clear_input_buffer()
+
+    # Convert nothing into None
+    if user_input == "":
+        user_input = None
+
+    # Return the input
+    return user_input
+
+
+def gui_init():
+    # Import here to prevent circular imports
+    from Maxs_Modules.network import get_free_port
+
+    # If the display type is GUI then start the web server
+    if display_type == "GUI":
+        web_port = get_free_port("localhost", 8080)
+        print(web_port)
+
+        eel.init("web")
+        eel.start("index.html", size=(console_width * 10, console_width * 100), block=False,
+                  port=web_port)

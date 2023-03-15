@@ -444,7 +444,7 @@ class QuizGameServer(QuizServer):
                 # Convert the user to an object
                 self.game.users.append(message.message)
                 temp_index = len(self.game.users) - 1
-                self.game.convert_users()
+                self.game.convert_to_object(self.game.users, self.game.user_reference)
 
                 is_new_player = True
 
@@ -483,7 +483,7 @@ class QuizGameServer(QuizServer):
                     self.game.users.pop(temp_index)
                     return
 
-                self.game.convert_users()
+                self.game.convert_to_object(self.game.users, self.game.user_reference)
 
                 # Set the sockets name to the user's name
                 self.client_names[self.clients.index(sock)] = self.game.users[temp_index].name
@@ -506,7 +506,7 @@ class QuizGameServer(QuizServer):
                         break
 
                 # Convert the users to objects
-                self.game.convert_users()
+                self.game.convert_to_object(self.game.users, self.game.user_reference)
                 debug_message(f"Player: {self.game.users[index].name} has synced", "network_server")
 
             case _:
@@ -520,7 +520,7 @@ class QuizGameServer(QuizServer):
         i.e use sync_players when showing the scoreboard.
         """
         # Ensure users have been converted, as timings can be off when networked
-        self.game.convert_users()
+        self.game.convert_to_object(self.game.users, self.game.user_reference)
 
         # Get the game data
         self.game.prepare_save_data()
@@ -540,7 +540,7 @@ class QuizGameServer(QuizServer):
         position of the local player before handling this. 
         """
         # Ensure users have been converted, as timings can be off when networked
-        self.game.convert_users()
+        self.game.convert_to_object(self.game.users, self.game.user_reference)
 
         # Get the game data
         self.game.prepare_save_data()
@@ -559,7 +559,7 @@ class QuizGameServer(QuizServer):
         Sync the bot data to all clients.
         """
         # Ensure bots have been converted, as timings can be off when networked
-        self.game.convert_bots()
+        self.game.convert_to_object(self.game.users, self.game.bot_reference)
 
         # Get the game data
         self.game.prepare_save_data()
@@ -678,7 +678,7 @@ class QuizGameClient(QuizClient):
 
                 self.game.users = synced_users
 
-                self.game.convert_users()
+                self.game.convert_to_object(self.game.users, self.game.user_reference)
                 for user in self.game.users:
                     debug_message(f"Player: {user.name} has synced with a score of {user.points}")
 
@@ -691,7 +691,7 @@ class QuizGameClient(QuizClient):
                 synced_bots = message.message
                 for bot_index in range(len(synced_bots)):
                     self.game.bots[bot_index] = synced_bots[bot_index]
-                self.game.convert_bots()
+                self.game.convert_to_object(self.game.users, self.game.bot_reference)
 
             case _:
                 debug_message(f"Unhandled message: {message.message}", "network_client")
@@ -850,7 +850,7 @@ def setup_tcp_server(port: int) -> socket.socket:
     ip = get_ip()
 
     # Bind the socket to the port
-    sock.bind((ip, port))
+    sock.bind((ip, get_free_port(ip,port)))
     debug_message(f"Bound to {ip}:{port}", "network_server")
 
     # Start listening
@@ -870,3 +870,22 @@ def get_ip() -> str:
     @return: The IP of the computer
     """
     return socket.gethostbyname(socket.gethostname())
+
+
+def get_free_port(ip: str, port: int) -> int:
+    """
+    Checks if the passed port is available and if not it will increment it until it finds a free port
+
+    @param port: The port to check
+    """
+    while True:
+
+        try:
+            debug_message(f"Checking if port {port} is free", "network_server")
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.bind((ip, port))
+                break
+        except OSError:
+            port += 1
+
+    return port

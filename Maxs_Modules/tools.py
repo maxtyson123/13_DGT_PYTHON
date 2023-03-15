@@ -83,7 +83,8 @@ def ip_address(text: str) -> Exception or str:
 
 
 def get_user_input_of_type(type_to_convert: object, input_message: str = "", must_be_one_of_these: list | tuple = None,
-                           allow_these: list | tuple = None, max_time: int = 0, pre_input: str = None) -> object:
+                           allow_these: list | tuple = None, max_time: int = 0, pre_input: str = None,
+                           gather_pre_input: bool = False) -> object:
     """
     Get user input of a specific type, if the input is not of the correct type then the user will be asked to re-enter
     until they do.
@@ -95,6 +96,8 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                          apply to these items) (By default: None)
     @param max_time: The maximum time the user has to enter input (in seconds) (0, for no limit) (By default: 0)
     @param pre_input: If there is string that should be treated as input on the first loop
+    @param gather_pre_input: If the user enters list as their input should the program return the list? (By default:
+                            false)
     @return: The user input converted to the type specified
     """
 
@@ -106,7 +109,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
             # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
             # running in the IDE
             if max_time != 0 and not in_ide:
-
                 try:
                     from inputimeout import inputimeout, TimeoutOccurred
                 except ImportError:
@@ -120,11 +122,23 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 # Calculate the time left
                 time_left = max_time - (time.time() - start_time)
 
-                # Get the user input
-                try:
-                    user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
-                except TimeoutOccurred:
-                    return None
+                # TODO: Dont use the UserData class here as too many file reads
+                from Maxs_Modules.files import UserData
+
+                # If display then user the GUI input
+                if UserData().display_mode == "GUI":
+                    from Maxs_Modules.renderer import get_gui_timed_input
+                    user_input = get_gui_timed_input(input_message + " > ", time_left)
+
+                    # This means the user timed out without entering anything
+                    if user_input is None:
+                        return None
+                else:
+                    # Use the console input
+                    try:
+                        user_input = inputimeout(prompt=input_message + " > ", timeout=time_left)
+                    except TimeoutOccurred:
+                        return None
             else:
                 from Maxs_Modules.renderer import get_input
                 user_input = get_input(input_message + " > ")
@@ -142,6 +156,12 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
 
             debug_cli(command)
             continue
+
+        # Check if it is a list
+        if "," in user_input:
+            # Split the string into a list
+            user_input = user_input.split(",")
+            return user_input
 
         # Check if the user inputted an allowed string
         if allow_these is not None:
@@ -194,7 +214,7 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
     except ValueError:
         if not supress_errors:
             error(f"Incorrect input type ({variable}) should be "
-                  f"{str(type_to_convert).replace('<class ', '').replace('>', '')}")
+                  + str(type_to_convert).replace("<class '", "").replace("'>", ""))
         return None
 
 

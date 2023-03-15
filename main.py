@@ -21,7 +21,7 @@ import os
 import sys
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input
+from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, gui_init
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
@@ -361,6 +361,7 @@ def main() -> None:
 if __name__ == "__main__":
     # Set up the program
     init_debug()
+    gui_init()
 
     # Run the main program and catch the exit to stop the debug session
     try:

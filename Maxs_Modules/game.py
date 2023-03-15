@@ -407,6 +407,8 @@ class Game(SaveFile):
     bots = None
     backend = None
     server_thread = None
+    user_reference = User
+    bot_reference = Bot
 
     def __init__(self, quiz_save: str = None) -> None:
         """
@@ -564,7 +566,12 @@ class Game(SaveFile):
         while user_id != self.how_many_players:
 
             # Clear the screen
-            os.system("cls")
+            clear()
+
+            #Show the title
+            render_text(divider)
+            render_text("Setup Players")
+            render_text(divider)
 
             # Create a new user
             user_id += 1
@@ -576,6 +583,7 @@ class Game(SaveFile):
 
             # Get colour
             colour_menu = Menu("Choose a colour for " + user.name, Colour.colours_names_list)
+            colour_menu.clear_screen = False
             colour_menu.get_input()
             user.colour = Colour.colours_list[Colour.colours_names_list.index(colour_menu.user_input)]
 
@@ -1535,7 +1543,7 @@ class Game(SaveFile):
         if self.check_server_error(): return
 
         # Wait for the server to start the game
-        os.system("cls")
+        clear()
         render_text(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
         render_text("Waiting for server to start the game...")
 
@@ -1564,7 +1572,7 @@ class Game(SaveFile):
         # If the socket has closed then return and print any errors
         if not self.backend.running:
             if self.backend.error is not None:
-                os.system("cls")
+                clear()
                 error(self.backend.error)
                 get_input("Press enter to continue...")
                 self.backend.error = None

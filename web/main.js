@@ -46,6 +46,7 @@ eel.expose(clear_screen);
 
 
 let input_buffer = ""
+let temp_input_buffer = ""
 let is_inputting = false
 function get_input(prompt){
     // Get the input boxs
@@ -60,14 +61,18 @@ function get_input(prompt){
 
         // Define a handler
         function input_handler(e){
+            temp_input_buffer = input_box.value
+             if (e.keyCode != 13){
+                return
+             }
+
              input_buffer = input_box.value
-             input_box.value = ""
-             input_box.removeEventListener("change", input_handler)
+             input_box.removeEventListener("keydown", input_handler)
              is_inputting = false
         }
 
         // Register the handler as a listener
-        input_box.addEventListener("change", input_handler)
+        input_box.addEventListener("keydown", input_handler)
 
         // Wait for input
         is_inputting = true
@@ -78,7 +83,14 @@ function get_input(prompt){
 }
 eel.expose(get_input);
 
+function force_get_input(){
+    return temp_input_buffer
+}
+eel.expose(force_get_input);
+
 function clear_input_buffer(){
     input_buffer = ""
+    temp_input_buffer = ""
+    document.getElementById("input").value = ""
 }
 eel.expose(clear_input_buffer)
