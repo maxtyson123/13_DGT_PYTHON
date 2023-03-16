@@ -182,7 +182,7 @@ class User:
         Loads the default values for the user, should any of the values be None.
         """
         self.name = set_if_none(self.name, "Player")
-        self.colour = set_if_none(self.colour, "White")
+        self.colour = set_if_none(self.colour, Colour.WHITE)
         self.icon = set_if_none(self.icon, "X")
         self.points = set_if_none(self.points, 0)
         self.correct = set_if_none(self.correct, 0)
@@ -544,8 +544,9 @@ class Game(SaveFile):
         """
         # For each user in the list of users convert the dict to a User object using the load() function
         for x in range(len(dicts)):
+
             # Check if the user is already a User object
-            if type(dicts[x]) is object_type:
+            if isinstance(dicts[x], object_type):
                 continue
 
             # Load
@@ -570,7 +571,8 @@ class Game(SaveFile):
             clear()
 
             # Show the title
-            render_header("Set Up Players")
+            render_header("Set Up Player")
+            colour_menu = Menu("Choose a colour for ", Colour.colours_names_list)
 
             # Create a new user
             user_id += 1
@@ -578,10 +580,10 @@ class Game(SaveFile):
 
             # Get name and check if it is valid
             while user.name is None:
-                user.name = try_convert(get_input("Enter the name for user " + str(user_id) + ": "), str)
+                user.name = colour_menu.get_input_option(str, "Enter the name for user " + str(user_id) + ": ")
 
             # Get colour
-            colour_menu = Menu("Choose a colour for " + user.name, Colour.colours_names_list)
+            colour_menu.title += user.name
             colour_menu.clear_screen = False
             colour_menu.get_input()
             user.colour = Colour.colours_list[Colour.colours_names_list.index(colour_menu.user_input)]
@@ -1017,6 +1019,7 @@ class Game(SaveFile):
         self.current_question += 1
 
         # Question is answered
+        self.convert_to_object(self.users, User)
         self.users[self.current_user_playing].has_answered = True
 
         # Check if backed is a server object
@@ -1544,7 +1547,7 @@ class Game(SaveFile):
 
         # Wait for the server to start the game
         clear()
-        render_text(f"Connected to server on {ip}:{port}! (Press Ctrl+C to quit)")
+        render_text(f"Connected to server on {ip}:{port}!")
         render_text("Waiting for server to start the game...")
 
         # Wait for the server to start the game or socket to close

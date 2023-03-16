@@ -7,13 +7,11 @@
 # [x] Easier debugging
 # [x] Multiplayer Base: Joining a game, creating a game, waiting for players
 # [x] Multiplayer Game Logic: Scores sync questions sync
-# [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
 # [x] Clean Up aka more efficient and correct commenting
 # [x] GUI Base, port the current render to a simple GUI
 # [x] GUI Extended, Buttons instead of text based, css and other styling
 # [ ] Clean Up
-# [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
-
+# [ ] Bug Hunting
 
 # - - - - - - - Imports - - - - - - -#
 # - - - - - - - Imports - - - - - - -#
@@ -195,15 +193,14 @@ def settings() -> None:
 
         # Create the settings menu, using the current settings as the values displayed
         settings_options = ("Display Mode", "Network", "Fix API", "Back")
-        settings_values = (str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
+        settings_values = (str(usersettings.use_ui), str(usersettings.network), str(usersettings.auto_fix_api),
                            "Main Menu")
         settings_menu = Menu("Settings", [settings_options, settings_values], True)
 
         # Show and get input from the menu
         match settings_menu.get_input():
             case "Display Mode":
-                usersettings.display_mode = settings_menu.get_input_option(str, "Please enter the display mode (CLI, "
-                                                                                "GUI): ", ("CLI", "GUI"))
+                usersettings.use_ui = settings_menu.get_input_option(string_bool, "Interact via UI? (True/False)")
 
             case "Network":
                 usersettings.network = settings_menu.get_input_option(string_bool,

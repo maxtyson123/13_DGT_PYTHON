@@ -104,6 +104,9 @@ class SaveFile:
         """
         debug_message("Saving file to " + self.save_file, "save_file")
 
+        if not os.path.exists(data_folder):
+            os.mkdir(data_folder)
+
         # Open the file and dump the object as a dictionary, then close the file
         with open(self.save_file, "w") as file:
             save_dict = self.save_data
@@ -145,7 +148,7 @@ class UserData(SaveFile):
         """
         Load the default values for the user data if they are not found
         """
-        self.display_mode = set_if_none(self.display_mode, "CLI")
+        self.display_mode = set_if_none(self.display_mode, "GUI")
         self.network = set_if_none(self.network, True)
         self.auto_fix_api = set_if_none(self.auto_fix_api, True)
 

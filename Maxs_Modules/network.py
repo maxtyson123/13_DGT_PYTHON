@@ -559,7 +559,7 @@ class QuizGameServer(QuizServer):
         Sync the bot data to all clients.
         """
         # Ensure bots have been converted, as timings can be off when networked
-        self.game.convert_to_object(self.game.users, self.game.bot_reference)
+        self.game.convert_to_object(self.game.bots, self.game.bot_reference)
 
         # Get the game data
         self.game.prepare_save_data()
@@ -691,7 +691,7 @@ class QuizGameClient(QuizClient):
                 synced_bots = message.message
                 for bot_index in range(len(synced_bots)):
                     self.game.bots[bot_index] = synced_bots[bot_index]
-                self.game.convert_to_object(self.game.users, self.game.bot_reference)
+                self.game.convert_to_object(self.game.bots, self.game.bot_reference)
 
             case _:
                 debug_message(f"Unhandled message: {message.message}", "network_client")

@@ -587,7 +587,6 @@ def get_gui_timed_input(prompt: str, timeout: int):
     user_input = eel.force_get_input()()
     eel.clear_input_buffer()
 
-    debug_message("User input: " + str(user_input))
 
     # Convert nothing into None
     if user_input == "" or user_input == " ":
@@ -628,16 +627,17 @@ def render_quiz_header(game) -> None:
 
 def gui_init():
     # Import here to prevent circular imports
-    from Maxs_Modules.network import get_free_port
+    from Maxs_Modules.network import get_free_port, get_ip
 
     # If the display type is GUI then start the web server
     if display_type == "GUI":
-        web_port = get_free_port("localhost", 8080)
+        web_ip = get_ip()
+        web_port = get_free_port(web_ip, 8080)
         print(web_port)
 
         eel.init("web")
         eel.start("index.html", block=False,
-                  port=web_port)
+                  port=web_port, host=web_ip)
 
 
 def gui_close():
