@@ -2,15 +2,19 @@
 import json
 import time
 import types
+import socket
+import selectors
 
 from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import install_package
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import render_text
 
-import socket
-import selectors
-
+try:
+    import requests
+except ImportError:
+    install_package("requests")
+    import requests
 
 # - - - - - - - Classes - - - - - - - -#
 
@@ -754,14 +758,6 @@ def api_get_questions(amount: int, category: int, difficulty: str, question_type
     @param question_type: The type of the questions
     @return: A list of dictionaries containing the questions
     """
-
-    # Get the setup data
-
-    try:
-        import requests
-    except ImportError:
-        install_package("requests")
-        import requests
 
     redo = True
     api_fix = 0

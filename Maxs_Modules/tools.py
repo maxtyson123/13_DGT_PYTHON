@@ -5,7 +5,7 @@ from Maxs_Modules.debug import error, debug_cli, in_ide
 
 
 # - - - - - - - Variables - - - - - - -#
-imported_timeout = False
+
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -116,7 +116,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 except ImportError:
                     install_package("inputimeout")
                     from inputimeout import inputimeout, TimeoutOccurred
-
                 # Check if the time limit has been reached
                 if time.time() - start_time > max_time:
                     return None

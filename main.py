@@ -10,7 +10,7 @@
 # [x] Clean Up aka more efficient and correct commenting
 # [x] GUI Base, port the current render to a simple GUI
 # [x] GUI Extended, Buttons instead of text based, css and other styling
-# [ ] Clean Up
+# [.] Clean Up
 # [ ] Bug Hunting
 
 # - - - - - - - Imports - - - - - - -#
@@ -19,7 +19,7 @@ import os
 import sys
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, gui_init, gui_close
+from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, init_gui, gui_close
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
@@ -360,10 +360,23 @@ def main() -> None:
     render_text("Thank you for playing Quiz Game by Max Tyson (13 DGT)")
 
 
+def init_main() -> None:
+    # Check if the desired folders exist and create them if they don't
+    if not os.path.exists("UserData"):
+        os.mkdir("UserData")
+
+    if not os.path.exists("UserData/Games"):
+        os.mkdir("UserData/Games")
+
+    if not os.path.exists("ProgramData"):
+        os.mkdir("ProgramData")
+
+
 if __name__ == "__main__":
     # Set up the program
     init_debug()
-    gui_init()
+    init_main()
+    init_gui()
 
     # Run the main program and catch the exit to stop the debug session
     try:
@@ -371,4 +384,3 @@ if __name__ == "__main__":
     finally:
         gui_close()
         close_debug_session()
-

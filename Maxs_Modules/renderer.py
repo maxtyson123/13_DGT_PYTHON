@@ -625,7 +625,7 @@ def render_quiz_header(game) -> None:
         render_text(f"Time Limit: {time_limit} seconds")
 
 
-def gui_init():
+def init_gui():
     # Import here to prevent circular imports
     from Maxs_Modules.network import get_free_port, get_ip
 
