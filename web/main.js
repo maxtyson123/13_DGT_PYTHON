@@ -62,17 +62,22 @@ function get_input(prompt){
         // Define a handler
         function input_handler(e){
             temp_input_buffer = input_box.value
-             if (e.keyCode != 13){
+             if (e.key != "Enter"){
                 return
              }
 
              input_buffer = input_box.value
-             input_box.removeEventListener("keydown", input_handler)
+             if (input_buffer == ""){
+                 // Make sure the loop breaks
+                 input_buffer = " "
+             }
+
+             input_box.removeEventListener("keypress", input_handler)
              is_inputting = false
         }
 
         // Register the handler as a listener
-        input_box.addEventListener("keydown", input_handler)
+        input_box.addEventListener("keypress", input_handler)
 
         // Wait for input
         is_inputting = true
@@ -94,3 +99,8 @@ function clear_input_buffer(){
     document.getElementById("input").value = ""
 }
 eel.expose(clear_input_buffer)
+
+// Make sure the window is big enough
+if (window.outerWidth < 1600 || window.outerHeight < 900){
+    window.resizeTo(1600, 900);
+}

@@ -101,6 +101,8 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     @return: The user input converted to the type specified
     """
 
+    from Maxs_Modules.renderer import display_type, get_gui_timed_input, get_input
+
     # Store the start time
     start_time = time.time()
 
@@ -122,12 +124,8 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 # Calculate the time left
                 time_left = max_time - (time.time() - start_time)
 
-                # TODO: Dont use the UserData class here as too many file reads
-                from Maxs_Modules.files import UserData
-
                 # If display then user the GUI input
-                if UserData().display_mode == "GUI":
-                    from Maxs_Modules.renderer import get_gui_timed_input
+                if display_type == "GUI":
                     user_input = get_gui_timed_input(input_message + " > ", time_left)
 
                     # This means the user timed out without entering anything
@@ -140,7 +138,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                     except TimeoutOccurred:
                         return None
             else:
-                from Maxs_Modules.renderer import get_input
                 user_input = get_input(input_message + " > ")
         else:
             user_input = pre_input

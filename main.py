@@ -207,18 +207,17 @@ def settings() -> None:
 
             case "Network":
                 usersettings.network = settings_menu.get_input_option(string_bool,
-                                                              "Do you want to use the network? (" +
-                                                              Colour.true_or_false_styled() + "): ")
+                                                                      "Do you want to use the network? (True/False)")
 
             case "Fix API":
                 render_text("Note: Fixing the API involves removing parameters from the API call until it goes though, "
-                      "this can fix errors where there arent enough questions of that type in the database, however it "
-                      "can mean that the question types arent the same as the ones you selected.")
+                            "this can fix errors where there arent enough questions of that type in the database, however it "
+                            "can mean that the question types arent the same as the ones you selected.")
 
                 usersettings.auto_fix_api = settings_menu.get_input_option(string_bool,
-                                                                   "Do you want to auto fix the API if an error "
-                                                                   "occurs? (" + Colour.true_or_false_styled() +
-                                                                   "): ")
+                                                                           "Do you want to auto fix the API if an error "
+                                                                           "occurs? (" + True / False +
+                                                                           "): ")
 
             case "Back":
                 break
@@ -273,7 +272,7 @@ def tutorial() -> None:
     """
     Show the user a tutorial on how to use the menus, host a game and join a game
     """
-     # Intro
+    # Intro
     render_text("- Welcome to the tutorial!")
     render_text("- This tutorial will show you how to play the game and how to use the menus")
     render_text("- To continue press enter")
@@ -282,7 +281,7 @@ def tutorial() -> None:
 
     # Game Settings Menu
     render_text("- The first menu you will see when creating a game is the game settings menu, this menu allows you to "
-          "configure the game.")
+                "configure the game.")
     render_text(
         "- The current value of each setting is shown in brackets, to change the value of a setting choose the setting "
         "and then you will be promoted to enter a new value.")
@@ -290,8 +289,9 @@ def tutorial() -> None:
     get_input()
     clear()
     render_text("- Here is an example of the game settings menu")
-    render_text("- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
-          "the option")
+    render_text(
+        "- Hint: When interacting with menus you can either use the index (number in square brackets) or the name of "
+        "the option")
     tut_menu = Menu("Tutorial", [""])
     tut_menu.multi_dimensional = True
     tut_menu.items = (("Number of Questions", "Question Types", "Difficulty", "Time Limit"),
@@ -304,11 +304,13 @@ def tutorial() -> None:
 
     # Play a game
     render_text("- Now that you know how to configure the game you can play a game")
-    render_text("- The game will display the question and then you will be prompted to enter your answer, you have until the "
-          "time limit (default 10 seconds) to enter your answer and then if no answer is selected a option will be "
-          "automatically selected (if configured so)")
-    render_text("- After that the game will show you the correct answer (if configured so) and then move on to the next "
-          "question will be displayed or show the scores list depending on the game configuration")
+    render_text(
+        "- The game will display the question and then you will be prompted to enter your answer, you have until the "
+        "time limit (default 10 seconds) to enter your answer and then if no answer is selected a option will be "
+        "automatically selected (if configured so)")
+    render_text(
+        "- After that the game will show you the correct answer (if configured so) and then move on to the next "
+        "question will be displayed or show the scores list depending on the game configuration")
     render_text("- When in the scores menu you can choose a player to see their stats")
     render_text("- To continue press enter")
     get_input()
@@ -317,15 +319,18 @@ def tutorial() -> None:
     # Network
     render_text("- The game also supports playing over a network, this allows you to play the game with your friends")
     render_text("- To play over a network you need to enable the network in the settings menu, if not already enabled")
-    render_text("- To play a networked game one player has to host a game by creating a game and then selecting the host a "
-          "game setting and setting it to true. The other players then join the game by selecting the join game option "
-          "and then pass the port and ip address of the host (displayed as option 0 on the host a game menu). Note: "
-          "when playing over a network you may need to forward the port you are using to the computer you are using to"
-          " be able to play the game over a non local network.")
-    render_text("- To continue a game the host can continue it like any other game, however the other players will need to "
-          "use the same nicknames they used before to continue the game, additionally no new players can join the game.")
-    render_text("- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
-          "not the host of the game.")
+    render_text(
+        "- To play a networked game one player has to host a game by creating a game and then selecting the host a "
+        "game setting and setting it to true. The other players then join the game by selecting the join game option "
+        "and then pass the port and ip address of the host (displayed as option 0 on the host a game menu). Note: "
+        "when playing over a network you may need to forward the port you are using to the computer you are using to"
+        " be able to play the game over a non local network.")
+    render_text(
+        "- To continue a game the host can continue it like any other game, however the other players will need to "
+        "use the same nicknames they used before to continue the game, additionally no new players can join the game.")
+    render_text(
+        "- When continuing a game that was part of a multiplayer game you will be sent to the join menu if you were "
+        "not the host of the game.")
     render_text("- To continue press enter")
     get_input()
     clear()

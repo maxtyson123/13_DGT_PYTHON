@@ -1,0 +1,28 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Quiz Game UI (BETA)</title>
+  </head>
+  <body>
+
+  <div class="top-nav-bar center-items">
+     <h1>Quiz Game</h1>
+  </div>
+  <br>
+
+  <div class="quiz-container center-items">
+    <div class="quiz-game center-items">
+            <pre id="output">----------------------------------------------------------------------------------------------------<br>- Game Settings: Gameplay                                                                          -<br>----------------------------------------------------------------------------------------------------<br>- [0] Host a server                                                                        (False) -<br>- [1] Time limit                                                                              (10) -<br>- [2] Question Amount                                                                         (10) -<br>- [3] Category                                                                               (Any) -<br>- [4] Difficulty                                                                             (Any) -<br>- [5] Type                                                                                   (Any) -<br>- [6] Show score after Question/Game                                                    (Question) -<br>- [7] Show correct answer after Question/Game                                           (Question) -<br>- [8] Points for correct answer                                                                (1) -<br>- [9] Points for incorrect answer                                                             (-1) -<br>- [10] Points for no answer                                                                    (0) -<br>- [11] Points multiplier for a streak                                                        (1.1) -<br>- [12] Compounding amount for a streak                                                         (1) -<br>- [13] Randomise questions                                                                  (True) -<br>- [14] Randomise answer placement                                                           (True) -<br>- [15] Pick random question when run out of time                                            (True) -<br>- [16] Bot difficulty                                                                         (50) -<br>- [17] Number of bots                                                                          (0) -<br>- [18] Next                                                                       (Local Settings) -<br>- [19] Back                                                                            (Main Menu) -<br>----------------------------------------------------------------------------------------------------<br></pre>
+    </div>
+    <div class="quiz-input-container">
+       <p class="inline" id="input_prompt">Choose an option (0-19) &gt; </p>
+       <input class="inline" type="text" placeholder="Enter choice here" id="input">
+    </div>
+  </div>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="./main.js"></script>
+
+</body></html>

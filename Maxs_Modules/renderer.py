@@ -2,6 +2,7 @@
 
 
 import os
+import re
 import sys
 import time
 
@@ -23,8 +24,9 @@ divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
 max_menu_items_per_page = 10
-imported_timeout = False
+auto_colour = True
 display_type = UserData().display_mode
+
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -236,7 +238,6 @@ class Menu:
 
         # Check if the user input is an array
         if isinstance(user_input, list):
-
             # Store the pre-input
             menu_manager.pre_input = user_input
 
@@ -478,17 +479,51 @@ def print_text_on_same_line(text_to_print: str) -> None:
     sys.stdout.write('\r' + text_to_print)
 
 
+def auto_style_text(text: str) -> str:
+    if not auto_colour:
+        return text
+
+    if text is None:
+        return text
+
+    if "ERROR" in text:
+        return Colour.RED + text + Colour.RESET
+
+    # Replace any numbers with the colour blue (Ignore colour codes)
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    text = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, text)
+
+    # Replace certain words with their colour (ignore case)
+    text = re.compile(r'\btrue\b', re.IGNORECASE).sub(Colour.GREEN + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bcorrect\b', re.IGNORECASE).sub(Colour.GREEN + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bfalse\b', re.IGNORECASE).sub(Colour.RED + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bincorrect\b', re.IGNORECASE).sub(Colour.RED + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bnone\b', re.IGNORECASE).sub(Colour.YELLOW + r'\g<0>' + Colour.RESET, text)
+
+    # Replace colours with their colour
+    text = re.compile(r'\bblack\b', re.IGNORECASE).sub(Colour.BLACK + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bred\b', re.IGNORECASE).sub(Colour.RED + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bgreen\b', re.IGNORECASE).sub(Colour.GREEN + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\byellow\b', re.IGNORECASE).sub(Colour.YELLOW + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bblue\b', re.IGNORECASE).sub(Colour.BLUE + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bmagenta\b', re.IGNORECASE).sub(Colour.MAGENTA + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bcyan\b', re.IGNORECASE).sub(Colour.CYAN + r'\g<0>' + Colour.RESET, text)
+    text = re.compile(r'\bwhite\b', re.IGNORECASE).sub(Colour.WHITE + r'\g<0>' + Colour.RESET, text)
+
+    return text
+
+
 def render_text(text: str) -> None:
     if display_type == "CLI":
-        print(text)
+        print(auto_style_text(text))
     elif display_type == "GUI":
-        eel.print(str(text))
+        eel.print(str(auto_style_text(text)))
 
 
-def get_input(prompt):
+def get_input(prompt: str = ""):
     # If the display type is CLI then use the normal input function
     if display_type == "CLI":
-        return input(prompt)
+        return input(auto_style_text(prompt))
 
     # If the display type is GUI then use the js function to get the input
     elif display_type == "GUI":
@@ -496,11 +531,16 @@ def get_input(prompt):
         user_input = ""
         while user_input == "":
             # Check for the user to have entered something
-            user_input = eel.get_input(prompt)()
+            user_input = eel.get_input(auto_style_text(prompt))()
             time.sleep(.1)
 
         # Clear amd return the input
         eel.clear_input_buffer()
+
+        # Convert nothing into None
+        if user_input == "" or user_input == " ":
+            user_input = None
+
         return user_input
 
 
@@ -519,7 +559,7 @@ def get_gui_timed_input(prompt: str, timeout: int):
     eel.clear_input_buffer()
 
     # Convert nothing into None
-    if user_input == "":
+    if user_input == "" or user_input == " ":
         user_input = None
 
     # Return the input
@@ -536,5 +576,5 @@ def gui_init():
         print(web_port)
 
         eel.init("web")
-        eel.start("index.html", size=(console_width * 10, console_width * 100), block=False,
+        eel.start("index.html", block=False,
                   port=web_port)

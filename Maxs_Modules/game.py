@@ -568,7 +568,7 @@ class Game(SaveFile):
             # Clear the screen
             clear()
 
-            #Show the title
+            # Show the title
             render_text(divider)
             render_text("Setup Players")
             render_text(divider)
@@ -862,7 +862,7 @@ class Game(SaveFile):
 
             # Tell the user that the answer is correct
             if current_user.player_type == "User":
-                render_text(Colour.GREEN + "Correct!" + Colour.RESET)
+                render_text("Correct!")
 
             # Add the answer to the user
             current_user.answers[len(current_user.answers) - 1] += "Correct"
@@ -891,7 +891,7 @@ class Game(SaveFile):
 
         else:
             if current_user.player_type == "User":
-                render_text(Colour.RED + "Incorrect." + Colour.RESET)
+                render_text("Incorrect.")
                 if self.show_correct_answer_after_question_or_game:
                     render_text("The correct answer was: " + question.correct_answer)
 
@@ -1336,7 +1336,7 @@ class Game(SaveFile):
             match gameplay_menu.get_input():
                 case "Host a server":
                     self.host_a_server = gameplay_menu.get_input_option(string_bool,
-                                                                "Host a server (" + Colour.true_or_false_styled() + ")")
+                                                                        "Host a server (True/False)")
 
                 case "Time limit":
                     self.time_limit = gameplay_menu.get_input_option(int, "Time limit (seconds)", range(1, 61))
@@ -1351,51 +1351,52 @@ class Game(SaveFile):
 
                 case "Difficulty":
                     self.quiz_difficulty = gameplay_menu.get_input_option(str, "Difficulty (Easy, Medium, Hard)",
-                                                                  ["Easy", "Medium", "Hard"])
+                                                                          ["Easy", "Medium", "Hard"])
 
                 case "Type":
                     self.question_type = gameplay_menu.get_input_option(str, "Type (Multiple, True/False)", ["Multiple",
-                                                                                                     "True/False"])
+                                                                                                             "True/False"])
 
                 case "Show score after Question/Game":
                     self.show_score_after_question_or_game = gameplay_menu.get_input_option(str,
-                                                                                    "Show score after: (Question/Game)",
-                                                                                    ["Question", "Game"])
+                                                                                            "Show score after: (Question/Game)",
+                                                                                            ["Question", "Game"])
 
                 case "Show correct answer after Question/Game":
                     self.show_correct_answer_after_question_or_game = gameplay_menu.get_input_option(str,
-                                                                                             "Show correct answer "
-                                                                                             "after: (Question/Game)",
-                                                                                             ["Question", "Game"])
+                                                                                                     "Show correct answer "
+                                                                                                     "after: (Question/Game)",
+                                                                                                     ["Question",
+                                                                                                      "Game"])
 
                 case "Points for correct answer":
                     self.points_for_correct_answer = gameplay_menu.get_input_option(int, "Points for correct answer")
 
                 case "Points for incorrect answer":
-                    self.points_for_incorrect_answer = gameplay_menu.get_input_option(int, "Points for incorrect answer")
+                    self.points_for_incorrect_answer = gameplay_menu.get_input_option(int,
+                                                                                      "Points for incorrect answer")
 
                 case "Points for no answer":
                     self.points_for_no_answer = gameplay_menu.get_input_option(int, "Points for no answer")
 
                 case "Points multiplier for a streak":
-                    self.points_multiplier_for_a_streak = gameplay_menu.get_input_option(int, "Points multiplier for a streak")
+                    self.points_multiplier_for_a_streak = gameplay_menu.get_input_option(int,
+                                                                                         "Points multiplier for a streak")
 
                 case "Compounding amount for a streak":
                     self.compounding_amount_for_a_streak = gameplay_menu.get_input_option(int,
-                                                                                  "Compounding amount for a streak")
+                                                                                          "Compounding amount for a streak")
 
                 case "Randomise questions":
-                    self.randomise_questions = gameplay_menu.get_input_option(string_bool, "Randomise questions ("
-                                                                      + Colour.true_or_false_styled() + ")")
+                    self.randomise_questions = gameplay_menu.get_input_option(string_bool,
+                                                                              "Randomise questions (True/False)")
 
                 case "Randomise answer placement":
                     self.randomise_answer_placement = gameplay_menu.get_input_option(string_bool,
-                                                                             "Randomise answer placement ("
-                                                                             + Colour.true_or_false_styled() + ")")
+                                                                                     "Randomise answer placement (True/False)")
 
                 case "Pick random question when run out of time":
-                    self.pick_random_question = gameplay_menu.get_input_option(string_bool, "Pick random question (" +
-                                                                       Colour.true_or_false_styled() + ")")
+                    self.pick_random_question = gameplay_menu.get_input_option(string_bool, "Pick random question (True/False)")
 
                 case "Bot difficulty":
                     self.bot_difficulty = gameplay_menu.get_input_option(int, "Bot difficulty (%)", range(1, 101))
@@ -1463,7 +1464,6 @@ class Game(SaveFile):
 
             players_menu = Menu("Players", players)
             players_menu.time_limit = 3
-
 
             match players_menu.get_input():
                 case "Start game":
