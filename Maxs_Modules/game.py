@@ -9,7 +9,8 @@ from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
 from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
 from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
-from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear, render_text, get_input
+from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear, render_text, get_input, \
+    render_header, render_quiz_header
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -569,9 +570,7 @@ class Game(SaveFile):
             clear()
 
             # Show the title
-            render_text(divider)
-            render_text("Setup Players")
-            render_text(divider)
+            render_header("Set Up Players")
 
             # Create a new user
             user_id += 1
@@ -677,6 +676,10 @@ class Game(SaveFile):
         if self.host_a_server:
             self.wait_for_players()
             return
+
+        # Corrupt file recovery can cause there to be no users
+        if len(self.users) == 0:
+            self.set_players()
 
         # Start the game, check if the game has finished or play the game
         if self.check_game_finished():
@@ -938,10 +941,7 @@ class Game(SaveFile):
         clear()
 
         # Print some info
-        render_text(divider)
-        render_text("Question " + str(self.current_question + 1) + " of " + str(self.question_amount))
-        render_text("User: " + current_user.styled_name())
-        render_text("Time Limit: " + str(self.time_limit) + " seconds")
+        render_quiz_header(self)
 
         # Don't clear the screen as information is printed before the menu
         question_menu.clear_screen = False

@@ -10,7 +10,7 @@
 # [-] Multiplayer Extended: Server Side Game Logic instead of client authority, server browser? Use WebServer instead of TCP
 # [x] Clean Up aka more efficient and correct commenting
 # [x] GUI Base, port the current render to a simple GUI
-# [.] GUI Extended, Buttons instead of text based, css and other styling
+# [x] GUI Extended, Buttons instead of text based, css and other styling
 # [ ] Clean Up
 # [ ] Move the GUI and Multiplayer into mods and potentially make a mod API
 
@@ -21,7 +21,7 @@ import os
 import sys
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, gui_init
+from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, gui_init, gui_close
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
@@ -372,4 +372,6 @@ if __name__ == "__main__":
     try:
         main()
     finally:
+        gui_close()
         close_debug_session()
+

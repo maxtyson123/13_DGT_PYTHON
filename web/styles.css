@@ -142,7 +142,42 @@ input:focus {
 
 .quiz-game #output {
     margin: 50px;
+    width: 100%;
+    text-align: center;
     white-space: pre-wrap;
+}
+
+.menu-title{
+   padding: 0px 10px 0px 10px;
+}
+
+.menu-option{
+    width: 75%;
+    padding-left: 13%;
+}
+
+.menu-option button{
+    width: 100%;
+    background-color: black;
+    color: var(--text-colour);
+    border-radius: 10px;
+    padding: 0px 10px 0px 10px;
+    font-size: 18px;
+}
+
+.menu-item-main{
+    float: left;
+}
+
+.menu-item-secondary{
+    float: right;
+}
+
+.question-header{
+    text-align: center;
+    font-size: 24px;
+    background-color: rgba(100, 149, 237, 0.18);
+    padding: 10px;
 }
 
 .top-nav-bar {
@@ -165,6 +200,7 @@ input:focus {
     align-items: center;
     justify-content: center;
 }
+
 
 .inline {
     display: inline-block;

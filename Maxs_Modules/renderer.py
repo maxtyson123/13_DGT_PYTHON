@@ -24,9 +24,9 @@ divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
 max_menu_items_per_page = 10
-auto_colour = True
 display_type = UserData().display_mode
-
+auto_htmlify = True
+auto_colour = True
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -190,8 +190,8 @@ class Menu:
             clear()
 
         # Print the menu
-        render_text(divider)
-        text_in_divider(" " + self.title, self.wrap_mode)
+        render_header(self.title, False)
+
         if self.multi_dimensional:
             show_menu_double(menu_items, self.wrap_mode)
         else:
@@ -320,7 +320,8 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
         match wrap:
             case WrapMode.CHAR:
                 # Print the current text in the divider, cutting off the text at the console width
-                render_text(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
+                text = divider_symbol + item_to_print[:console_space_free] + divider_symbol
+                render_text(text)
 
                 # Store the text to print as adding a space for readability
                 item_to_print = " " + item_to_print[console_space_free:]
@@ -415,13 +416,20 @@ def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
-    render_text(divider)
+    if auto_htmlify:
+        for x in range(len(menu_items)):
+            item_to_print = f"<div class='menu-option'><button id='{x}' onclick='choose_item(this)'> <p " \
+                            f"class='split_for_colour menu-item-main inline'>{menu_items[x]}</p><p " \
+                            f"class='menu-item-secondary inline'></p></button></div>"
+            render_text(item_to_print)
+    else:
+        render_text(divider)
 
-    # Loop through all the items in the menu
-    for x in range(len(menu_items)):
-        item_to_print = " [" + str(x) + "]" + " " + menu_items[x]
-        text_in_divider(item_to_print, wrap)
-    render_text(divider)
+        # Loop through all the items in the menu
+        for x in range(len(menu_items)):
+            item_to_print = " [" + str(x) + "]" + " " + menu_items[x]
+            text_in_divider(item_to_print, wrap)
+        render_text(divider)
 
 
 def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
@@ -434,35 +442,43 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
     @param menu_items: The list of menu items to print
     """
     # TODO: Double Wrap
-    render_text(divider)
 
-    # Loop through all the items in the menu
-    for x in range(len(menu_items[0])):
+    if auto_htmlify:
+        for x in range(len(menu_items[0])):
+            item_to_print = f"<div class='menu-option'><button id='{x}' onclick='choose_item(this)'><p " \
+                            f"class='split_for_colour menu-item-main inline'>{menu_items[0][x]}</p><p class='menu" \
+                            f"-item-secondary " \
+                            f"inline'>{menu_items[1][x]}</p></button></div>"
+            render_text(item_to_print)
+    else:
+        render_text(divider)
+        # Loop through all the items in the menu
+        for x in range(len(menu_items[0])):
 
-        # Create the two items to print
-        item_to_print_1 = " [" + str(x) + "]" + " " + menu_items[0][x]
-        item_to_print_2 = "(" + menu_items[1][x] + ") "
+            # Create the two items to print
+            item_to_print_1 = " [" + str(x) + "]" + " " + menu_items[0][x]
+            item_to_print_2 = "(" + menu_items[1][x] + ") "
 
-        # Truncate the text if it is too long
-        allowed_width = int(console_width / 2)
+            # Truncate the text if it is too long
+            allowed_width = int(console_width / 2)
 
-        if len(Colour.clean_text(item_to_print_1)) > allowed_width:
-            item_to_print_1 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
+            if len(Colour.clean_text(item_to_print_1)) > allowed_width:
+                item_to_print_1 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
-        if len(Colour.clean_text(item_to_print_2)) > allowed_width:
-            item_to_print_2 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
+            if len(Colour.clean_text(item_to_print_2)) > allowed_width:
+                item_to_print_2 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
-        # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
-        # The length of the text, minus console width, minus 2 for the border
-        width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(
-            Colour.clean_text(item_to_print_2)) - 2
-        spacing = " " * width_left
+            # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
+            # The length of the text, minus console width, minus 2 for the border
+            width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(
+                Colour.clean_text(item_to_print_2)) - 2
+            spacing = " " * width_left
 
-        # Combine the two items
-        final_item_to_print = divider_symbol + item_to_print_1 + spacing + item_to_print_2 + divider_symbol
-        render_text(final_item_to_print)
+            # Combine the two items
+            final_item_to_print = divider_symbol + item_to_print_1 + spacing + item_to_print_2 + divider_symbol
+            render_text(final_item_to_print)
 
-    render_text(divider)
+        render_text(divider)
 
 
 def print_text_on_same_line(text_to_print: str) -> None:
@@ -489,9 +505,22 @@ def auto_style_text(text: str) -> str:
     if "ERROR" in text:
         return Colour.RED + text + Colour.RESET
 
-    # Replace any numbers with the colour blue (Ignore colour codes)
+    # NOTE: Regex symbols: \b = word boundary, \d = digit, \s = whitespace, \w = word character, \B = not word boundary
+    # \g = group, r' = raw string
+
+    # Regex to match ANSI escape codes
     ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    text = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, text)
+
+    # Split after id
+    split_text = re.split(r'split_for_colour', text)
+
+    if len(split_text) > 1:
+        prefix, suffix = split_text[0], split_text[1]
+        suffix = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, suffix)
+        text = ''.join(prefix + suffix)
+    else:
+        # Replace numbers with blue
+        text = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, text)
 
     # Replace certain words with their colour (ignore case)
     text = re.compile(r'\btrue\b', re.IGNORECASE).sub(Colour.GREEN + r'\g<0>' + Colour.RESET, text)
@@ -558,12 +587,43 @@ def get_gui_timed_input(prompt: str, timeout: int):
     user_input = eel.force_get_input()()
     eel.clear_input_buffer()
 
+    debug_message("User input: " + str(user_input))
+
     # Convert nothing into None
     if user_input == "" or user_input == " ":
         user_input = None
 
     # Return the input
     return user_input
+
+
+def render_header(title: str, enclose_bottom: bool = True) -> None:
+    if auto_htmlify:
+        render_text(f"<h2 class='menu-title'>{title}</h2>")
+    else:
+        # Print spacer and title
+        render_text(divider)
+        render_text(title.center(console_width))
+
+        # Allow for a bottom border
+        if enclose_bottom:
+            render_text(divider)
+
+
+def render_quiz_header(game) -> None:
+    current_question = game.current_question + 1
+    question_amount = game.question_amount
+    user = game.users[game.current_user_playing].styled_name()
+    time_limit = game.time_limit
+
+    if auto_htmlify:
+        render_text(f"<p class='question-header'>Question {current_question} of {question_amount} | User: {user} | "
+                    f"Time Limit: {time_limit} seconds</p>")
+    else:
+        render_text(divider)
+        render_text(f"Question {current_question} of {question_amount}")
+        render_text(f"User: {user}")
+        render_text(f"Time Limit: {time_limit} seconds")
 
 
 def gui_init():
@@ -578,3 +638,9 @@ def gui_init():
         eel.init("web")
         eel.start("index.html", block=False,
                   port=web_port)
+
+
+def gui_close():
+    # If the display type is GUI then close the web server
+    if display_type == "GUI":
+        eel.close_window()

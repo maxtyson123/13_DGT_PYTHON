@@ -40,7 +40,10 @@ function print(text){
 eel.expose(print);
 
 function clear_screen(){
-    document.getElementById("output").innerHTML = ""
+    const output = document.getElementById("output")
+    output.innerHTML = ""
+    output.scrollIntoView()
+
 }
 eel.expose(clear_screen);
 
@@ -99,6 +102,18 @@ function clear_input_buffer(){
     document.getElementById("input").value = ""
 }
 eel.expose(clear_input_buffer)
+
+function choose_item(option){
+    input_buffer = option.id
+    temp_input_buffer = input_buffer
+    document.getElementById("input").value = input_buffer
+    document.getElementById("input").scrollIntoView()
+}
+
+function close_window(){
+    window.close()
+}
+eel.expose(close_window)
 
 // Make sure the window is big enough
 if (window.outerWidth < 1600 || window.outerHeight < 900){
