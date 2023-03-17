@@ -1,0 +1,240 @@
+\hypertarget{classnetwork_1_1_quiz_game_server}{}\doxysection{network.\+Quiz\+Game\+Server Class Reference}
+\label{classnetwork_1_1_quiz_game_server}\index{network.QuizGameServer@{network.QuizGameServer}}
+Inheritance diagram for network.\+Quiz\+Game\+Server\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{d8/dea/classnetwork_1_1_quiz_game_server}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a3275d7f3c27e8da72af6350e050513b1}{handle\+\_\+data\+\_\+received}} (self, socket sock, object key\+\_\+data, bytes recv\+\_\+data)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a91d5674a99bab3e57b1aa8fc16e763a9}{sync\+\_\+game}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a575be936a5704ed34ebc2bc57e635bc3}{sync\+\_\+players}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a392d81624cb8db4b1687b05311ed4b80}{sync\+\_\+bots}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a5af74b0b0b282c942191de3b4017b837}{handle\+\_\+error}} (self, socket sock, object key\+\_\+data, Exception error\+\_\+response)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a5c34309b77c541c481436c95389b005c}{close\+\_\+connection}} (self, socket sock)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions inherited from \mbox{\hyperlink{classnetwork_1_1_quiz_server}{network.\+Quiz\+Server}}}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{classnetwork_1_1_quiz_server_ae0e4a091a173259e6b3dfc10ee805345}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str \mbox{\hyperlink{classnetwork_1_1_quiz_server_ad5d27ffd4a14e66b72e2b6aa395ebd71}{host}}, int \mbox{\hyperlink{classnetwork_1_1_quiz_server_a5bccdb01671a37ee92ef2be3a48d772d}{port}})
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_a6fd8d0e42e651afb9a35d384298e44a9}{run}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_afcfc36c4fb7a0cdfddcbb97233843a0f}{accept\+\_\+connection}} (self, socket sock)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_ab7f5d7eb223674bf88f458e83032232b}{close\+\_\+connection}} (self, socket sock)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_ade1af4cbf089ccf28ede819bb678f20a}{service\+\_\+connection}} (self, object key, object mask)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_a126afe4244401a8556759baeaad7fd76}{handle\+\_\+data\+\_\+received}} (self, socket sock, object key\+\_\+data, bytes recv\+\_\+data)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_a02dc2bda40bf16f77ec3a5328c07f736}{handle\+\_\+data\+\_\+send}} (self, socket sock, object key\+\_\+data, bytes send\+\_\+data)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_aafd23096200e9f58846d4c46794295e9}{send\+\_\+message}} (self, socket sock, str message, str message\+\_\+type)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_aadf7b638da058d0a7ec0df6b45b61589}{send\+\_\+message\+\_\+to\+\_\+all}} (self, str message, str message\+\_\+type)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_ae7dfd1402ce96d987387d3d14a09a666}{kill}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_server_a45653482b88e7f6f09b59c360cb8beda}{handle\+\_\+error}} (self, socket sock, object key\+\_\+data, Exception error\+\_\+response)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a7ec8e850abea2a39441a9845cbd83564}{running}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes inherited from \mbox{\hyperlink{classnetwork_1_1_quiz_server}{network.\+Quiz\+Server}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_ad5d27ffd4a14e66b72e2b6aa395ebd71}{host}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_a5bccdb01671a37ee92ef2be3a48d772d}{port}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_aeab1d7efe5fa5bfd23a7d75202da616b}{selector}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_a2906f0474951e62bcfb516ee990a8888}{clients}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_a17777fe27fc1810ac303b27a7763a86b}{client\+\_\+names}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_server_aba8df8d3838cb494ffcb66a77f3b1dd9}{server}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_adac94d6f6bc68f41debda1120622b58a}{game}} = None
+\item 
+bool \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_a4d39575ab7511faeb1f01ae75a95307a}{running}} = False
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_game_server_af39d6b6970843757a5f30374cf4a4978}{error}} = None
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00407}{407}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a5c34309b77c541c481436c95389b005c}\label{classnetwork_1_1_quiz_game_server_a5c34309b77c541c481436c95389b005c}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!close\_connection@{close\_connection}}
+\index{close\_connection@{close\_connection}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{close\_connection()}{close\_connection()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+close\+\_\+connection (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Close a connection from a client by removing it from the selector and the list of clients. The user is also
+removed from the games list of players.
+
+@param sock: The socket to close the connection on.
+\end{DoxyVerb}
+ 
+
+Reimplemented from \mbox{\hyperlink{classnetwork_1_1_quiz_server_ab7f5d7eb223674bf88f458e83032232b}{network.\+Quiz\+Server}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00587}{587}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a3275d7f3c27e8da72af6350e050513b1}\label{classnetwork_1_1_quiz_game_server_a3275d7f3c27e8da72af6350e050513b1}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!handle\_data\_received@{handle\_data\_received}}
+\index{handle\_data\_received@{handle\_data\_received}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{handle\_data\_received()}{handle\_data\_received()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+handle\+\_\+data\+\_\+received (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock,  }\item[{object}]{key\+\_\+data,  }\item[{bytes}]{recv\+\_\+data }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Handle data received from a client. This function can handle the client_join message type and the sync_player
+message. Both of these actions involve updating the game's users array with the new user data if the request
+was handled without error. Upon handling the messages the server will send a error response to the socket if
+the game is full or has already started or if the username is already taken.  If the game has already started
+then the server will only allow the client to join if they have a name that is already in the game's users
+but not connected, which is treated as a reconnect.
+
+@param sock: The socket to handle the data from
+@param key_data: The data from the selector key
+@param recv_data: The data received from the client (same as key_data.receive_bytes but kept for convenience)
+\end{DoxyVerb}
+ 
+
+Reimplemented from \mbox{\hyperlink{classnetwork_1_1_quiz_server_a126afe4244401a8556759baeaad7fd76}{network.\+Quiz\+Server}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00412}{412}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a5af74b0b0b282c942191de3b4017b837}\label{classnetwork_1_1_quiz_game_server_a5af74b0b0b282c942191de3b4017b837}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!handle\_error@{handle\_error}}
+\index{handle\_error@{handle\_error}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{handle\_error()}{handle\_error()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+handle\+\_\+error (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock,  }\item[{object}]{key\+\_\+data,  }\item[{Exception}]{error\+\_\+response }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Handle an error from a client and then close the client. Uses the super class to handle the error and then sets
+the running variable to false
+
+@param sock: The socket that the error occurred on
+@param key_data: The key data for the socket
+@param error_response: The exception that was raised that caused the error
+\end{DoxyVerb}
+ 
+
+Reimplemented from \mbox{\hyperlink{classnetwork_1_1_quiz_server_a45653482b88e7f6f09b59c360cb8beda}{network.\+Quiz\+Server}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00575}{575}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a392d81624cb8db4b1687b05311ed4b80}\label{classnetwork_1_1_quiz_game_server_a392d81624cb8db4b1687b05311ed4b80}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!sync\_bots@{sync\_bots}}
+\index{sync\_bots@{sync\_bots}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{sync\_bots()}{sync\_bots()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+sync\+\_\+bots (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Sync the bot data to all clients.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00556}{556}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a91d5674a99bab3e57b1aa8fc16e763a9}\label{classnetwork_1_1_quiz_game_server_a91d5674a99bab3e57b1aa8fc16e763a9}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!sync\_game@{sync\_game}}
+\index{sync\_game@{sync\_game}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{sync\_game()}{sync\_game()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+sync\+\_\+game (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Sync the game data to all clients. This will send all the game data, so it is best practice to save any
+variables that need to be saved before handling this. As games can be quite large (30kb with 50 questions,
+50 players) this function should be used sparingly, instead send the data that needs to be updated,
+i.e use sync_players when showing the scoreboard.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00514}{514}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a575be936a5704ed34ebc2bc57e635bc3}\label{classnetwork_1_1_quiz_game_server_a575be936a5704ed34ebc2bc57e635bc3}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!sync\_players@{sync\_players}}
+\index{sync\_players@{sync\_players}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{sync\_players()}{sync\_players()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Game\+Server.\+sync\+\_\+players (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Sync the player data to all clients. This will send all the player data, so it is best practice to save the
+position of the local player before handling this. 
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00536}{536}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_af39d6b6970843757a5f30374cf4a4978}\label{classnetwork_1_1_quiz_game_server_af39d6b6970843757a5f30374cf4a4978}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!error@{error}}
+\index{error@{error}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{error}{error}}
+{\footnotesize\ttfamily None network.\+Quiz\+Game\+Server.\+error = None\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00410}{410}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_adac94d6f6bc68f41debda1120622b58a}\label{classnetwork_1_1_quiz_game_server_adac94d6f6bc68f41debda1120622b58a}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!game@{game}}
+\index{game@{game}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{game}{game}}
+{\footnotesize\ttfamily None network.\+Quiz\+Game\+Server.\+game = None\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00408}{408}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a4d39575ab7511faeb1f01ae75a95307a}\label{classnetwork_1_1_quiz_game_server_a4d39575ab7511faeb1f01ae75a95307a}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!running@{running}}
+\index{running@{running}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{running}{running}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool network.\+Quiz\+Game\+Server.\+running = False\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00409}{409}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_game_server_a7ec8e850abea2a39441a9845cbd83564}\label{classnetwork_1_1_quiz_game_server_a7ec8e850abea2a39441a9845cbd83564}} 
+\index{network.QuizGameServer@{network.QuizGameServer}!running@{running}}
+\index{running@{running}!network.QuizGameServer@{network.QuizGameServer}}
+\doxysubsubsection{\texorpdfstring{running}{running}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily network.\+Quiz\+Game\+Server.\+running}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00585}{585}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Maxs\+\_\+\+Modules/\mbox{\hyperlink{network_8py}{network.\+py}}\end{DoxyCompactItemize}

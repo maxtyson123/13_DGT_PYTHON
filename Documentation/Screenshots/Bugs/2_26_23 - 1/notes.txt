@@ -1,6 +1,0 @@
-In bug_p1 data is seen to be decoded properly, In bug_p2 data (same execution) is it seen to error on decode, this is
-due to packet being bigger than the reception buffer size and the program is not checking for this situation
-(see old_code). To fix this I made a loop to read the data in chunks and then check for the end of the packet. It loops
-reading 4KB at a time storing the chunks in an array (as += on a string would be inefficient) and then joining the array
-and trying to decode the data. If the data is not decoded properly it will loop again and read more data. This is
-done until the data is decoded properly or the end of the packet is reached.

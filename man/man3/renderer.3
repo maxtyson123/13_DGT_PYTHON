@@ -1,0 +1,175 @@
+.TH "renderer" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+renderer
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBColour\fP"
+.br
+.ti -1c
+.RI "class \fBMenu\fP"
+.br
+.ti -1c
+.RI "class \fBMenuManager\fP"
+.br
+.ti -1c
+.RI "class \fBWrapMode\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fBclear\fP ()"
+.br
+.ti -1c
+.RI "None \fBtext_in_divider\fP (str item_to_print, \fBWrapMode\fP wrap=\fBWrapMode\&.TRUNCATE\fP)"
+.br
+.ti -1c
+.RI "None \fBshow_menu\fP (list menu_items, \fBWrapMode\fP wrap=\fBWrapMode\&.TRUNCATE\fP)"
+.br
+.ti -1c
+.RI "None \fBshow_menu_double\fP (list menu_items, \fBWrapMode\fP wrap=\fBWrapMode\&.TRUNCATE\fP)"
+.br
+.ti -1c
+.RI "None \fBprint_text_on_same_line\fP (str text_to_print)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "int \fBconsole_width\fP = 100"
+.br
+.ti -1c
+.RI "str \fBdivider_symbol\fP = '#'"
+.br
+.ti -1c
+.RI "len \fBdivider_symbol_size\fP = len(\fBdivider_symbol\fP)"
+.br
+.ti -1c
+.RI "str \fBdivider\fP = \fBdivider_symbol\fP * \fBconsole_width\fP"
+.br
+.ti -1c
+.RI "None \fBmenu_manager\fP = None"
+.br
+.ti -1c
+.RI "int \fBmax_menu_items_per_page\fP = 10"
+.br
+.ti -1c
+.RI "bool \fBimported_timeout\fP = False"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS " None renderer\&.clear ()"
+
+.PP
+.nf
+Clears the screen
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB130\fP of file \fBrenderer\&.py\fP\&.
+.SS " None renderer\&.print_text_on_same_line (str text_to_print)"
+
+.PP
+.nf
+Prints the text on the same line as the last text printed\&. It first writes a blank line the length of the console
+to clear the line\&. Then it prints the text using the return character to overwrite the previous text\&.
+
+@param text_to_print: The text to print
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB579\fP of file \fBrenderer\&.py\fP\&.
+.SS " None renderer\&.show_menu (list menu_items, \fBWrapMode\fP  wrap = \fC\fBWrapMode\&.TRUNCATE\fP\fP)"
+
+.PP
+.nf
+Prints a divider at the start and end of the menu\&. Then prints the menu items and their index in the middle using
+the text_in_divider function for each item with the wrap mode passed in\&.
+
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@param menu_items: The list of menu items to print
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB521\fP of file \fBrenderer\&.py\fP\&.
+.SS " None renderer\&.show_menu_double (list menu_items, \fBWrapMode\fP  wrap = \fC\fBWrapMode\&.TRUNCATE\fP\fP)"
+
+.PP
+.nf
+Prints the menu item from the first array and its index on the left\&. On the right it prints the item from the
+second array\&. This is sandwiched inbetween two dividers\&. The item is wrapped if it is longer than
+half the console width, allowing space for the divider and the value\&.
+
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@param menu_items: The list of menu items to print
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB538\fP of file \fBrenderer\&.py\fP\&.
+.SS " None renderer\&.text_in_divider (str item_to_print, \fBWrapMode\fP  wrap = \fC\fBWrapMode\&.TRUNCATE\fP\fP)"
+
+.PP
+.nf
+Prints the item in between two divider symbols and wraps the text if it is too long by default using Truncate but
+will use whatever is passed in the wrap parameter\&.
+
+@param item_to_print: The text to print
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@return: None
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB417\fP of file \fBrenderer\&.py\fP\&.
+.SH "Variable Documentation"
+.PP 
+.SS "int renderer\&.console_width = 100"
+
+.PP
+Definition at line \fB14\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.divider = \fBdivider_symbol\fP * \fBconsole_width\fP"
+
+.PP
+Definition at line \fB17\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.divider_symbol = '#'"
+
+.PP
+Definition at line \fB15\fP of file \fBrenderer\&.py\fP\&.
+.SS "len renderer\&.divider_symbol_size = len(\fBdivider_symbol\fP)"
+
+.PP
+Definition at line \fB16\fP of file \fBrenderer\&.py\fP\&.
+.SS "bool renderer\&.imported_timeout = False"
+
+.PP
+Definition at line \fB20\fP of file \fBrenderer\&.py\fP\&.
+.SS "int renderer\&.max_menu_items_per_page = 10"
+
+.PP
+Definition at line \fB19\fP of file \fBrenderer\&.py\fP\&.
+.SS "\fBMenuManager\fP renderer\&.menu_manager = None"
+
+.PP
+Definition at line \fB18\fP of file \fBrenderer\&.py\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

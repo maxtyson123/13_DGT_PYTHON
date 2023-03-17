@@ -1,6 +1,0 @@
-It seems that the issue that is being caused is trying to convert an array to an int when using pre-input. After testing,
-I have found that this is only occurs when in a multidimensional menu and the pre-input is attempting to go to a menu
-and then chose an option from the new menu. Another thing I noticed was that it only occurs when the choice to go to a
-new menu is the first option and another thing I noted was that when trying to choose a non menu option first, it just
-gets ignored (e.g. "1,2" skips 1 and only runs 2) From that I believe that the bug is being caused by the way the first
-option is being handled when using pre-input.

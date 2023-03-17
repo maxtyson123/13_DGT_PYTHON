@@ -1,6 +1,0 @@
-Bug found is that when adding the correct answer to the question for the options it adds to the "incorrect answers"
-array and the prints this. This is an issue because when assigning the "incorrect answers" array to the options array it
-is more of a reference (maybe like a c pointer?) to the original array. This causes problems as when saving the file the
-correct answer is now saved as an incorrect answer. Then when printing the same question again (ie, second users turn,
-restarting) the option is there twice, this is unacceptable as a keen eyed user will be able to notice this behaviour
-and then use it to cheat. The workaround was to use the shallow copy function built into python.

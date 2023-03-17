@@ -1,0 +1,121 @@
+.TH "network.QuizMessage" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+network.QuizMessage
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fB__init__\fP (self, str \fBmessage\fP, str \fBsender\fP, str \fBrecipient\fP, str \fBmessage_type\fP)"
+.br
+.ti -1c
+.RI "def \fB__str__\fP (self)"
+.br
+.ti -1c
+.RI "bytes \fBto_bytes\fP (self)"
+.br
+.ti -1c
+.RI "object \fBfrom_bytes\fP (self, bytes data)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBmessage\fP"
+.br
+.ti -1c
+.RI "\fBsender\fP"
+.br
+.ti -1c
+.RI "\fBrecipient\fP"
+.br
+.ti -1c
+.RI "\fBmessage_type\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+.nf
+A class to represent a message sent between the client and server
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB16\fP of file \fBnetwork\&.py\fP\&.
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "def network\&.QuizMessage\&.__init__ ( self, str message, str sender, str recipient, str message_type)"
+
+.PP
+.nf
+@param message: The message
+@param sender: The sender of the message
+@param recipient: The recipient of the message
+@param message_type: The type of the message
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB21\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "def network\&.QuizMessage\&.__str__ ( self)"
+
+.PP
+Definition at line \fB33\fP of file \fBnetwork\&.py\fP\&.
+.SS " object network\&.QuizMessage\&.from_bytes ( self, bytes data)"
+
+.PP
+.nf
+Update this objects attributes from the bytes (JSON encoded in utf-8)
+@param data: The data to decode
+@return: This object
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB50\fP of file \fBnetwork\&.py\fP\&.
+.SS " bytes network\&.QuizMessage\&.to_bytes ( self)"
+
+.PP
+.nf
+Creates a JSON object from the attributes of this object and encodes it in utf-8
+@return: The message as bytes (JSON encoded in utf-8)
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB36\fP of file \fBnetwork\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "network\&.QuizMessage\&.message"
+
+.PP
+Definition at line \fB28\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizMessage\&.message_type"
+
+.PP
+Definition at line \fB31\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizMessage\&.recipient"
+
+.PP
+Definition at line \fB30\fP of file \fBnetwork\&.py\fP\&.
+.SS "network\&.QuizMessage\&.sender"
+
+.PP
+Definition at line \fB29\fP of file \fBnetwork\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

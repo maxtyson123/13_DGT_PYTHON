@@ -1,0 +1,196 @@
+\hypertarget{namespacerenderer}{}\doxysection{renderer Namespace Reference}
+\label{namespacerenderer}\index{renderer@{renderer}}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classrenderer_1_1_colour}{Colour}}
+\item 
+class \mbox{\hyperlink{classrenderer_1_1_menu}{Menu}}
+\item 
+class \mbox{\hyperlink{classrenderer_1_1_menu_manager}{Menu\+Manager}}
+\item 
+class \mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \mbox{\hyperlink{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}{clear}} ()
+\item 
+None \mbox{\hyperlink{namespacerenderer_af8b87468bd0006df413b18169b304691}{text\+\_\+in\+\_\+divider}} (str item\+\_\+to\+\_\+print, \mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} wrap=\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}})
+\item 
+None \mbox{\hyperlink{namespacerenderer_a7e4c00c65f166be3451cf4e24e57ed5a}{show\+\_\+menu}} (list menu\+\_\+items, \mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} wrap=\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}})
+\item 
+None \mbox{\hyperlink{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}{show\+\_\+menu\+\_\+double}} (list menu\+\_\+items, \mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} wrap=\mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}})
+\item 
+None \mbox{\hyperlink{namespacerenderer_a8f04096ba0117ead5c1a988a0946478c}{print\+\_\+text\+\_\+on\+\_\+same\+\_\+line}} (str text\+\_\+to\+\_\+print)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}{console\+\_\+width}} = 100
+\item 
+str \mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{divider\+\_\+symbol}} = \char`\"{}\#\char`\"{}
+\item 
+len \mbox{\hyperlink{namespacerenderer_ac3bed2098fa09f5b657228373802aa88}{divider\+\_\+symbol\+\_\+size}} = len(\mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{divider\+\_\+symbol}})
+\item 
+str \mbox{\hyperlink{namespacerenderer_a2bbd4c561239fe59326b95eaf6eaa6f0}{divider}} = \mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{divider\+\_\+symbol}} $\ast$ \mbox{\hyperlink{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}{console\+\_\+width}}
+\item 
+None \mbox{\hyperlink{namespacerenderer_ac9865303362455243804ce483b013583}{menu\+\_\+manager}} = None
+\item 
+int \mbox{\hyperlink{namespacerenderer_a260c72f08b4086d7fa9e4eee50427b40}{max\+\_\+menu\+\_\+items\+\_\+per\+\_\+page}} = 10
+\item 
+bool \mbox{\hyperlink{namespacerenderer_aaef55d4218d66d35821effe65c5843a6}{imported\+\_\+timeout}} = False
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}\label{namespacerenderer_ab9f710d95789617bbfa8d9a9ffb7073d}} 
+\index{renderer@{renderer}!clear@{clear}}
+\index{clear@{clear}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily  None renderer.\+clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Clears the screen
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00130}{130}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_a8f04096ba0117ead5c1a988a0946478c}\label{namespacerenderer_a8f04096ba0117ead5c1a988a0946478c}} 
+\index{renderer@{renderer}!print\_text\_on\_same\_line@{print\_text\_on\_same\_line}}
+\index{print\_text\_on\_same\_line@{print\_text\_on\_same\_line}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{print\_text\_on\_same\_line()}{print\_text\_on\_same\_line()}}
+{\footnotesize\ttfamily  None renderer.\+print\+\_\+text\+\_\+on\+\_\+same\+\_\+line (\begin{DoxyParamCaption}\item[{str}]{text\+\_\+to\+\_\+print }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Prints the text on the same line as the last text printed. It first writes a blank line the length of the console
+to clear the line. Then it prints the text using the return character to overwrite the previous text.
+
+@param text_to_print: The text to print
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00579}{579}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_a7e4c00c65f166be3451cf4e24e57ed5a}\label{namespacerenderer_a7e4c00c65f166be3451cf4e24e57ed5a}} 
+\index{renderer@{renderer}!show\_menu@{show\_menu}}
+\index{show\_menu@{show\_menu}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{show\_menu()}{show\_menu()}}
+{\footnotesize\ttfamily  None renderer.\+show\+\_\+menu (\begin{DoxyParamCaption}\item[{list}]{menu\+\_\+items,  }\item[{\mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} }]{wrap = {\ttfamily \mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}}} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Prints a divider at the start and end of the menu. Then prints the menu items and their index in the middle using
+the text_in_divider function for each item with the wrap mode passed in.
+
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@param menu_items: The list of menu items to print
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00521}{521}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}\label{namespacerenderer_a1f9909cb99ab50fb1d8e172f59ebe7af}} 
+\index{renderer@{renderer}!show\_menu\_double@{show\_menu\_double}}
+\index{show\_menu\_double@{show\_menu\_double}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{show\_menu\_double()}{show\_menu\_double()}}
+{\footnotesize\ttfamily  None renderer.\+show\+\_\+menu\+\_\+double (\begin{DoxyParamCaption}\item[{list}]{menu\+\_\+items,  }\item[{\mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} }]{wrap = {\ttfamily \mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}}} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Prints the menu item from the first array and its index on the left. On the right it prints the item from the
+second array. This is sandwiched inbetween two dividers. The item is wrapped if it is longer than
+half the console width, allowing space for the divider and the value.
+
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@param menu_items: The list of menu items to print
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00538}{538}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_af8b87468bd0006df413b18169b304691}\label{namespacerenderer_af8b87468bd0006df413b18169b304691}} 
+\index{renderer@{renderer}!text\_in\_divider@{text\_in\_divider}}
+\index{text\_in\_divider@{text\_in\_divider}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{text\_in\_divider()}{text\_in\_divider()}}
+{\footnotesize\ttfamily  None renderer.\+text\+\_\+in\+\_\+divider (\begin{DoxyParamCaption}\item[{str}]{item\+\_\+to\+\_\+print,  }\item[{\mbox{\hyperlink{classrenderer_1_1_wrap_mode}{Wrap\+Mode}} }]{wrap = {\ttfamily \mbox{\hyperlink{classrenderer_1_1_wrap_mode_a2e7764aebd7b9a22ce6f6c7ba4ecdac5}{Wrap\+Mode.\+TRUNCATE}}} }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Prints the item in between two divider symbols and wraps the text if it is too long by default using Truncate but
+will use whatever is passed in the wrap parameter.
+
+@param item_to_print: The text to print
+@param wrap: How the text should be wrapped if it is too long (Truncate by default)
+@return: None
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00417}{417}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}\label{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}} 
+\index{renderer@{renderer}!console\_width@{console\_width}}
+\index{console\_width@{console\_width}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{console\_width}{console\_width}}
+{\footnotesize\ttfamily int renderer.\+console\+\_\+width = 100}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00014}{14}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_a2bbd4c561239fe59326b95eaf6eaa6f0}\label{namespacerenderer_a2bbd4c561239fe59326b95eaf6eaa6f0}} 
+\index{renderer@{renderer}!divider@{divider}}
+\index{divider@{divider}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{divider}{divider}}
+{\footnotesize\ttfamily str renderer.\+divider = \mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{divider\+\_\+symbol}} $\ast$ \mbox{\hyperlink{namespacerenderer_ad6c472e1abdf9c593e07389ee73f30c3}{console\+\_\+width}}}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00017}{17}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}\label{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}} 
+\index{renderer@{renderer}!divider\_symbol@{divider\_symbol}}
+\index{divider\_symbol@{divider\_symbol}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{divider\_symbol}{divider\_symbol}}
+{\footnotesize\ttfamily str renderer.\+divider\+\_\+symbol = \char`\"{}\#\char`\"{}}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00015}{15}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_ac3bed2098fa09f5b657228373802aa88}\label{namespacerenderer_ac3bed2098fa09f5b657228373802aa88}} 
+\index{renderer@{renderer}!divider\_symbol\_size@{divider\_symbol\_size}}
+\index{divider\_symbol\_size@{divider\_symbol\_size}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{divider\_symbol\_size}{divider\_symbol\_size}}
+{\footnotesize\ttfamily len renderer.\+divider\+\_\+symbol\+\_\+size = len(\mbox{\hyperlink{namespacerenderer_aac005a2fa7f8587e2d596e73a79c532e}{divider\+\_\+symbol}})}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00016}{16}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_aaef55d4218d66d35821effe65c5843a6}\label{namespacerenderer_aaef55d4218d66d35821effe65c5843a6}} 
+\index{renderer@{renderer}!imported\_timeout@{imported\_timeout}}
+\index{imported\_timeout@{imported\_timeout}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{imported\_timeout}{imported\_timeout}}
+{\footnotesize\ttfamily bool renderer.\+imported\+\_\+timeout = False}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00020}{20}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_a260c72f08b4086d7fa9e4eee50427b40}\label{namespacerenderer_a260c72f08b4086d7fa9e4eee50427b40}} 
+\index{renderer@{renderer}!max\_menu\_items\_per\_page@{max\_menu\_items\_per\_page}}
+\index{max\_menu\_items\_per\_page@{max\_menu\_items\_per\_page}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{max\_menu\_items\_per\_page}{max\_menu\_items\_per\_page}}
+{\footnotesize\ttfamily int renderer.\+max\+\_\+menu\+\_\+items\+\_\+per\+\_\+page = 10}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00019}{19}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+
+\mbox{\Hypertarget{namespacerenderer_ac9865303362455243804ce483b013583}\label{namespacerenderer_ac9865303362455243804ce483b013583}} 
+\index{renderer@{renderer}!menu\_manager@{menu\_manager}}
+\index{menu\_manager@{menu\_manager}!renderer@{renderer}}
+\doxysubsubsection{\texorpdfstring{menu\_manager}{menu\_manager}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classrenderer_1_1_menu_manager}{Menu\+Manager}} renderer.\+menu\+\_\+manager = None}
+
+
+
+Definition at line \mbox{\hyperlink{renderer_8py_source_l00018}{18}} of file \mbox{\hyperlink{renderer_8py_source}{renderer.\+py}}.
+

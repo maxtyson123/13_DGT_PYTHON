@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['cancelled_0',['cancelled',['../d5/dea/classgame_1_1_game.html#a79fcf41bfb755ce0cb79f10a1198822e',1,'game.Game.cancelled()'],['../d5/dea/classgame_1_1_game.html#a5a8dd26742f7bc2288cec8e34fc187ae',1,'game.Game.cancelled()']]],
+  ['category_1',['category',['../d4/d84/classgame_1_1_question.html#a0437d81394b8eaf9cdb1d769bf3218f0',1,'game.Question.category()'],['../d4/d84/classgame_1_1_question.html#aebbae4715af41e2de7e4956fe432f886',1,'game.Question.category()']]],
+  ['category_5foffset_2',['category_offset',['../d3/d2c/namespacegame.html#a9784461d8d8463a9706d516f94e4221b',1,'game']]],
+  ['char_3',['CHAR',['../d0/def/classrenderer_1_1_wrap_mode.html#af8ac28656ea9b0ea1699bb35077378bc',1,'renderer::WrapMode']]],
+  ['clear_5fscreen_4',['clear_screen',['../da/db5/classrenderer_1_1_menu.html#a5421327b7b93116d3c6b0bd1e1c4b961',1,'renderer::Menu']]],
+  ['client_5',['client',['../d0/d2f/classnetwork_1_1_quiz_client.html#afd1e37b4b9333a9a68c08bba3d880734',1,'network::QuizClient']]],
+  ['client_5fnames_6',['client_names',['../d6/ddf/classnetwork_1_1_quiz_server.html#a17777fe27fc1810ac303b27a7763a86b',1,'network::QuizServer']]],
+  ['clients_7',['clients',['../d6/ddf/classnetwork_1_1_quiz_server.html#a2906f0474951e62bcfb516ee990a8888',1,'network::QuizServer']]],
+  ['colour_8',['colour',['../da/d88/classgame_1_1_user.html#af13e79cf308cc0382594bb53360fa97a',1,'game.User.colour()'],['../da/d88/classgame_1_1_user.html#a2ba5c519232f3150f224f209c2a2b46e',1,'game.User.colour()']]],
+  ['colours_5flist_9',['colours_list',['../dd/d29/classrenderer_1_1_colour.html#ab9b447af6de3a36378eff92b778c9bae',1,'renderer::Colour']]],
+  ['colours_5fnames_5flist_10',['colours_names_list',['../dd/d29/classrenderer_1_1_colour.html#ae95004f73ce0b4834969f74a804784e3',1,'renderer::Colour']]],
+  ['compounding_5famount_5ffor_5fa_5fstreak_11',['compounding_amount_for_a_streak',['../d5/dea/classgame_1_1_game.html#a93fb8288e93b1c981360a750d6a9808e',1,'game.Game.compounding_amount_for_a_streak()'],['../d5/dea/classgame_1_1_game.html#a7eb84d104ab5d24f1ce66876d3f19516',1,'game.Game.compounding_amount_for_a_streak()']]],
+  ['console_5fwidth_12',['console_width',['../d0/db9/namespacerenderer.html#ad6c472e1abdf9c593e07389ee73f30c3',1,'renderer']]],
+  ['correct_13',['correct',['../da/d88/classgame_1_1_user.html#af1124347df205559f8359e3ab89a8b37',1,'game.User.correct()'],['../da/d88/classgame_1_1_user.html#a909be85cb260eafd897debfd03240467',1,'game.User.correct()']]],
+  ['correct_5fanswer_14',['correct_answer',['../d4/d84/classgame_1_1_question.html#ae63debd9f8e90c327b4c071e3c969ce7',1,'game.Question.correct_answer()'],['../d4/d84/classgame_1_1_question.html#a6216957434ba0f5758252ec1346df2dc',1,'game.Question.correct_answer()']]],
+  ['current_5fquestion_15',['current_question',['../d5/dea/classgame_1_1_game.html#a482dca8bf181b7b9aa30c9dd958a8cc0',1,'game.Game.current_question()'],['../d5/dea/classgame_1_1_game.html#a3bcfc03e31ca7f395dbba50c1b9b3aeb',1,'game.Game.current_question()']]],
+  ['current_5fuser_5fplaying_16',['current_user_playing',['../d5/dea/classgame_1_1_game.html#a7748c995ff477d4f746c446ccccbe604',1,'game.Game.current_user_playing()'],['../d5/dea/classgame_1_1_game.html#a13c9b41adafd1b3bc99b1dbc9073471f',1,'game.Game.current_user_playing()']]],
+  ['current_5fuser_5fplaying_5fnet_5fname_17',['current_user_playing_net_name',['../d5/dea/classgame_1_1_game.html#a642c12244cc8f6738d0be18b2557d77f',1,'game.Game.current_user_playing_net_name()'],['../d5/dea/classgame_1_1_game.html#af005434b56ddf47bce76046496f28e39',1,'game.Game.current_user_playing_net_name()']]],
+  ['cyan_18',['CYAN',['../dd/d29/classrenderer_1_1_colour.html#ab414a00f537ed1cf833a5474b4df99b1',1,'renderer::Colour']]]
+];

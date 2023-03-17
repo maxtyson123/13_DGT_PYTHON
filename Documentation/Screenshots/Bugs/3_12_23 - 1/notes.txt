@@ -1,4 +1,0 @@
-For some reason when the game was being finished with multiple players the game finished menu was ran twice.
-This was probably due to when checking if the game was finished it reran the game with the next user which would cause
-the check for the game over menu twice, therefore to fix this there needs for there to be a way to check if the current
-user finishing is the last user.

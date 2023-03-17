@@ -1,0 +1,223 @@
+\hypertarget{classnetwork_1_1_quiz_client}{}\doxysection{network.\+Quiz\+Client Class Reference}
+\label{classnetwork_1_1_quiz_client}\index{network.QuizClient@{network.QuizClient}}
+Inheritance diagram for network.\+Quiz\+Client\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{d0/d2f/classnetwork_1_1_quiz_client}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \mbox{\hyperlink{classnetwork_1_1_quiz_client_a8d2801e671d6efc35cb7d4042d96d813}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, str \mbox{\hyperlink{classnetwork_1_1_quiz_client_a363402eb4c2e31314f040bf7f92e9bce}{host}}, int \mbox{\hyperlink{classnetwork_1_1_quiz_client_a0790126f479506e7e9ecc09c5d180b48}{port}})
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_af33b378da23f3ffcf891ed9aa54610f8}{run}} (self)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_ac47c477e08a143c53870a27d7b42829d}{close\+\_\+connection}} (self, socket sock)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_a5f92452a17af094ca62214700ddc2660}{handle\+\_\+data\+\_\+received}} (self, socket sock, object key\+\_\+data, bytes recv\+\_\+data)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_a8bc0e51718576b2d87bfa3a0071e3e86}{handle\+\_\+request}} (self, socket sock, object key\+\_\+data, bytes send\+\_\+data)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_a2d2d2f01fb46b50b4ec5e60b1a42d66d}{handle\+\_\+error}} (self, socket sock, object key\+\_\+data, Exception error\+\_\+response)
+\item 
+None \mbox{\hyperlink{classnetwork_1_1_quiz_client_a59a637415adcbf9faf028140a43c9f19}{send\+\_\+message}} (self, object sock, str message, str message\+\_\+type)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_client_a363402eb4c2e31314f040bf7f92e9bce}{host}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_client_a0790126f479506e7e9ecc09c5d180b48}{port}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_client_a657e9ee188f28f38bab10d4726211484}{selector}}
+\item 
+\mbox{\hyperlink{classnetwork_1_1_quiz_client_afd1e37b4b9333a9a68c08bba3d880734}{client}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyVerb}A class to represent a client for the quiz game
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00267}{267}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a8d2801e671d6efc35cb7d4042d96d813}\label{classnetwork_1_1_quiz_client_a8d2801e671d6efc35cb7d4042d96d813}} 
+\index{network.QuizClient@{network.QuizClient}!\_\_init\_\_@{\_\_init\_\_}}
+\index{\_\_init\_\_@{\_\_init\_\_}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def network.\+Quiz\+Client.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{str}]{host,  }\item[{int}]{port }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Initialise the client and connect to the server. The selector set and then is used to listen for data from
+the server
+
+@param host: The host ip to connect to
+@param port: The port to listen on
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classnetwork_1_1_quiz_game_client_aaf39a12833df9e07b551deec423a3022}{network.\+Quiz\+Game\+Client}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00272}{272}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_ac47c477e08a143c53870a27d7b42829d}\label{classnetwork_1_1_quiz_client_ac47c477e08a143c53870a27d7b42829d}} 
+\index{network.QuizClient@{network.QuizClient}!close\_connection@{close\_connection}}
+\index{close\_connection@{close\_connection}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{close\_connection()}{close\_connection()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+close\+\_\+connection (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Close a connection on a socket and unregisters it from the selector, mostly used to close the connection on 
+the server
+
+@param sock: The socket to close the connection on.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00347}{347}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a5f92452a17af094ca62214700ddc2660}\label{classnetwork_1_1_quiz_client_a5f92452a17af094ca62214700ddc2660}} 
+\index{network.QuizClient@{network.QuizClient}!handle\_data\_received@{handle\_data\_received}}
+\index{handle\_data\_received@{handle\_data\_received}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{handle\_data\_received()}{handle\_data\_received()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+handle\+\_\+data\+\_\+received (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock,  }\item[{object}]{key\+\_\+data,  }\item[{bytes}]{recv\+\_\+data }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Handle data received from the server. This is called when data is received from the server. Functionality needs
+to be written by the subclass
+
+@param sock: The socket the data was received on
+@param key_data: The data from the key
+@param recv_data: The data received from the server, same as key_data.receive_bytes but kept for convenience
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classnetwork_1_1_quiz_game_client_ae58cfd8e1146483dffa74ff71403fe63}{network.\+Quiz\+Game\+Client}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00360}{360}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a2d2d2f01fb46b50b4ec5e60b1a42d66d}\label{classnetwork_1_1_quiz_client_a2d2d2f01fb46b50b4ec5e60b1a42d66d}} 
+\index{network.QuizClient@{network.QuizClient}!handle\_error@{handle\_error}}
+\index{handle\_error@{handle\_error}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{handle\_error()}{handle\_error()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+handle\+\_\+error (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock,  }\item[{object}]{key\+\_\+data,  }\item[{Exception}]{error\+\_\+response }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Handle an error from the client. This is called when an error occurs in the client. The connection is closed
+and then the exception is printed using the error function
+
+@param sock: The socket the error occurred on
+@param key_data: The data from the selector key
+@param error_response: The string representation of the error
+\end{DoxyVerb}
+ 
+
+Reimplemented in \mbox{\hyperlink{classnetwork_1_1_quiz_game_client_a23d6698472eac2fe85d8617614c73cf3}{network.\+Quiz\+Game\+Client}}.
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00382}{382}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a8bc0e51718576b2d87bfa3a0071e3e86}\label{classnetwork_1_1_quiz_client_a8bc0e51718576b2d87bfa3a0071e3e86}} 
+\index{network.QuizClient@{network.QuizClient}!handle\_request@{handle\_request}}
+\index{handle\_request@{handle\_request}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{handle\_request()}{handle\_request()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+handle\+\_\+request (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{socket}]{sock,  }\item[{object}]{key\+\_\+data,  }\item[{bytes}]{send\+\_\+data }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Handle a request to send data to the server. This is called when data is sent to the server. Functionality needs
+to be written by the subclass
+
+@param sock: The socket to send the data on
+@param key_data: The data from the key
+@param send_data: The data to send to the server, same as key_data.send_bytes but kept for convenience
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00371}{371}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_af33b378da23f3ffcf891ed9aa54610f8}\label{classnetwork_1_1_quiz_client_af33b378da23f3ffcf891ed9aa54610f8}} 
+\index{network.QuizClient@{network.QuizClient}!run@{run}}
+\index{run@{run}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+run (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Run the client, listening for data from the server refreshing every second. If there is data then it is read
+at 4096 bytes per chunk and then checked to see if it is a valid json string. If it is then it is sent to the
+handle_data_received function. If there is no data then the connection has been closed and the client is closed.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00289}{289}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a59a637415adcbf9faf028140a43c9f19}\label{classnetwork_1_1_quiz_client_a59a637415adcbf9faf028140a43c9f19}} 
+\index{network.QuizClient@{network.QuizClient}!send\_message@{send\_message}}
+\index{send\_message@{send\_message}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{send\_message()}{send\_message()}}
+{\footnotesize\ttfamily  None network.\+Quiz\+Client.\+send\+\_\+message (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{object}]{sock,  }\item[{str}]{message,  }\item[{str}]{message\+\_\+type }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Send a message to the server enclosed in a QuizMessage object
+
+@param message_type: The type of message to send
+@param sock: The socket to send the message on
+@param message: The message to send
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00394}{394}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_afd1e37b4b9333a9a68c08bba3d880734}\label{classnetwork_1_1_quiz_client_afd1e37b4b9333a9a68c08bba3d880734}} 
+\index{network.QuizClient@{network.QuizClient}!client@{client}}
+\index{client@{client}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{client}{client}}
+{\footnotesize\ttfamily network.\+Quiz\+Client.\+client}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00285}{285}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a363402eb4c2e31314f040bf7f92e9bce}\label{classnetwork_1_1_quiz_client_a363402eb4c2e31314f040bf7f92e9bce}} 
+\index{network.QuizClient@{network.QuizClient}!host@{host}}
+\index{host@{host}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{host}{host}}
+{\footnotesize\ttfamily network.\+Quiz\+Client.\+host}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00280}{280}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a0790126f479506e7e9ecc09c5d180b48}\label{classnetwork_1_1_quiz_client_a0790126f479506e7e9ecc09c5d180b48}} 
+\index{network.QuizClient@{network.QuizClient}!port@{port}}
+\index{port@{port}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{port}{port}}
+{\footnotesize\ttfamily network.\+Quiz\+Client.\+port}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00281}{281}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+\mbox{\Hypertarget{classnetwork_1_1_quiz_client_a657e9ee188f28f38bab10d4726211484}\label{classnetwork_1_1_quiz_client_a657e9ee188f28f38bab10d4726211484}} 
+\index{network.QuizClient@{network.QuizClient}!selector@{selector}}
+\index{selector@{selector}!network.QuizClient@{network.QuizClient}}
+\doxysubsubsection{\texorpdfstring{selector}{selector}}
+{\footnotesize\ttfamily network.\+Quiz\+Client.\+selector}
+
+
+
+Definition at line \mbox{\hyperlink{network_8py_source_l00283}{283}} of file \mbox{\hyperlink{network_8py_source}{network.\+py}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+Maxs\+\_\+\+Modules/\mbox{\hyperlink{network_8py}{network.\+py}}\end{DoxyCompactItemize}

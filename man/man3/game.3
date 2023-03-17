@@ -1,0 +1,116 @@
+.TH "game" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+game
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBBot\fP"
+.br
+.ti -1c
+.RI "class \fBGame\fP"
+.br
+.ti -1c
+.RI "class \fBQuestion\fP"
+.br
+.ti -1c
+.RI "class \fBUser\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fBgenerate_new_save_file\fP ()"
+.br
+.ti -1c
+.RI "def \fBget_saved_games\fP ()"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "str \fBdata_folder\fP = 'UserData/Games/'"
+.br
+.ti -1c
+.RI "int \fBcategory_offset\fP = 9"
+.br
+.ti -1c
+.RI "int \fBmax_number_of_questions\fP = 50"
+.br
+.ti -1c
+.RI "tuple \fBquiz_categories\fP"
+.br
+.ti -1c
+.RI "bool \fBhost_a_server_by_default\fP = False"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "def game\&.generate_new_save_file ()"
+
+.PP
+.nf
+Generates a new save file name by searching through the data folder for a name that is not already taken in the
+format of 'Game_0\&.json' (where 0 is the number of the save file)\&. If more than 1000 save files are found, then an
+exception is raised to prevent infinite looping as most likely something has gone wrong\&.
+
+@return: The name of the save file
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB28\fP of file \fBgame\&.py\fP\&.
+.SS "def game\&.get_saved_games ()"
+
+.PP
+.nf
+Gets a list of all the saved games (note this returns a list of all JSON files in the data folder and if a user
+has tampered with the data folder, a JSON file that isn't a save file may be returned)
+
+@return: A list of all the saved games
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB56\fP of file \fBgame\&.py\fP\&.
+.SH "Variable Documentation"
+.PP 
+.SS "int game\&.category_offset = 9"
+
+.PP
+Definition at line \fB16\fP of file \fBgame\&.py\fP\&.
+.SS "str game\&.data_folder = 'UserData/Games/'"
+
+.PP
+Definition at line \fB15\fP of file \fBgame\&.py\fP\&.
+.SS "bool game\&.host_a_server_by_default = False"
+
+.PP
+Definition at line \fB22\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.max_number_of_questions = 50"
+
+.PP
+Definition at line \fB17\fP of file \fBgame\&.py\fP\&.
+.SS "tuple game\&.quiz_categories"
+\fBInitial value:\fP.PP
+.nf
+1 =  ("General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games",
+2                    "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography",
+3                    "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets",
+4                    "Japanese Anime & Manga", "Cartoon & Animations")
+.fi
+
+.PP
+Definition at line \fB18\fP of file \fBgame\&.py\fP\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

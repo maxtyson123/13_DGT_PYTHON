@@ -1,0 +1,89 @@
+.TH "Maxs_Modules/debug.py" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Maxs_Modules/debug.py
+.SH SYNOPSIS
+.br
+.PP
+.SS "Namespaces"
+
+.in +1c
+.ti -1c
+.RI "namespace \fBdebug\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fBdebug\&.init_debug\fP ()"
+.br
+.ti -1c
+.RI "None \fBdebug\&.close_debug_session\fP ()"
+.br
+.ti -1c
+.RI "None \fBdebug\&.debug_cli\fP (list command)"
+.br
+.ti -1c
+.RI "None \fBdebug\&.debug_message\fP (str message, str log_type='info')"
+.br
+.ti -1c
+.RI "None \fBdebug\&.error\fP (str error_message)"
+.br
+.ti -1c
+.RI "str or None \fBdebug\&.handle_arg\fP (str arg, bool get_value=False)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "None \fBdebug\&.maxs_debugger\fP = None"
+.br
+.ti -1c
+.RI "list \fBdebug\&.session_message_log\fP = []"
+.br
+.ti -1c
+.RI "list \fBdebug\&.session_error_log\fP = []"
+.br
+.ti -1c
+.RI "tuple \fBdebug\&.in_ide\fP = (handle_arg('\-\-ide') == '\-\-ide')"
+.br
+.ti -1c
+.RI "tuple \fBdebug\&.use_debug\fP = (handle_arg('\-\-debug') == '\-\-debug')"
+.br
+.ti -1c
+.RI "\fBdebug\&.log_ignore\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.full_message_log\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.full_error_log\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.store_logs\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.max_log_history\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.save_logs_location\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.individual_log_files\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.local_db\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.handlers\fP"
+.br
+.ti -1c
+.RI "\fBdebug\&.save_data\fP"
+.br
+.in -1c
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

@@ -1,3 +1,0 @@
-requests~=2.28.2
-eel~=0.16.0
-inputimeout~=1.0.4

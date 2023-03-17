@@ -1,0 +1,143 @@
+.TH "game.Question" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+game.Question
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fB__init__\fP (self)"
+.br
+.ti -1c
+.RI "'Question' \fBload\fP (self, dict data)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBcategory\fP"
+.br
+.ti -1c
+.RI "\fBquestion_type\fP"
+.br
+.ti -1c
+.RI "\fBdifficulty\fP"
+.br
+.ti -1c
+.RI "\fBquestion\fP"
+.br
+.ti -1c
+.RI "\fBcorrect_answer\fP"
+.br
+.ti -1c
+.RI "\fBincorrect_answers\fP"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "None \fBcategory\fP = None"
+.br
+.ti -1c
+.RI "None \fBquestion_type\fP = None"
+.br
+.ti -1c
+.RI "None \fBdifficulty\fP = None"
+.br
+.ti -1c
+.RI "None \fBquestion\fP = None"
+.br
+.ti -1c
+.RI "None \fBcorrect_answer\fP = None"
+.br
+.ti -1c
+.RI "None \fBincorrect_answers\fP = None"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line \fB77\fP of file \fBgame\&.py\fP\&.
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS " None game\&.Question\&.__init__ ( self)"
+
+.PP
+Definition at line \fB85\fP of file \fBgame\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " 'Question' game\&.Question\&.load ( self, dict data)"
+
+.PP
+.nf
+Takes a dictionary of data and loads it into the question object\&. The data is also html character unescaped
+when loaded
+
+@param data: The dict to load the data from\&. Needs to have the following keys: category, type, difficulty,
+question, correct_answer, incorrect_answers
+@return: The question object
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB90\fP of file \fBgame\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "None game\&.Question\&.category = None\fC [static]\fP"
+
+.PP
+Definition at line \fB78\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.category"
+
+.PP
+Definition at line \fB99\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.Question\&.correct_answer = None\fC [static]\fP"
+
+.PP
+Definition at line \fB82\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.correct_answer"
+
+.PP
+Definition at line \fB104\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.Question\&.difficulty = None\fC [static]\fP"
+
+.PP
+Definition at line \fB80\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.difficulty"
+
+.PP
+Definition at line \fB101\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.Question\&.incorrect_answers = None\fC [static]\fP"
+
+.PP
+Definition at line \fB83\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.incorrect_answers"
+
+.PP
+Definition at line \fB105\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.Question\&.question = None\fC [static]\fP"
+
+.PP
+Definition at line \fB81\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.question"
+
+.PP
+Definition at line \fB102\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.Question\&.question_type = None\fC [static]\fP"
+
+.PP
+Definition at line \fB79\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.Question\&.question_type"
+
+.PP
+Definition at line \fB100\fP of file \fBgame\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

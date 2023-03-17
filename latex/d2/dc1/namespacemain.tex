@@ -1,0 +1,173 @@
+\hypertarget{namespacemain}{}\doxysection{main Namespace Reference}
+\label{namespacemain}\index{main@{main}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+None \mbox{\hyperlink{namespacemain_ac7bf6f92e6673a09b8458525b94be6c7}{game\+\_\+finished}} (Game game)
+\item 
+None \mbox{\hyperlink{namespacemain_a31f86411c71f6637aa28d79c4deef80a}{continue\+\_\+game}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_a498bae716a317260d060132192c00179}{new\+\_\+game}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_ab2a89467a71b1b7f45d7c3d110b948e9}{join\+\_\+game}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_ae2aadfa8b0fd98b5b9a2c4ba4f9fabd5}{settings}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_a0408aeaa943945ffd5163288f11494c6}{game\+\_\+main\+\_\+menu}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_a80e3dc9270e9b922b6755ec8b3ef54e9}{tutorial}} ()
+\item 
+None \mbox{\hyperlink{namespacemain_aa7a58ac748c5293faa4d77a82b94d161}{main}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+str \mbox{\hyperlink{namespacemain_a0f246e70b25ce982e5083a12de8d33ee}{data\+\_\+folder}} = \char`\"{}User\+Data/\char`\"{}
+\item 
+\mbox{\hyperlink{namespacemain_a129bda823cbb62ffb698427de27e0d56}{try}} \+:
+\item 
+\mbox{\hyperlink{namespacemain_a70165b466db43b741f75c3f51bceb869}{finally}} \+:
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{namespacemain_a31f86411c71f6637aa28d79c4deef80a}\label{namespacemain_a31f86411c71f6637aa28d79c4deef80a}} 
+\index{main@{main}!continue\_game@{continue\_game}}
+\index{continue\_game@{continue\_game}!main@{main}}
+\doxysubsubsection{\texorpdfstring{continue\_game()}{continue\_game()}}
+{\footnotesize\ttfamily  None main.\+continue\+\_\+game (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Shows a menu that allows the user to continue a game, It allows the user to select a game from the saved games
+folder, if the user selects a previously joined multiplayer game it will delete the save file and join the game
+instead of continuing
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00082}{82}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_ac7bf6f92e6673a09b8458525b94be6c7}\label{namespacemain_ac7bf6f92e6673a09b8458525b94be6c7}} 
+\index{main@{main}!game\_finished@{game\_finished}}
+\index{game\_finished@{game\_finished}!main@{main}}
+\doxysubsubsection{\texorpdfstring{game\_finished()}{game\_finished()}}
+{\footnotesize\ttfamily  None main.\+game\+\_\+finished (\begin{DoxyParamCaption}\item[{Game}]{game }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Shows a menu that allows the user to play again or return to the main menu, if the game does not have the
+game_finished variable set to True, it will only return to the main menu without letting the user choosing an option
+. Play again resets the game and calls the game.begin() function, once the reset game is finished the input loop
+will run again (using the same game object). When returning to the main menu the game.save_file will be deleted if
+it exists
+
+@param game: The Game object to use.
+@return: None, the function will break the loop when the user selects an option that leaves the menu
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00040}{40}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_a0408aeaa943945ffd5163288f11494c6}\label{namespacemain_a0408aeaa943945ffd5163288f11494c6}} 
+\index{main@{main}!game\_main\_menu@{game\_main\_menu}}
+\index{game\_main\_menu@{game\_main\_menu}!main@{main}}
+\doxysubsubsection{\texorpdfstring{game\_main\_menu()}{game\_main\_menu()}}
+{\footnotesize\ttfamily  None main.\+game\+\_\+main\+\_\+menu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Show the user the main menu, allowing them to continue a game, start a new game, join a game, view the tutorial or
+quit
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00230}{230}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_ab2a89467a71b1b7f45d7c3d110b948e9}\label{namespacemain_ab2a89467a71b1b7f45d7c3d110b948e9}} 
+\index{main@{main}!join\_game@{join\_game}}
+\index{join\_game@{join\_game}!main@{main}}
+\doxysubsubsection{\texorpdfstring{join\_game()}{join\_game()}}
+{\footnotesize\ttfamily  None main.\+join\+\_\+game (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Shows the user a menu to join a game, the user can enter the ip and port of the server to join. The default values
+are the local ip and port 1234 as that is the default port for the server.
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00146}{146}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_aa7a58ac748c5293faa4d77a82b94d161}\label{namespacemain_aa7a58ac748c5293faa4d77a82b94d161}} 
+\index{main@{main}!main@{main}}
+\index{main@{main}!main@{main}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily  None main.\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}The main function, initialise the program and show the main menu
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00341}{341}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_a498bae716a317260d060132192c00179}\label{namespacemain_a498bae716a317260d060132192c00179}} 
+\index{main@{main}!new\_game@{new\_game}}
+\index{new\_game@{new\_game}!main@{main}}
+\doxysubsubsection{\texorpdfstring{new\_game()}{new\_game()}}
+{\footnotesize\ttfamily  None main.\+new\+\_\+game (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Creates a new game object, runs the settings setup and then starts the game (if not cancelled during settings)
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00128}{128}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_ae2aadfa8b0fd98b5b9a2c4ba4f9fabd5}\label{namespacemain_ae2aadfa8b0fd98b5b9a2c4ba4f9fabd5}} 
+\index{main@{main}!settings@{settings}}
+\index{settings@{settings}!main@{main}}
+\doxysubsubsection{\texorpdfstring{settings()}{settings()}}
+{\footnotesize\ttfamily  None main.\+settings (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Show the user a menu that allows them to change their already specified settings
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00188}{188}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_a80e3dc9270e9b922b6755ec8b3ef54e9}\label{namespacemain_a80e3dc9270e9b922b6755ec8b3ef54e9}} 
+\index{main@{main}!tutorial@{tutorial}}
+\index{tutorial@{tutorial}!main@{main}}
+\doxysubsubsection{\texorpdfstring{tutorial()}{tutorial()}}
+{\footnotesize\ttfamily  None main.\+tutorial (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\begin{DoxyVerb}Show the user a tutorial on how to use the menus, host a game and join a game
+\end{DoxyVerb}
+ 
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00272}{272}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacemain_a0f246e70b25ce982e5083a12de8d33ee}\label{namespacemain_a0f246e70b25ce982e5083a12de8d33ee}} 
+\index{main@{main}!data\_folder@{data\_folder}}
+\index{data\_folder@{data\_folder}!main@{main}}
+\doxysubsubsection{\texorpdfstring{data\_folder}{data\_folder}}
+{\footnotesize\ttfamily str main.\+data\+\_\+folder = \char`\"{}User\+Data/\char`\"{}}
+
+
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00032}{32}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_a70165b466db43b741f75c3f51bceb869}\label{namespacemain_a70165b466db43b741f75c3f51bceb869}} 
+\index{main@{main}!finally@{finally}}
+\index{finally@{finally}!main@{main}}
+\doxysubsubsection{\texorpdfstring{finally}{finally}}
+{\footnotesize\ttfamily main.\+finally \+:}
+
+
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00368}{368}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+
+\mbox{\Hypertarget{namespacemain_a129bda823cbb62ffb698427de27e0d56}\label{namespacemain_a129bda823cbb62ffb698427de27e0d56}} 
+\index{main@{main}!try@{try}}
+\index{try@{try}!main@{main}}
+\doxysubsubsection{\texorpdfstring{try}{try}}
+{\footnotesize\ttfamily main.\+try \+:}
+
+
+
+Definition at line \mbox{\hyperlink{main_8py_source_l00366}{366}} of file \mbox{\hyperlink{main_8py_source}{main.\+py}}.
+

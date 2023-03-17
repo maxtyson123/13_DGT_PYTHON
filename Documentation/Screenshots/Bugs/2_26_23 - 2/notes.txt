@@ -1,5 +1,0 @@
-List index out of range error in the server. This was caused by trying to access a user in the game that wasn't there.
-This was caused when checking if the proposed user to connect is valid. What happened is that the user was found to have
-save data as the run was a continue from file sorta thing and so their progress was sent to be synced. After that the
-new proposed user was removed, however the loop continued and tried to access the next user in the array (which had just
-been removed). The fix was to break the loop once the sync was complete

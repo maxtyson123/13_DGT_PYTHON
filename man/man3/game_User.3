@@ -1,0 +1,423 @@
+.TH "game.User" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+game.User
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherited by \fBgame\&.Bot\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fB__int__\fP (self, str \fBname\fP, str \fBcolour\fP, str \fBicon\fP)"
+.br
+.ti -1c
+.RI "None \fBload\fP (self, dict data)"
+.br
+.ti -1c
+.RI "None \fBload_defaults\fP (self)"
+.br
+.ti -1c
+.RI "None \fBcalculate_stats\fP (self)"
+.br
+.ti -1c
+.RI "None \fBshow_stats\fP (self)"
+.br
+.ti -1c
+.RI "None \fBreset\fP (self)"
+.br
+.ti -1c
+.RI "str \fBstyled_name\fP (self)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBname\fP"
+.br
+.ti -1c
+.RI "\fBcolour\fP"
+.br
+.ti -1c
+.RI "\fBicon\fP"
+.br
+.ti -1c
+.RI "\fBpoints\fP"
+.br
+.ti -1c
+.RI "\fBcorrect\fP"
+.br
+.ti -1c
+.RI "\fBincorrect\fP"
+.br
+.ti -1c
+.RI "\fBstreak\fP"
+.br
+.ti -1c
+.RI "\fBhighest_streak\fP"
+.br
+.ti -1c
+.RI "\fBquestions_missed\fP"
+.br
+.ti -1c
+.RI "\fBanswers\fP"
+.br
+.ti -1c
+.RI "\fBtimes\fP"
+.br
+.ti -1c
+.RI "\fBhas_answered\fP"
+.br
+.ti -1c
+.RI "\fBquestions_answered\fP"
+.br
+.ti -1c
+.RI "\fBaccuracy\fP"
+.br
+.ti -1c
+.RI "\fBaverage_time\fP"
+.br
+.ti -1c
+.RI "\fBaverage_time_correct\fP"
+.br
+.ti -1c
+.RI "\fBaverage_time_incorrect\fP"
+.br
+.ti -1c
+.RI "\fBaverage_time_missed\fP"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "str \fBplayer_type\fP = 'User'"
+.br
+.ti -1c
+.RI "None \fBname\fP = None"
+.br
+.ti -1c
+.RI "None \fBcolour\fP = None"
+.br
+.ti -1c
+.RI "None \fBicon\fP = None"
+.br
+.ti -1c
+.RI "int \fBpoints\fP = 0"
+.br
+.ti -1c
+.RI "int \fBcorrect\fP = 0"
+.br
+.ti -1c
+.RI "int \fBincorrect\fP = 0"
+.br
+.ti -1c
+.RI "int \fBstreak\fP = 0"
+.br
+.ti -1c
+.RI "int \fBhighest_streak\fP = 0"
+.br
+.ti -1c
+.RI "int \fBquestions_missed\fP = 0"
+.br
+.ti -1c
+.RI "list \fBanswers\fP = []"
+.br
+.ti -1c
+.RI "list \fBtimes\fP = []"
+.br
+.ti -1c
+.RI "int \fBquestions_answered\fP = 0"
+.br
+.ti -1c
+.RI "int \fBaverage_time\fP = 0"
+.br
+.ti -1c
+.RI "int \fBaverage_time_correct\fP = 0"
+.br
+.ti -1c
+.RI "int \fBaverage_time_incorrect\fP = 0"
+.br
+.ti -1c
+.RI "int \fBaverage_time_missed\fP = 0"
+.br
+.ti -1c
+.RI "int \fBaccuracy\fP = 0"
+.br
+.ti -1c
+.RI "bool \fBis_host\fP = False"
+.br
+.ti -1c
+.RI "bool \fBis_connected\fP = False"
+.br
+.ti -1c
+.RI "bool \fBhas_answered\fP = False"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line \fB114\fP of file \fBgame\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " None game\&.User\&.__int__ ( self, str name, str colour, str icon)"
+
+.PP
+.nf
+Creates a new user
+@param name: The name of the user
+@param colour: The colour of the user
+@param icon: The path to the icon of the user
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBgame\&.Bot\fP\&.
+.PP
+Definition at line \fB142\fP of file \fBgame\&.py\fP\&.
+.SS " None game\&.User\&.calculate_stats ( self)"
+
+.PP
+.nf
+Calculates the stats for the user, this saves time as the stats only need to be calculated when the user selects
+to display them\&. The stats are stored in the following variables: questions_answered, accuracy, average_time,
+average_time_correct, average_time_incorrect, average_time_missed
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB197\fP of file \fBgame\&.py\fP\&.
+.SS " None game\&.User\&.load ( self, dict data)"
+
+.PP
+.nf
+Loads the data from a dictionary into the user object, if the data is None, then the default value is used\&.
+
+@param data: A dictionary of data to load into the user object\&. May contain the following keys: name, colour,
+icon, points, correct, incorrect, streak, highest_streak, questions_missed, answers, times, has_answered
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBgame\&.Bot\fP\&.
+.PP
+Definition at line \fB153\fP of file \fBgame\&.py\fP\&.
+.SS " None game\&.User\&.load_defaults ( self)"
+
+.PP
+.nf
+Loads the default values for the user, should any of the values be None\&.
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBgame\&.Bot\fP\&.
+.PP
+Definition at line \fB178\fP of file \fBgame\&.py\fP\&.
+.SS " None game\&.User\&.reset ( self)"
+
+.PP
+.nf
+Removes all the set answers, 0s out the points, correct, incorrect, steak, questions_missed variables\&. Name,
+icon and colour are kept\&.
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB261\fP of file \fBgame\&.py\fP\&.
+.SS " None game\&.User\&.show_stats ( self)"
+
+.PP
+.nf
+Calculates and then prints the stats for the user\&.
+
+.fi
+.PP
+ 
+.PP
+Reimplemented in \fBgame\&.Bot\fP\&.
+.PP
+Definition at line \fB237\fP of file \fBgame\&.py\fP\&.
+.SS " str game\&.User\&.styled_name ( self)"
+
+.PP
+.nf
+Returns the name of the user with the colour (includes reset char)
+
+@return: The name of the user with the colour (includes reset char)
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB280\fP of file \fBgame\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "int game\&.User\&.accuracy = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB135\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.accuracy"
+
+.PP
+Definition at line \fB209\fP of file \fBgame\&.py\fP\&.
+.SS "list game\&.User\&.answers = []\fC [static]\fP"
+
+.PP
+Definition at line \fB126\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.answers"
+
+.PP
+Definition at line \fB170\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.average_time = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB131\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.average_time"
+
+.PP
+Definition at line \fB213\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.average_time_correct = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB132\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.average_time_correct"
+
+.PP
+Definition at line \fB231\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.average_time_incorrect = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB133\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.average_time_incorrect"
+
+.PP
+Definition at line \fB233\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.average_time_missed = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB134\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.average_time_missed"
+
+.PP
+Definition at line \fB235\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.User\&.colour = None\fC [static]\fP"
+
+.PP
+Definition at line \fB118\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.colour"
+
+.PP
+Definition at line \fB150\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.correct = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB121\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.correct"
+
+.PP
+Definition at line \fB165\fP of file \fBgame\&.py\fP\&.
+.SS "bool game\&.User\&.has_answered = False\fC [static]\fP"
+
+.PP
+Definition at line \fB140\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.has_answered"
+
+.PP
+Definition at line \fB174\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.highest_streak = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB124\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.highest_streak"
+
+.PP
+Definition at line \fB168\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.User\&.icon = None\fC [static]\fP"
+
+.PP
+Definition at line \fB119\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.icon"
+
+.PP
+Definition at line \fB151\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.incorrect = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB122\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.incorrect"
+
+.PP
+Definition at line \fB166\fP of file \fBgame\&.py\fP\&.
+.SS "bool game\&.User\&.is_connected = False\fC [static]\fP"
+
+.PP
+Definition at line \fB139\fP of file \fBgame\&.py\fP\&.
+.SS "bool game\&.User\&.is_host = False\fC [static]\fP"
+
+.PP
+Definition at line \fB138\fP of file \fBgame\&.py\fP\&.
+.SS "None game\&.User\&.name = None\fC [static]\fP"
+
+.PP
+Definition at line \fB117\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.name"
+
+.PP
+Definition at line \fB149\fP of file \fBgame\&.py\fP\&.
+.SS "str game\&.User\&.player_type = 'User'\fC [static]\fP"
+
+.PP
+Definition at line \fB116\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.points = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB120\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.points"
+
+.PP
+Definition at line \fB164\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.questions_answered = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB130\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.questions_answered"
+
+.PP
+Definition at line \fB205\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.questions_missed = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB125\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.questions_missed"
+
+.PP
+Definition at line \fB169\fP of file \fBgame\&.py\fP\&.
+.SS "int game\&.User\&.streak = 0\fC [static]\fP"
+
+.PP
+Definition at line \fB123\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.streak"
+
+.PP
+Definition at line \fB167\fP of file \fBgame\&.py\fP\&.
+.SS "list game\&.User\&.times = []\fC [static]\fP"
+
+.PP
+Definition at line \fB127\fP of file \fBgame\&.py\fP\&.
+.SS "game\&.User\&.times"
+
+.PP
+Definition at line \fB171\fP of file \fBgame\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

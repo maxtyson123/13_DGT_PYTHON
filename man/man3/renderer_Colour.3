@@ -1,0 +1,263 @@
+.TH "renderer.Colour" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+renderer.Colour
+.SH SYNOPSIS
+.br
+.PP
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "str \fBtext_with_colour\fP (str text, str colour)"
+.br
+.ti -1c
+.RI "str \fBclean_text\fP (str text)"
+.br
+.ti -1c
+.RI "str \fBtrue_or_false_styled\fP ()"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "str \fBBLACK\fP = '\\033[30m'"
+.br
+.ti -1c
+.RI "str \fBRED\fP = '\\033[31m'"
+.br
+.ti -1c
+.RI "str \fBGREEN\fP = '\\033[32m'"
+.br
+.ti -1c
+.RI "str \fBYELLOW\fP = '\\033[33m'"
+.br
+.ti -1c
+.RI "str \fBBLUE\fP = '\\033[34m'"
+.br
+.ti -1c
+.RI "str \fBMAGENTA\fP = '\\033[35m'"
+.br
+.ti -1c
+.RI "str \fBCYAN\fP = '\\033[36m'"
+.br
+.ti -1c
+.RI "str \fBWHITE\fP = '\\033[37m'"
+.br
+.ti -1c
+.RI "str \fBGREY\fP = '\\033[90m'"
+.br
+.ti -1c
+.RI "tuple \fBcolours_list\fP = (\fBBLACK\fP, \fBRED\fP, \fBGREEN\fP, \fBYELLOW\fP, \fBBLUE\fP, \fBMAGENTA\fP, \fBCYAN\fP, \fBWHITE\fP, \fBGREY\fP)"
+.br
+.ti -1c
+.RI "tuple \fBcolours_names_list\fP = ('Black', 'Red', 'Green', 'Yellow', 'Blue', 'Magenta', 'Cyan', 'White', 'Grey')"
+.br
+.ti -1c
+.RI "str \fBBOLD\fP = '\\033[1m'"
+.br
+.ti -1c
+.RI "str \fBDIM\fP = '\\033[2m'"
+.br
+.ti -1c
+.RI "str \fBITALIC\fP = '\\033[3m'"
+.br
+.ti -1c
+.RI "str \fBUNDERLINE\fP = '\\033[4m'"
+.br
+.ti -1c
+.RI "str \fBBLINK\fP = '\\033[5m'"
+.br
+.ti -1c
+.RI "str \fBINVERT\fP = '\\033[7m'"
+.br
+.ti -1c
+.RI "str \fBSTRIKETHROUGH\fP = '\\033[9m'"
+.br
+.ti -1c
+.RI "tuple \fBstyles_list\fP = (\fBBOLD\fP, \fBDIM\fP, \fBITALIC\fP, \fBUNDERLINE\fP, \fBBLINK\fP, \fBINVERT\fP, \fBSTRIKETHROUGH\fP)"
+.br
+.ti -1c
+.RI "tuple \fBstyles_names_list\fP = ('Bold', 'Dim', 'Italic', 'Underline', 'Blink', 'Invert', 'Strikethrough')"
+.br
+.ti -1c
+.RI "str \fBRESET\fP = '\\033[0m'"
+.br
+.ti -1c
+.RI "str \fBerror\fP = \fBRED\fP"
+.br
+.ti -1c
+.RI "str \fBinfo\fP = \fBBLUE\fP"
+.br
+.ti -1c
+.RI "str \fBsuccess\fP = \fBGREEN\fP"
+.br
+.ti -1c
+.RI "str \fBwarning\fP = \fBYELLOW\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+.nf
+A class that stores the colour codes for the different colours\&.
+Note: from https://en\&.wikipedia\&.org/wiki/ANSI_escape_code
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB34\fP of file \fBrenderer\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " str renderer\&.Colour\&.clean_text (str text)\fC [static]\fP"
+
+.PP
+.nf
+Removes the colour codes from the text, useful when doing len() operations on the text
+
+
+@param text: The text to remove the colour codes from
+@return: The text without the colour codes (copy of original string)
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB86\fP of file \fBrenderer\&.py\fP\&.
+.SS " str renderer\&.Colour\&.text_with_colour (str text, str colour)\fC [static]\fP"
+
+.PP
+.nf
+Returns the text with the colour code before and the reset code after it
+
+@param text: The text to colour
+@param colour: The colour code
+@return: The coloured text
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB75\fP of file \fBrenderer\&.py\fP\&.
+.SS " str renderer\&.Colour\&.true_or_false_styled ()\fC [static]\fP"
+
+.PP
+.nf
+Returns a coloured true or false string
+@return: '(green)True/(red)False'
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB112\fP of file \fBrenderer\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "str renderer\&.Colour\&.BLACK = '\\033[30m'\fC [static]\fP"
+
+.PP
+Definition at line \fB40\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.BLINK = '\\033[5m'\fC [static]\fP"
+
+.PP
+Definition at line \fB58\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.BLUE = '\\033[34m'\fC [static]\fP"
+
+.PP
+Definition at line \fB44\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.BOLD = '\\033[1m'\fC [static]\fP"
+
+.PP
+Definition at line \fB54\fP of file \fBrenderer\&.py\fP\&.
+.SS "tuple renderer\&.Colour\&.colours_list = (\fBBLACK\fP, \fBRED\fP, \fBGREEN\fP, \fBYELLOW\fP, \fBBLUE\fP, \fBMAGENTA\fP, \fBCYAN\fP, \fBWHITE\fP, \fBGREY\fP)\fC [static]\fP"
+
+.PP
+Definition at line \fB50\fP of file \fBrenderer\&.py\fP\&.
+.SS "tuple renderer\&.Colour\&.colours_names_list = ('Black', 'Red', 'Green', 'Yellow', 'Blue', 'Magenta', 'Cyan', 'White', 'Grey')\fC [static]\fP"
+
+.PP
+Definition at line \fB51\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.CYAN = '\\033[36m'\fC [static]\fP"
+
+.PP
+Definition at line \fB46\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.DIM = '\\033[2m'\fC [static]\fP"
+
+.PP
+Definition at line \fB55\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.error = \fBRED\fP\fC [static]\fP"
+
+.PP
+Definition at line \fB69\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.GREEN = '\\033[32m'\fC [static]\fP"
+
+.PP
+Definition at line \fB42\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.GREY = '\\033[90m'\fC [static]\fP"
+
+.PP
+Definition at line \fB48\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.info = \fBBLUE\fP\fC [static]\fP"
+
+.PP
+Definition at line \fB70\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.INVERT = '\\033[7m'\fC [static]\fP"
+
+.PP
+Definition at line \fB59\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.ITALIC = '\\033[3m'\fC [static]\fP"
+
+.PP
+Definition at line \fB56\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.MAGENTA = '\\033[35m'\fC [static]\fP"
+
+.PP
+Definition at line \fB45\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.RED = '\\033[31m'\fC [static]\fP"
+
+.PP
+Definition at line \fB41\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.RESET = '\\033[0m'\fC [static]\fP"
+
+.PP
+Definition at line \fB66\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.STRIKETHROUGH = '\\033[9m'\fC [static]\fP"
+
+.PP
+Definition at line \fB60\fP of file \fBrenderer\&.py\fP\&.
+.SS "tuple renderer\&.Colour\&.styles_list = (\fBBOLD\fP, \fBDIM\fP, \fBITALIC\fP, \fBUNDERLINE\fP, \fBBLINK\fP, \fBINVERT\fP, \fBSTRIKETHROUGH\fP)\fC [static]\fP"
+
+.PP
+Definition at line \fB62\fP of file \fBrenderer\&.py\fP\&.
+.SS "tuple renderer\&.Colour\&.styles_names_list = ('Bold', 'Dim', 'Italic', 'Underline', 'Blink', 'Invert', 'Strikethrough')\fC [static]\fP"
+
+.PP
+Definition at line \fB63\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.success = \fBGREEN\fP\fC [static]\fP"
+
+.PP
+Definition at line \fB71\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.UNDERLINE = '\\033[4m'\fC [static]\fP"
+
+.PP
+Definition at line \fB57\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.warning = \fBYELLOW\fP\fC [static]\fP"
+
+.PP
+Definition at line \fB72\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.WHITE = '\\033[37m'\fC [static]\fP"
+
+.PP
+Definition at line \fB47\fP of file \fBrenderer\&.py\fP\&.
+.SS "str renderer\&.Colour\&.YELLOW = '\\033[33m'\fC [static]\fP"
+
+.PP
+Definition at line \fB43\fP of file \fBrenderer\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

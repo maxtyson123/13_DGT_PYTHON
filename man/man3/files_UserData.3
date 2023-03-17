@@ -1,0 +1,163 @@
+.TH "files.UserData" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+files.UserData
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits \fBfiles\&.SaveFile\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fB__init__\fP (self)"
+.br
+.ti -1c
+.RI "None \fBload_defaults\fP (self)"
+.br
+.ti -1c
+.RI "None \fBsave\fP (self)"
+.br
+.in -1c
+
+Public Member Functions inherited from \fBfiles\&.SaveFile\fP
+.in +1c
+.ti -1c
+.RI "None \fB__init__\fP (self, str \fBsave_file\fP, bool auto_load=True)"
+.br
+.ti -1c
+.RI "None \fBload\fP (self)"
+.br
+.ti -1c
+.RI "None \fBsave\fP (self)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBdisplay_mode\fP"
+.br
+.ti -1c
+.RI "\fBnetwork\fP"
+.br
+.ti -1c
+.RI "\fBauto_fix_api\fP"
+.br
+.ti -1c
+.RI "\fBsave_data\fP"
+.br
+.in -1c
+
+Public Attributes inherited from \fBfiles\&.SaveFile\fP
+.in +1c
+.ti -1c
+.RI "\fBsave_file\fP"
+.br
+.ti -1c
+.RI "\fBsave_data\fP"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "None \fBdisplay_mode\fP = None"
+.br
+.ti -1c
+.RI "None \fBnetwork\fP = None"
+.br
+.ti -1c
+.RI "None \fBauto_fix_api\fP = None"
+.br
+.in -1c
+
+Static Public Attributes inherited from \fBfiles\&.SaveFile\fP
+.in +1c
+.ti -1c
+.RI "str \fBsave_file\fP = 'save\&.json'"
+.br
+.ti -1c
+.RI "dict \fBsave_data\fP = {}"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line \fB113\fP of file \fBfiles\&.py\fP\&.
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS " None files\&.UserData\&.__init__ ( self)"
+
+.PP
+.nf
+Create a new UserData object, loaded from setup\&.json
+
+.fi
+.PP
+ 
+.PP
+Reimplemented from \fBfiles\&.SaveFile\fP\&.
+.PP
+Definition at line \fB119\fP of file \fBfiles\&.py\fP\&.
+.SH "Member Function Documentation"
+.PP 
+.SS " None files\&.UserData\&.load_defaults ( self)"
+
+.PP
+.nf
+Load the default values for the user data if they are not found
+
+.fi
+.PP
+ 
+.PP
+Definition at line \fB133\fP of file \fBfiles\&.py\fP\&.
+.SS " None files\&.UserData\&.save ( self)"
+
+.PP
+.nf
+Save the user data to the save file
+
+.fi
+.PP
+ 
+.PP
+Reimplemented from \fBfiles\&.SaveFile\fP\&.
+.PP
+Definition at line \fB141\fP of file \fBfiles\&.py\fP\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "None files\&.UserData\&.auto_fix_api = None\fC [static]\fP"
+
+.PP
+Definition at line \fB117\fP of file \fBfiles\&.py\fP\&.
+.SS "files\&.UserData\&.auto_fix_api"
+
+.PP
+Definition at line \fB128\fP of file \fBfiles\&.py\fP\&.
+.SS "None files\&.UserData\&.display_mode = None\fC [static]\fP"
+
+.PP
+Definition at line \fB115\fP of file \fBfiles\&.py\fP\&.
+.SS "files\&.UserData\&.display_mode"
+
+.PP
+Definition at line \fB126\fP of file \fBfiles\&.py\fP\&.
+.SS "None files\&.UserData\&.network = None\fC [static]\fP"
+
+.PP
+Definition at line \fB116\fP of file \fBfiles\&.py\fP\&.
+.SS "files\&.UserData\&.network"
+
+.PP
+Definition at line \fB127\fP of file \fBfiles\&.py\fP\&.
+.SS "files\&.UserData\&.save_data"
+
+.PP
+Definition at line \fB145\fP of file \fBfiles\&.py\fP\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.

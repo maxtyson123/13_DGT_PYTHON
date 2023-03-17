@@ -1,0 +1,28 @@
+var classgame_1_1_user =
+[
+    [ "__int__", "da/d88/classgame_1_1_user.html#ad5da59fcdc8a858cf5adfd96c6b0f9b5", null ],
+    [ "calculate_stats", "da/d88/classgame_1_1_user.html#a95a545f2207143f7401f1755f8c62c1d", null ],
+    [ "load", "da/d88/classgame_1_1_user.html#aed3b10c8101e357afec7b2dfe7f565a4", null ],
+    [ "load_defaults", "da/d88/classgame_1_1_user.html#a1f78775589691d40bd54dc16489acd43", null ],
+    [ "reset", "da/d88/classgame_1_1_user.html#aa9c6de24665713c4f320c30553d44f8e", null ],
+    [ "show_stats", "da/d88/classgame_1_1_user.html#a86e01daac5227c786c18312d1cf9cef9", null ],
+    [ "styled_name", "da/d88/classgame_1_1_user.html#a146f72434fcd748070acef9cd82c972e", null ],
+    [ "accuracy", "da/d88/classgame_1_1_user.html#a9a6f9303176a289ab2b57e4d2fe75427", null ],
+    [ "answers", "da/d88/classgame_1_1_user.html#afc1e74cec3077d2d0cc45e83e5a17742", null ],
+    [ "average_time", "da/d88/classgame_1_1_user.html#a3964908a95245f65cdb3cc13d21de266", null ],
+    [ "average_time_correct", "da/d88/classgame_1_1_user.html#aaf3f26fbbd97e2ffc4310fafb1494880", null ],
+    [ "average_time_incorrect", "da/d88/classgame_1_1_user.html#a7fb4be8eca3421a5d4fe966b0540dcea", null ],
+    [ "average_time_missed", "da/d88/classgame_1_1_user.html#af4ec0ee722eac06ba44be1f290882acc", null ],
+    [ "colour", "da/d88/classgame_1_1_user.html#a2ba5c519232f3150f224f209c2a2b46e", null ],
+    [ "correct", "da/d88/classgame_1_1_user.html#a909be85cb260eafd897debfd03240467", null ],
+    [ "has_answered", "da/d88/classgame_1_1_user.html#a9c5ec097f6caf38a5fb07c4ef861c986", null ],
+    [ "highest_streak", "da/d88/classgame_1_1_user.html#a8252f1b80963a49e2c34ecb245d6835d", null ],
+    [ "icon", "da/d88/classgame_1_1_user.html#a27c6aaddc322561eda2b98872c600517", null ],
+    [ "incorrect", "da/d88/classgame_1_1_user.html#aa5e1cad23a4e985caa5ca11573f9e890", null ],
+    [ "name", "da/d88/classgame_1_1_user.html#a128280e2209c3ecb6a13a2af6360938a", null ],
+    [ "points", "da/d88/classgame_1_1_user.html#a6c3256c9042c0e11ec8f227dc5561621", null ],
+    [ "questions_answered", "da/d88/classgame_1_1_user.html#a4c4affd0dcba2da038fae7bc4fda5c1e", null ],
+    [ "questions_missed", "da/d88/classgame_1_1_user.html#a2d9cf0eaee1e978ceac635855a2b43fb", null ],
+    [ "streak", "da/d88/classgame_1_1_user.html#a9e9fabcdf1ed6e6dc97543e240a16242", null ],
+    [ "times", "da/d88/classgame_1_1_user.html#ac5f432cc831d7636c78fade99fc0ac90", null ]
+];

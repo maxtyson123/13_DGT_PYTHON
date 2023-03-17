@@ -1,0 +1,78 @@
+.TH "Maxs_Modules/renderer.py" 3 "Sun Mar 12 2023" "Version 0.55" "Quiz Game" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Maxs_Modules/renderer.py
+.SH SYNOPSIS
+.br
+.PP
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBrenderer\&.WrapMode\fP"
+.br
+.ti -1c
+.RI "class \fBrenderer\&.Colour\fP"
+.br
+.ti -1c
+.RI "class \fBrenderer\&.MenuManager\fP"
+.br
+.ti -1c
+.RI "class \fBrenderer\&.Menu\fP"
+.br
+.in -1c
+.SS "Namespaces"
+
+.in +1c
+.ti -1c
+.RI "namespace \fBrenderer\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "None \fBrenderer\&.clear\fP ()"
+.br
+.ti -1c
+.RI "None \fBrenderer\&.text_in_divider\fP (str item_to_print, WrapMode wrap=WrapMode\&.TRUNCATE)"
+.br
+.ti -1c
+.RI "None \fBrenderer\&.show_menu\fP (list menu_items, WrapMode wrap=WrapMode\&.TRUNCATE)"
+.br
+.ti -1c
+.RI "None \fBrenderer\&.show_menu_double\fP (list menu_items, WrapMode wrap=WrapMode\&.TRUNCATE)"
+.br
+.ti -1c
+.RI "None \fBrenderer\&.print_text_on_same_line\fP (str text_to_print)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "int \fBrenderer\&.console_width\fP = 100"
+.br
+.ti -1c
+.RI "str \fBrenderer\&.divider_symbol\fP = '#'"
+.br
+.ti -1c
+.RI "len \fBrenderer\&.divider_symbol_size\fP = len(divider_symbol)"
+.br
+.ti -1c
+.RI "str \fBrenderer\&.divider\fP = divider_symbol * console_width"
+.br
+.ti -1c
+.RI "None \fBrenderer\&.menu_manager\fP = None"
+.br
+.ti -1c
+.RI "int \fBrenderer\&.max_menu_items_per_page\fP = 10"
+.br
+.ti -1c
+.RI "bool \fBrenderer\&.imported_timeout\fP = False"
+.br
+.in -1c
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Quiz Game from the source code\&.
