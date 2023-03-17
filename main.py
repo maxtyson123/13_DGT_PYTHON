@@ -14,16 +14,16 @@
 # [ ] Bug Hunting
 
 # - - - - - - - Imports - - - - - - -#
-# - - - - - - - Imports - - - - - - -#
 import os
 import sys
+from natsort import natsorted
 
 from Maxs_Modules.network import get_ip
-from Maxs_Modules.renderer import Menu, Colour, clear, render_text, get_input, init_gui, gui_close
-from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, error, handle_arg
+from Maxs_Modules.renderer import Menu, clear, render_text, get_input, init_gui, gui_close
+from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, handle_arg
 from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.files import UserData
-from Maxs_Modules.tools import get_user_input_of_type, string_bool, ip_address, install_package
+from Maxs_Modules.tools import string_bool, ip_address
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/"
@@ -85,13 +85,6 @@ def continue_game() -> None:
 
     # Get all the saved files and create a menu
     saves = get_saved_games()
-
-    # Sort the files
-    try:
-        from natsort import natsorted
-    except ImportError:
-        install_package("natsort")
-        from natsort import natsorted
     saves = natsorted(saves)
 
     # Add back to the menu
@@ -370,6 +363,12 @@ def init_main() -> None:
 
     if not os.path.exists("ProgramData"):
         os.mkdir("ProgramData")
+
+    if not os.path.exists("ProgramData/Logs"):
+        os.mkdir("ProgramData/Logs")
+
+    if not os.path.exists("ProgramData/Logs/Store"):
+        os.mkdir("ProgramData/Logs/Store")
 
 
 if __name__ == "__main__":

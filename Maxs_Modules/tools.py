@@ -1,5 +1,6 @@
 # - - - - - - - Imports - - - - - - -#
 import time
+from inputimeout import inputimeout, TimeoutOccurred
 
 from Maxs_Modules.debug import error, debug_cli, in_ide
 
@@ -111,11 +112,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
             # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
             # running in the IDE
             if max_time != 0 and not in_ide:
-                try:
-                    from inputimeout import inputimeout, TimeoutOccurred
-                except ImportError:
-                    install_package("inputimeout")
-                    from inputimeout import inputimeout, TimeoutOccurred
                 # Check if the time limit has been reached
                 if time.time() - start_time > max_time:
                     return None
@@ -212,18 +208,3 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
             error(f"Incorrect input type ({variable}) should be "
                   + str(type_to_convert).replace("<class '", "").replace("'>", ""))
         return None
-
-
-def install_package(package: str) -> None:
-    """
-    Install a package using pip
-
-    @param package: The package to install
-    @return: None
-    """
-    try:
-        import pip
-        print("Installing package: " + package + "...")
-        pip.main(["install", package, "--disable-pip-version-check", "--no-color", "--quiet"])
-    except Exception as e:
-        error("Failed to install package: " + package + " (" + str(e) + ")")

@@ -1,20 +1,15 @@
 # - - - - - - - Imports - - - - - - -#
-
-
 import os
 import re
 import sys
 import time
+import eel
 
 from Maxs_Modules.debug import debug_message
 from Maxs_Modules.files import UserData
-from Maxs_Modules.tools import get_user_input_of_type, install_package
+from Maxs_Modules.tools import get_user_input_of_type
 
-try:
-    import eel
-except ImportError:
-    install_package("eel")
-    import eel
+
 # - - - - - - - Variables - - - - - - -#
 
 

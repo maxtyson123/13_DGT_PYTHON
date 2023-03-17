@@ -7,9 +7,9 @@ import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
 from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
-from Maxs_Modules.tools import try_convert, set_if_none, get_user_input_of_type, string_bool, sort_multi_array
+from Maxs_Modules.tools import try_convert, set_if_none, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
-from Maxs_Modules.renderer import Menu, divider, Colour, print_text_on_same_line, clear, render_text, get_input, \
+from Maxs_Modules.renderer import Menu, Colour, print_text_on_same_line, clear, render_text, get_input, \
     render_header, render_quiz_header
 
 # - - - - - - - Variables - - - - - - -#

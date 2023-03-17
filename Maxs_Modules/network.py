@@ -4,17 +4,12 @@ import time
 import types
 import socket
 import selectors
+import requests
 
 from Maxs_Modules.files import UserData
-from Maxs_Modules.tools import install_package
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import render_text
 
-try:
-    import requests
-except ImportError:
-    install_package("requests")
-    import requests
 
 # - - - - - - - Classes - - - - - - - -#
 
