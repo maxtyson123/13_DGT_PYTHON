@@ -5,16 +5,12 @@ from inputimeout import inputimeout, TimeoutOccurred
 from Maxs_Modules.debug import error, debug_cli, in_ide
 
 
-# - - - - - - - Variables - - - - - - -#
-
-
-
 # - - - - - - - Functions - - - - - - -#
 
 
 def sort_multi_array(data: list, descending: bool = False) -> list:
     """
-    Sorts a multi-dimensional array by the second value in each array using lambda shorthand, returns a copy of the list
+    Sorts a multidimensional array by the second value in each array using lambda shorthand, returns a copy of the list
     instead of sorting the original incase caller wants to keep the original list. If the descending parameter is set
     then the data will be sorted in reverse order. The second array in the list must be a list of numbers.
 
@@ -151,9 +147,14 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
 
         # Check if it is a list
         if "," in user_input:
-            # Split the string into a list
-            user_input = user_input.split(",")
-            return user_input
+
+            # Check if the list should be returned
+            if gather_pre_input:
+
+                # Split the string into a list
+                user_input = user_input.split(",")
+                return user_input
+
 
         # Check if the user inputted an allowed string
         if allow_these is not None:

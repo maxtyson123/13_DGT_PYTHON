@@ -20,7 +20,8 @@ divider = divider_symbol * console_width
 menu_manager = None
 max_menu_items_per_page = 10
 display_type = UserData().display_mode
-auto_htmlify = True
+# Note change this to False to disable auto htmlify (leave the display_type == "GUI" part)
+auto_htmlify = True and display_type == "GUI"
 auto_colour = True
 
 
@@ -165,7 +166,7 @@ class Menu:
 
         @param title: The title of the menu
         @param items: The items in the menu, if multi_dimensional is True then the items should be a list of lists
-        @param multi_dimensional: If the menu items array is multi-dimensional (i.e. has a value for each item)
+        @param multi_dimensional: If the menu items array is multidimensional (i.e. has a value for each item)
         """
         self.title = title
         self.items = items
@@ -210,13 +211,13 @@ class Menu:
 
         menu_items = self.show_menu()
 
-        used_pre_input = False
+        False
 
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
             debug_message(f"Using pre-input ({menu_manager.pre_input[0]}) from {menu_manager.pre_input}")
             user_input = menu_manager.pre_input[0]
-            used_pre_input = True
+            True
             menu_manager.pre_input.pop(0)
 
         # Calculate the possible options
@@ -229,7 +230,7 @@ class Menu:
 
         input_prompt = "Choose an option (" + str(options[0]) + "-" + str(options[len(options) - 1]) + ")"
 
-        user_input = get_user_input_of_type(int, input_prompt, options, input_items, self.time_limit, user_input)
+        user_input = get_user_input_of_type(int, input_prompt, options, input_items, self.time_limit, user_input, True)
 
         # Check if the user input is an array
         if isinstance(user_input, list):
@@ -276,7 +277,7 @@ class Menu:
             menu_manager.pre_input.pop(0)
 
         user_input = get_user_input_of_type(type_to_convert, input_message, must_be_one_of_these, allow_these,
-                                            self.time_limit, user_input)
+                                            self.time_limit, user_input, True)
 
         # Check if the user input is an array
         if isinstance(user_input, list):
@@ -582,7 +583,6 @@ def get_gui_timed_input(prompt: str, timeout: int):
     user_input = eel.force_get_input()()
     eel.clear_input_buffer()
 
-
     # Convert nothing into None
     if user_input == "" or user_input == " ":
         user_input = None
@@ -626,6 +626,7 @@ def init_gui():
 
     # If the display type is GUI then start the web server
     if display_type == "GUI":
+
         web_ip = get_ip()
         web_port = get_free_port(web_ip, 8080)
         print(web_port)

@@ -10,19 +10,20 @@
 # [x] Clean Up aka more efficient and correct commenting
 # [x] GUI Base, port the current render to a simple GUI
 # [x] GUI Extended, Buttons instead of text based, css and other styling
-# [.] Clean Up
-# [ ] Bug Hunting
+# [x] Clean Up
+# [.] Bug Hunting
 
 # - - - - - - - Imports - - - - - - -#
 import os
 import sys
+
 from natsort import natsorted
 
+from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, handle_arg
+from Maxs_Modules.files import UserData
+from Maxs_Modules.game import get_saved_games, Game
 from Maxs_Modules.network import get_ip
 from Maxs_Modules.renderer import Menu, clear, render_text, get_input, init_gui, gui_close
-from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, handle_arg
-from Maxs_Modules.game import get_saved_games, Game
-from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import string_bool, ip_address
 
 # - - - - - - - Variables - - - - - - -#
@@ -78,7 +79,7 @@ def game_finished(game: Game) -> None:
 
 def continue_game() -> None:
     """
-    Shows a menu that allows the user to continue a game, It allows the user to select a game from the saved games
+    Shows a menu that allows the user to continue a game, It allows the user to select a game from the saved games,
     folder, if the user selects a previously joined multiplayer game it will delete the save file and join the game
     instead of continuing
     """
@@ -186,14 +187,15 @@ def settings() -> None:
 
         # Create the settings menu, using the current settings as the values displayed
         settings_options = ("Display Mode", "Network", "Fix API", "Back")
-        settings_values = (str(usersettings.use_ui), str(usersettings.network), str(usersettings.auto_fix_api),
+        settings_values = (str(usersettings.display_mode), str(usersettings.network), str(usersettings.auto_fix_api),
                            "Main Menu")
         settings_menu = Menu("Settings", [settings_options, settings_values], True)
 
         # Show and get input from the menu
         match settings_menu.get_input():
             case "Display Mode":
-                usersettings.use_ui = settings_menu.get_input_option(string_bool, "Interact via UI? (True/False)")
+                usersettings.display_mode = settings_menu.get_input_option(str, "How should the game be rendered? "
+                                                                                "(CLI/GUI)", ["CLI", "GUI"])
 
             case "Network":
                 usersettings.network = settings_menu.get_input_option(string_bool,
@@ -201,13 +203,12 @@ def settings() -> None:
 
             case "Fix API":
                 render_text("Note: Fixing the API involves removing parameters from the API call until it goes though, "
-                            "this can fix errors where there arent enough questions of that type in the database, however it "
-                            "can mean that the question types arent the same as the ones you selected.")
+                            "this can fix errors where there arent enough questions of that type in the database, "
+                            "however it can mean that the question types arent the same as the ones you selected.")
 
                 usersettings.auto_fix_api = settings_menu.get_input_option(string_bool,
-                                                                           "Do you want to auto fix the API if an error "
-                                                                           "occurs? (" + True / False +
-                                                                           "): ")
+                                                                           "Do you want to auto fix the API if an "
+                                                                           "error occurs? (True / False): ")
 
             case "Back":
                 break
@@ -227,12 +228,12 @@ def game_main_menu() -> None:
 
     # If the user is not connected to the network then don't add the join game option
     usersettings = UserData()
-    if usersettings.network is not None:
-        if usersettings.network:
-            debug_message("Network is enabled", "network")
-            game_menu.items.insert(2, "Join Game")
-        else:
-            debug_message("Network is disabled", "network")
+
+    if usersettings.network:
+        debug_message("Network is enabled", "network")
+        game_menu.items.insert(2, "Join Game")
+    else:
+        debug_message("Network is disabled", "network")
 
     # Loop this menu until the user selects an option that leaves this menu
     while True:

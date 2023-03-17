@@ -192,7 +192,7 @@ def init_debug() -> None:
 
             # Import the modules
             from Maxs_Modules.tools import get_user_input_of_type, string_bool
-            from Maxs_Modules.renderer import Colour, menu_manager, render_text
+            from Maxs_Modules.renderer import menu_manager, render_text
 
             # Default behaviour for no args
             if len(args) == 0:
@@ -216,7 +216,8 @@ def init_debug() -> None:
                         render_text(" -store-individual: Sets weather or not to store the logs in individual files")
                         render_text(" -store-max: Sets the maximum amount of logs to store")
                         render_text(" -menu-history: Shows a log of all the menus in the current session")
-                        render_text(" -menu-history-input: Shows a log of all the input in the menus in the current session")
+                        render_text(
+                            " -menu-history-input: Shows a log of all the input in the menus in the current session")
 
                     case "-ignore-add":
                         self.log_ignore.append(get_user_input_of_type(str, "Log type to ignore: "))
@@ -442,17 +443,17 @@ def handle_arg(arg: str, get_value: bool = False) -> str or None:
         if arg == program_args[index]:
 
             # If the arg is found, check if the value should be returned
-            if get_value:
+            if not get_value:
+                return arg
 
-                # Check if there is a value after this arg
-                if index != len(program_args):
-                    return program_args[index + 1]
-                else:
-                    return None
-
-            return arg
+            # Check if there is a value after this arg
+            if index != len(program_args):
+                return program_args[index + 1]
+            else:
+                return None
 
     return None
+
 
 in_ide = (handle_arg("--ide") == "--ide")
 use_debug = (handle_arg("--debug") == "--debug")

@@ -153,8 +153,8 @@ class QuizServer:
     def service_connection(self, key: object, mask: object) -> None:
         """
         Service a connection from a client. This is called when the client has data to send or is ready to receive
-        data. Data is read in 4096 byte chunks so messages shouldnt be sent directly one after another or will cause
-        issues on the recving end. Data is then sent to the handle_data_received function. If there is data to send
+        data. Data is read in 4096 byte chunks so messages shouldn't be sent directly one after another or will cause
+        issues on the receiving end. Data is then sent to the handle_data_received function. If there is data to send
         then it is sent to the handle_data_send function.
 
         @param key: The key to the client
@@ -309,7 +309,6 @@ class QuizClient:
 
                             # Store all the data parts in a list
                             fragments = []
-                            recv_data = b''
 
                             # While there is data to read
                             while True:
@@ -476,7 +475,7 @@ class QuizGameServer(QuizServer):
                 # If this server is continuing a game then don't allow new players to join
                 if is_new_player and self.game.game_loaded:
                     self.send_message(sock,
-                                      "Server is continuing game, must rejoin using same name. New players arent allowed",
+                                      "Server is continuing game, must rejoin using same name. New players not allowed",
                                       "server_error")
                     # Remove the user from the list
                     self.game.users.pop(temp_index)
@@ -516,7 +515,7 @@ class QuizGameServer(QuizServer):
         Sync the game data to all clients. This will send all the game data, so it is best practice to save any
         variables that need to be saved before handling this. As games can be quite large (30kb with 50 questions,
         50 players) this function should be used sparingly, instead send the data that needs to be updated,
-        i.e use sync_players when showing the scoreboard.
+        i.e. use sync_players when showing the scoreboard.
         """
         # Ensure users have been converted, as timings can be off when networked
         self.game.convert_to_object(self.game.users, self.game.user_reference)
@@ -841,7 +840,7 @@ def setup_tcp_server(port: int) -> socket.socket:
     ip = get_ip()
 
     # Bind the socket to the port
-    sock.bind((ip, get_free_port(ip,port)))
+    sock.bind((ip, get_free_port(ip, port)))
     debug_message(f"Bound to {ip}:{port}", "network_server")
 
     # Start listening
@@ -867,6 +866,7 @@ def get_free_port(ip: str, port: int) -> int:
     """
     Checks if the passed port is available and if not it will increment it until it finds a free port
 
+    @param ip: The ip address to create the socket to test the port on (can be localhost, 127.0.0.1, 198.168.3.1 etc)
     @param port: The port to check
     """
     while True:

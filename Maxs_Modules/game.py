@@ -319,7 +319,7 @@ class Bot(User):
 
     def load_defaults(self) -> None:
         """
-        Loads the default values for the bot, the defaults are the same as the User class with the addition of an
+        Loads the default values for the bot, the defaults are the same as the User class with the addition of a
         default accuracy of 0.5 (50%). Also sets the player_type to "Bot"
         """
         super().load_defaults()
@@ -539,7 +539,7 @@ class Game(SaveFile):
     def convert_to_object(self, dicts: list, object_type: object) -> None:
         """
         Converts the dicts list from a list of item to a list of object_type objects. It will only attempt convert
-        the item if it is not already a object_type object, therefore this function can be called without knowing the
+        the item if it is not already an object_type object, therefore this function can be called without knowing the
         state of each item in the list
         """
         # For each user in the list of users convert the dict to a User object using the load() function
@@ -694,7 +694,7 @@ class Game(SaveFile):
     def show_scores(self) -> None:
         """
         Shows the scores of all the players in a menu with the points beside them sorted from highest to lowest. If the
-        user selects a player their individual stats are show i.e accuracy and time etc.
+        user selects a player their individual stats are show i.e. accuracy and time etc.
         """
         # Array to store the names and scores
         score_menu_players = []
@@ -1358,19 +1358,19 @@ class Game(SaveFile):
 
                 case "Type":
                     self.question_type = gameplay_menu.get_input_option(str, "Type (Multiple, True/False)", ["Multiple",
-                                                                                                             "True/False"])
+                                                                                                             "True"
+                                                                                                             "/False"])
 
                 case "Show score after Question/Game":
                     self.show_score_after_question_or_game = gameplay_menu.get_input_option(str,
-                                                                                            "Show score after: (Question/Game)",
+                                                                                            "Show score after: "
+                                                                                            "(Question/Game)",
                                                                                             ["Question", "Game"])
 
                 case "Show correct answer after Question/Game":
-                    self.show_correct_answer_after_question_or_game = gameplay_menu.get_input_option(str,
-                                                                                                     "Show correct answer "
-                                                                                                     "after: (Question/Game)",
-                                                                                                     ["Question",
-                                                                                                      "Game"])
+                    self.show_correct_answer_after_question_or_game \
+                        = gameplay_menu.get_input_option(str, "Show correct answer after: (Question/Game)",
+                                                         ["Question", "Game"])
 
                 case "Points for correct answer":
                     self.points_for_correct_answer = gameplay_menu.get_input_option(int, "Points for correct answer")
@@ -1383,12 +1383,12 @@ class Game(SaveFile):
                     self.points_for_no_answer = gameplay_menu.get_input_option(int, "Points for no answer")
 
                 case "Points multiplier for a streak":
-                    self.points_multiplier_for_a_streak = gameplay_menu.get_input_option(int,
-                                                                                         "Points multiplier for a streak")
+                    self.points_multiplier_for_a_streak = gameplay_menu.get_input_option(
+                        int, "Points multiplier for a streak")
 
                 case "Compounding amount for a streak":
-                    self.compounding_amount_for_a_streak = gameplay_menu.get_input_option(int,
-                                                                                          "Compounding amount for a streak")
+                    self.compounding_amount_for_a_streak = gameplay_menu.get_input_option(
+                        int, "Compounding amount for a streak")
 
                 case "Randomise questions":
                     self.randomise_questions = gameplay_menu.get_input_option(string_bool,
@@ -1399,7 +1399,8 @@ class Game(SaveFile):
                                                                                      "Randomise answer placement (True/False)")
 
                 case "Pick random question when run out of time":
-                    self.pick_random_question = gameplay_menu.get_input_option(string_bool, "Pick random question (True/False)")
+                    self.pick_random_question = gameplay_menu.get_input_option(string_bool,
+                                                                               "Pick random question (True/False)")
 
                 case "Bot difficulty":
                     self.bot_difficulty = gameplay_menu.get_input_option(int, "Bot difficulty (%)", range(1, 101))
