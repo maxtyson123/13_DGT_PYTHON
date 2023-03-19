@@ -206,6 +206,24 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
         return type_to_convert(variable)
     except ValueError:
         if not supress_errors:
-            error(f"Incorrect input type ({variable}) should be "
-                  + str(type_to_convert).replace("<class '", "").replace("'>", ""))
+            should_be_type = str(type_to_convert).replace("<class '", "").replace("'>", "")
+            if "string_bool" in should_be_type:
+                error(f"Incorrect input ({variable}) should be True or False")
+
+            else:
+
+                match should_be_type:
+                    case "bool":
+                        error(f"Incorrect input ({variable}) should be True or False")
+                    case "int":
+                        error(f"Incorrect input ({variable}) should be a number")
+                    case "float":
+                        error(f"Incorrect input ({variable}) should be a decimal number")
+                    case "str":
+                        error(f"Incorrect input ({variable}) should be a string")
+                    case "list":
+                        error(f"Incorrect input ({variable}) should be a list")
+                    # If it is a tuple then it should be a list
+                    case _:
+                        error(f"Incorrect input ({variable}) should be {should_be_type}")
         return None

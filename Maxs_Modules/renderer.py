@@ -491,8 +491,8 @@ def print_text_on_same_line(text_to_print: str) -> None:
     sys.stdout.write('\r' + text_to_print)
 
 
-def auto_style_text(text: str) -> str:
-    if not auto_colour:
+def auto_style_text(text: str, force: bool = False) -> str:
+    if not auto_colour and not force:
         return text
 
     if text is None:
