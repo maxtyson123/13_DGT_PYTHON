@@ -1,0 +1,41 @@
+### Setup and run ###
+
+1. pip install -r requirements.txt
+or
+1. python -m pip install -r requirements.txt
+2. run main.py
+
+### Modify Script ###
+- Some constants in the script can be modified to change the game's behavior
+1. game.py : max_number_of_questions = Maximum number of questions per game (shouldn't exceed 50)
+2. game.py : max_number_of_players = Maximum number of players per game (shouldn't exceed 4) (applys to bots as well)
+3. game.py : host_a_server_by_default = Should the default game be a server (True/False)
+4. renderer.py : compact_console = Use the compact variant of the console
+5. renderer.py : console_width = Width of the console
+6. renderer.py : divider_symbol = Symbol used as borders and such when printing, can be changed on compact console
+7. renderer.py : auto_htmlify = Convert text to html when printing to the GUI
+8. renderer.py : auto_colour = Convert some strings to coloured vairants
+9. renderer.py : use_colour = Enable colour
+
+- When running in idle, change use_colour to False and compact_console to True for better user experience if using CLI mode
+
+### Multiplayer - Local Test ###
+
+1. Setup first
+2. Open Tools directory
+3. Run start_server.bat or join_local_server.bat
+
+### Multiplayer - Start ###
+
+1. Setup first
+2. Run main.py
+3. Create a new game
+4. In the game settings menu, set Host a server to True
+5. Wait for other players to join
+6. Unless port forwarding is set up, the game will not be visible to other players on the internet
+
+### Multiplayer - Join ###
+
+1. Setup first
+2. Run main.py
+3. Join a game using the IP address of the host and the port

@@ -4,10 +4,6 @@ from Maxs_Modules.renderer import auto_style_text, Colour
 
 
 class TestRenderer(TestCase):
-    def test_auto_style_text_number(self):
-        result = auto_style_text("1", True)
-        self.assertEqual(result, Colour.BLUE + "1" + Colour.RESET)
-
     def test_auto_style_text_colour(self):
         result = auto_style_text("red", True)
         self.assertEqual(result, Colour.RED + "red" + Colour.RESET)

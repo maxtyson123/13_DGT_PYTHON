@@ -30,9 +30,6 @@ from Maxs_Modules.tools import string_bool, ip_address
 data_folder = "UserData/"
 
 
-# - - - - - - - Classes - - - - - - -#
-
-
 # - - - - - - - MENUS - - - - - - -#
 
 def game_finished(game: Game) -> None:
@@ -162,7 +159,7 @@ def join_game() -> None:
                 ip = join_menu.get_input_option(ip_address, "Please enter the IP: ")
 
             case "Port":
-                port = join_menu.get_input_option(int, "Please enter the port: ", range(1, 65535))
+                port = join_menu.get_input_option(int, "Please enter the port: (1-65535)", range(1, 65535))
 
             case "Join Game":
                 # Create a new game object and join the game

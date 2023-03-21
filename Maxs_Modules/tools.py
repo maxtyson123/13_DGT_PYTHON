@@ -155,7 +155,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 user_input = user_input.split(",")
                 return user_input
 
-
         # Check if the user inputted an allowed string
         if allow_these is not None:
             if user_input in allow_these:
@@ -170,7 +169,18 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 if user_input in must_be_one_of_these:
                     return user_input
                 else:
-                    error(f"Invalid input ({user_input})")
+                    boundary_error = str(must_be_one_of_these)
+
+                    # Minus 1 on the must_be_one_of_these if it is a range
+                    if isinstance(must_be_one_of_these, range):
+                        boundary_error = str(must_be_one_of_these.start) + " to " + str(must_be_one_of_these.stop - 1)
+
+                    # Handle if the type is a tuple or list
+                    if isinstance(must_be_one_of_these, (list, tuple)):
+                        boundary_error = "one of these: "
+                        boundary_error += ", ".join([str(item) for item in must_be_one_of_these])
+
+                    error(f"Invalid input ({user_input}) should be {boundary_error}")
             else:
                 return user_input
         # Side note: No need to error here as the error will be called in the try_convert function

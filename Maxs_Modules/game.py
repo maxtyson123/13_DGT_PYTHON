@@ -10,7 +10,7 @@ from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
 from Maxs_Modules.tools import try_convert, set_if_none, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Menu, Colour, print_text_on_same_line, clear, render_text, get_input, \
-    render_header, render_quiz_header
+    render_header, render_quiz_header, round_to_decimal
 
 # - - - - - - - Variables - - - - - - -#
 data_folder = "UserData/Games/"
@@ -21,7 +21,7 @@ quiz_categories = ("General Knowledge", "Books", "Film", "Music", "Musicals & Th
                    "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets",
                    "Japanese Anime & Manga", "Cartoon & Animations")
 host_a_server_by_default = False
-
+max_number_of_players = 10
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -247,17 +247,17 @@ class User:
         # Print the stats
         render_text(self.styled_name() + "'s Stats: ")
         render_text("Type: " + self.player_type)
-        render_text("Score: " + str(self.points))
+        render_text("Score: " + str(round_to_decimal(self.points)))
         render_text("Streak: " + str(self.streak))
         render_text("Highest Streak: " + str(self.highest_streak))
         render_text("Questions Answered: " + str(self.questions_answered))
         render_text("Questions Correct: " + str(self.correct))
         render_text("Questions Incorrect: " + str(self.incorrect))
         render_text("Questions Skipped: " + str(self.questions_missed))
-        render_text("Average Time: " + str(self.average_time))
-        render_text("Average Time Correct: " + str(self.average_time_correct))
-        render_text("Average Time Incorrect: " + str(self.average_time_incorrect))
-        render_text("Average Time Skipped: " + str(self.average_time_missed))
+        render_text("Average Time: " + str(round_to_decimal(self.average_time)))
+        render_text("Average Time Correct: " + str(round_to_decimal(self.average_time_correct)))
+        render_text("Average Time Incorrect: " + str(round_to_decimal(self.average_time_incorrect)))
+        render_text("Average Time Skipped: " + str(round_to_decimal(self.average_time_missed)))
         render_text("Accuracy: " + str(self.accuracy * 100) + "%")
 
     def reset(self) -> None:
@@ -572,7 +572,7 @@ class Game(SaveFile):
 
             # Show the title
             render_header("Set Up Player")
-            colour_menu = Menu("Choose a colour for ", Colour.colours_names_list)
+            colour_menu = Menu(" Choose a colour for ", Colour.colours_names_list)
 
             # Create a new user
             user_id += 1
@@ -703,12 +703,12 @@ class Game(SaveFile):
         # Add the users and their scores to the arrays
         for user in self.users:
             score_menu_players.append(user.styled_name())
-            score_menu_scores.append(user.points)
+            score_menu_scores.append(round_to_decimal(user.points))
 
         # Add the bots and their scores to the arrays
         for bot in self.bots:
             score_menu_players.append(bot.styled_name())
-            score_menu_scores.append(bot.points)
+            score_menu_scores.append(round_to_decimal(bot.points))
 
         # Sort the arrays based on the scores
         score_menu_multi = [score_menu_players, score_menu_scores]
@@ -989,18 +989,19 @@ class Game(SaveFile):
         current_user.times.append(end_time)
 
         # Make the bots answer
-        for bot in self.bots:
-            # Get the bot to answer the question
-            bot_answer = bot.answer(question)
+        if self.current_user_playing == 0:
+            for bot in self.bots:
+                # Get the bot to answer the question
+                bot_answer = bot.answer(question)
 
-            # As the bot cant miss then just leave the preheader blank
-            bot.answers.append("")
+                # As the bot cant miss then just leave the preheader blank
+                bot.answers.append("")
 
-            # Mark the question
-            self.mark_question(bot_answer, bot)
+                # Mark the question
+                self.mark_question(bot_answer, bot)
 
-            # Add the time, for use in stats
-            bot.times.append(0)
+                # Add the time, for use in stats
+                bot.times.append(0)
 
         # Give user time to read the answer
         time.sleep(3)
@@ -1258,7 +1259,7 @@ class Game(SaveFile):
 
             match single_player_menu.get_input():
                 case "How many players":
-                    self.how_many_players = single_player_menu.get_input_option(int, "How many players", range(1, 11))
+                    self.how_many_players = single_player_menu.get_input_option(int, f"How many players (max {max_number_of_players})", range(1, max_number_of_players+1))
                 case "Next":
                     self.set_players()
                     break
@@ -1285,10 +1286,12 @@ class Game(SaveFile):
                     self.server_name = networking_menu.get_input_option(str, "Server Name")
 
                 case "Server Port":
-                    self.server_port = networking_menu.get_input_option(int, "Server Port", range(1, 65535))
+                    self.server_port = networking_menu.get_input_option(int, "Server Port (1-65535)", range(1, 65535))
 
                 case "Max Players":
-                    self.max_players = networking_menu.get_input_option(int, "Max Players", range(1, 11))
+                    self.max_players = networking_menu.get_input_option(int, f"Max Players (max "
+                                                                             f"{max_number_of_players})",
+                                                                        range(1, max_number_of_players+1))
 
                 case "Next":
                     break
@@ -1342,7 +1345,7 @@ class Game(SaveFile):
                                                                         "Host a server (True/False)")
 
                 case "Time limit":
-                    self.time_limit = gameplay_menu.get_input_option(int, "Time limit (seconds)", range(1, 61))
+                    self.time_limit = gameplay_menu.get_input_option(int, "Time limit (seconds) (max 60)", range(1, 61))
 
                 case "Question Amount":
                     self.question_amount = gameplay_menu.get_input_option(int, "Question Amount (1-50)", range(1, 51))
@@ -1406,7 +1409,9 @@ class Game(SaveFile):
                     self.bot_difficulty = gameplay_menu.get_input_option(int, "Bot difficulty (%)", range(1, 101))
 
                 case "Number of bots":
-                    self.how_many_bots = gameplay_menu.get_input_option(int, "Number of bots", range(1, 11))
+                    self.how_many_bots = gameplay_menu.get_input_option(int, f"Number of bots "
+                                                                             f"(max {max_number_of_players})",
+                                                                        range(1, max_number_of_players+1))
 
                 case "Next":
                     if self.host_a_server:

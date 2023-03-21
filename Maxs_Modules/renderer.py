@@ -9,20 +9,21 @@ from Maxs_Modules.debug import debug_message
 from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import get_user_input_of_type
 
-
 # - - - - - - - Variables - - - - - - -#
 
-
+compact_console = False
 console_width = 100
-divider_symbol = "-"
+divider_symbol = chr(9617)  # OR use '░'
+if compact_console:
+    divider_symbol = "-"
 divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
-max_menu_items_per_page = 10
 display_type = UserData().display_mode
 # Note change this to False to disable auto htmlify (leave the display_type == "GUI" part)
 auto_htmlify = True and display_type == "GUI"
 auto_colour = True
+use_colour = True
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -33,7 +34,7 @@ class WrapMode:
     NONE = 0
     CHAR = 1
     WORD = 2
-    TRUNCATE = 2
+    TRUNCATE = 3
 
 
 class Colour:
@@ -42,33 +43,33 @@ class Colour:
     Note: from https://en.wikipedia.org/wiki/ANSI_escape_code
     """
     # Colours
-    BLACK = "\033[30m"
-    RED = "\033[31m"
-    GREEN = "\033[32m"
-    YELLOW = "\033[33m"
-    BLUE = "\033[34m"
-    MAGENTA = "\033[35m"
-    CYAN = "\033[36m"
-    WHITE = "\033[37m"
-    GREY = "\033[90m"
+    BLACK = "\033[30m" if use_colour else ""
+    RED = "\033[31m" if use_colour else ""
+    GREEN = "\033[32m" if use_colour else ""
+    YELLOW = "\033[33m" if use_colour else ""
+    BLUE = "\033[34m" if use_colour else ""
+    MAGENTA = "\033[35m" if use_colour else ""
+    CYAN = "\033[36m" if use_colour else ""
+    WHITE = "\033[37m" if use_colour else ""
+    GREY = "\033[90m" if use_colour else ""
 
     colours_list = (BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, GREY)
     colours_names_list = ("Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White", "Grey")
 
     # Styles
-    BOLD = "\033[1m"
-    DIM = "\033[2m"
-    ITALIC = "\033[3m"
-    UNDERLINE = "\033[4m"
-    BLINK = "\033[5m"
-    INVERT = "\033[7m"
-    STRIKETHROUGH = "\033[9m"
+    BOLD = "\033[1m" if use_colour else ""
+    DIM = "\033[2m" if use_colour else ""
+    ITALIC = "\033[3m" if use_colour else ""
+    UNDERLINE = "\033[4m" if use_colour else ""
+    BLINK = "\033[5m" if use_colour else ""
+    INVERT = "\033[7m" if use_colour else ""
+    STRIKETHROUGH = "\033[9m" if use_colour else ""
 
     styles_list = (BOLD, DIM, ITALIC, UNDERLINE, BLINK, INVERT, STRIKETHROUGH)
     styles_names_list = ("Bold", "Dim", "Italic", "Underline", "Blink", "Invert", "Strikethrough")
 
     # Reset
-    RESET = "\033[0m"
+    RESET = "\033[0m" if use_colour else ""
 
     # THEME
     error = RED
@@ -157,7 +158,6 @@ class Menu:
     multi_dimensional = None
     wrap_mode = WrapMode.WORD
     page_number = 1
-    items_per_page = max_menu_items_per_page
     time_limit = 0
 
     def __init__(self, title: str, items: list | tuple, multi_dimensional: bool = False) -> None:
@@ -316,7 +316,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
         match wrap:
             case WrapMode.CHAR:
                 # Print the current text in the divider, cutting off the text at the console width
-                text = divider_symbol + item_to_print[:console_space_free] + divider_symbol
+                text = divider_symbol + item_to_print[:console_space_free]  + divider_symbol
                 render_text(text)
 
                 # Store the text to print as adding a space for readability
@@ -339,7 +339,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                 # Loop through all the words
                 for word in words:
                     # If this word is bigger then the entire console then split it up
-                    if len(word) > console_space_free:
+                    if len(Colour.clean_text(word)) > console_space_free:
                         # Join the words together
                         item_to_print = " ".join(words)
 
@@ -357,9 +357,9 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                         return
 
                     # If the current size plus the word length is less than the console width
-                    if current_size + len(word) < console_space_free:
+                    if current_size + len(Colour.clean_text(word)) < console_space_free:
                         # Add the word to the current size
-                        current_size += len(word)
+                        current_size += len(Colour.clean_text(word))
 
                         # Add a space to the current size
                         current_size += 1
@@ -401,7 +401,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
 
     # The length of the text, minus console width, minus 2 for the border
     width_left = console_space_free - text_length
-    render_text(divider_symbol + item_to_print + " " * width_left + divider_symbol)
+    render_text(divider_symbol + item_to_print + Colour.RESET + " " * width_left + divider_symbol)
 
 
 def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
@@ -420,11 +420,15 @@ def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
             render_text(item_to_print)
     else:
         render_text(divider)
+        if not compact_console:
+            text_in_divider("")
 
         # Loop through all the items in the menu
         for x in range(len(menu_items)):
             item_to_print = " [" + str(x) + "]" + " " + menu_items[x]
             text_in_divider(item_to_print, wrap)
+        if not compact_console:
+            text_in_divider("")
         render_text(divider)
 
 
@@ -448,6 +452,8 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
             render_text(item_to_print)
     else:
         render_text(divider)
+        if not compact_console:
+            text_in_divider("")
         # Loop through all the items in the menu
         for x in range(len(menu_items[0])):
 
@@ -471,9 +477,12 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
             spacing = " " * width_left
 
             # Combine the two items
-            final_item_to_print = divider_symbol + item_to_print_1 + spacing + item_to_print_2 + divider_symbol
+            final_item_to_print = divider_symbol + item_to_print_1 + Colour.RESET + spacing + item_to_print_2 + \
+                                  Colour.RESET + divider_symbol
             render_text(final_item_to_print)
 
+        if not compact_console:
+            text_in_divider("")
         render_text(divider)
 
 
@@ -503,20 +512,6 @@ def auto_style_text(text: str, force: bool = False) -> str:
 
     # NOTE: Regex symbols: \b = word boundary, \d = digit, \s = whitespace, \w = word character, \B = not word boundary
     # \g = group, r' = raw string
-
-    # Regex to match ANSI escape codes
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-
-    # Split after id
-    split_text = re.split(r'split_for_colour', text)
-
-    if len(split_text) > 1:
-        prefix, suffix = split_text[0], split_text[1]
-        suffix = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, suffix)
-        text = ''.join(prefix + suffix)
-    else:
-        # Replace numbers with blue
-        text = re.sub(r'\b\d+\b(?!.*' + ansi_escape.pattern + ')', Colour.BLUE + r'\g<0>' + Colour.RESET, text)
 
     # Replace certain words with their colour (ignore case)
     text = re.compile(r'\btrue\b', re.IGNORECASE).sub(Colour.GREEN + r'\g<0>' + Colour.RESET, text)
@@ -597,7 +592,13 @@ def render_header(title: str, enclose_bottom: bool = True) -> None:
     else:
         # Print spacer and title
         render_text(divider)
-        render_text(title.center(console_width))
+        if not compact_console:
+            text_in_divider("")
+
+        text_in_divider(" " + title.center(console_width - (divider_symbol_size * 2) - 1), WrapMode.WORD)
+
+        if not compact_console:
+            text_in_divider("")
 
         # Allow for a bottom border
         if enclose_bottom:
@@ -615,9 +616,23 @@ def render_quiz_header(game) -> None:
                     f"Time Limit: {time_limit} seconds</p>")
     else:
         render_text(divider)
-        render_text(f"Question {current_question} of {question_amount}")
-        render_text(f"User: {user}")
-        render_text(f"Time Limit: {time_limit} seconds")
+        if not compact_console:
+            text_in_divider("")
+        text_in_divider(f" Question {current_question} of {question_amount}")
+        text_in_divider(f" User: {user}", WrapMode.WORD)
+        text_in_divider(f" Time Limit: {time_limit} seconds")
+        if not compact_console:
+            text_in_divider("")
+
+
+def round_to_decimal(number: float, decimal_places: int = 2) -> float:
+    """
+    Round a number to a certain amount of decimal places
+    @param number: The number to round
+    @param decimal_places: The amount of decimal places to round to
+    @return: The rounded number
+    """
+    return round(number * (10 ** decimal_places)) / (10 ** decimal_places)
 
 
 def init_gui():
@@ -626,7 +641,6 @@ def init_gui():
 
     # If the display type is GUI then start the web server
     if display_type == "GUI":
-
         web_ip = get_ip()
         web_port = get_free_port(web_ip, 8080)
         print(web_port)
