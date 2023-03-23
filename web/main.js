@@ -115,6 +115,11 @@ function close_window(){
 }
 eel.expose(close_window)
 
+function set_title(title){
+    document.title = "Quiz Game UI | " + title
+}
+eel.expose(set_title)
+
 // Make sure the window is big enough
 if (window.outerWidth < 1600 || window.outerHeight < 900){
     window.resizeTo(1600, 900);

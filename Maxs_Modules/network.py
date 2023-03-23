@@ -402,7 +402,6 @@ class QuizClient:
         debug_message(f"Sending {message}", "network_client")
         sock.sendall(message.to_bytes())
 
-
 class QuizGameServer(QuizServer):
     game = None
     running = False

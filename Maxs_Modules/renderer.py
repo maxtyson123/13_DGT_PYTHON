@@ -587,6 +587,7 @@ def get_gui_timed_input(prompt: str, timeout: int):
 
 
 def render_header(title: str, enclose_bottom: bool = True) -> None:
+    eel.set_title(title)
     if auto_htmlify:
         render_text(f"<h2 class='menu-title'>{title}</h2>")
     else:

@@ -6,7 +6,7 @@ import html
 import random
 
 from Maxs_Modules.files import SaveFile, load_questions_from_file, UserData
-from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient
+from Maxs_Modules.network import get_ip, QuizGameServer, QuizGameClient, get_free_port
 from Maxs_Modules.tools import try_convert, set_if_none, string_bool, sort_multi_array
 from Maxs_Modules.debug import debug_message, error
 from Maxs_Modules.renderer import Menu, Colour, print_text_on_same_line, clear, render_text, get_input, \
@@ -372,7 +372,6 @@ class Game(SaveFile):
     points_for_no_answer = None
     points_multiplier_for_a_streak = None
     points_multiplier_for_a_streak_base = None
-    compounding_amount_for_a_streak = None
     randomise_questions = None
     randomise_answer_placement = None
     pick_random_question = None
@@ -460,7 +459,6 @@ class Game(SaveFile):
         self.points_multiplier_for_a_streak = try_convert(self.save_data.get("points_multiplier_for_a_streak"), int)
         self.points_multiplier_for_a_streak_base = try_convert(
             self.save_data.get("points_multiplier_for_a_streak_base"), int)
-        self.compounding_amount_for_a_streak = try_convert(self.save_data.get("compounding_amount_for_a_streak"), int)
         self.randomise_questions = try_convert(self.save_data.get("randomise_questions"), bool)
         self.randomise_answer_placement = try_convert(self.save_data.get("randomise_answer_placement"), bool)
         self.pick_random_question = try_convert(self.save_data.get("pick_random_question"), bool)
@@ -503,7 +501,6 @@ class Game(SaveFile):
         self.points_multiplier_for_a_streak_base = set_if_none(self.points_multiplier_for_a_streak_base, 1.1)
         self.randomise_questions = set_if_none(self.randomise_questions, True)
         self.randomise_answer_placement = set_if_none(self.randomise_answer_placement, True)
-        self.compounding_amount_for_a_streak = set_if_none(self.compounding_amount_for_a_streak, 1)
         self.pick_random_question = set_if_none(self.pick_random_question, True)
         self.bot_difficulty = set_if_none(self.bot_difficulty, 50)
         self.server_name = set_if_none(self.server_name, "Quiz Game Server")
@@ -877,8 +874,6 @@ class Game(SaveFile):
 
             # Check if the user has a streak
             if current_user.streak > 0:
-                # Compound the streak
-                self.points_multiplier_for_a_streak *= self.compounding_amount_for_a_streak
 
                 # If the user has a streak then add the streak to the point
                 point = self.points_multiplier_for_a_streak * current_user.streak
@@ -897,7 +892,7 @@ class Game(SaveFile):
         else:
             if current_user.player_type == "User":
                 render_text("Incorrect.")
-                if self.show_correct_answer_after_question_or_game:
+                if self.show_correct_answer_after_question_or_game == "Question":
                     render_text("The correct answer was: " + question.correct_answer)
 
             # Add the answer to the user
@@ -1251,12 +1246,13 @@ class Game(SaveFile):
         """
         Shows a menu to configure the settings for a local hosted game
         """
-        local_menu_options = ["How many players", "Next", "Back"]
-        local_menu_values = [str(self.how_many_players), "Play Game", "Gameplay Settings"]
-        single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
+
 
         while True:
-
+            local_menu_options = ["How many players", "Next", "Back"]
+            local_menu_values = [str(self.how_many_players), "Play Game", "Gameplay Settings"]
+            single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
+            
             match single_player_menu.get_input():
                 case "How many players":
                     self.how_many_players = single_player_menu.get_input_option(int, f"How many players (max {max_number_of_players})", range(1, max_number_of_players+1))
@@ -1272,13 +1268,13 @@ class Game(SaveFile):
         Shows a menu to configure the networking settings for the game
 
         """
-        networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next", "Back"]
-        networking_menu_values = [str(self.server_name), str(self.server_port), str(self.max_players),
-                                  "Waiting for players", "Gameplay Settings"]
-
-        networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
-
         while True:
+
+            networking_menu_options = ["Server Name", "Server Port", "Max Players", "Next", "Back"]
+            networking_menu_values = [str(self.server_name), str(self.server_port), str(self.max_players),
+                                      "Waiting for players", "Gameplay Settings"]
+
+            networking_menu = Menu("Game Settings: Networking", [networking_menu_options, networking_menu_values], True)
 
             match networking_menu.get_input():
 
@@ -1287,11 +1283,12 @@ class Game(SaveFile):
 
                 case "Server Port":
                     self.server_port = networking_menu.get_input_option(int, "Server Port (1-65535)", range(1, 65535))
+                    self.server_port = get_free_port(get_ip(), self.server_port)
 
                 case "Max Players":
                     self.max_players = networking_menu.get_input_option(int, f"Max Players (max "
                                                                              f"{max_number_of_players})",
-                                                                        range(1, max_number_of_players+1))
+                                                                        range(2, max_number_of_players+1))
 
                 case "Next":
                     break
@@ -1311,7 +1308,7 @@ class Game(SaveFile):
                                       "Type", "Show score after Question/Game",
                                       "Show correct answer after Question/Game", "Points for correct answer",
                                       "Points for incorrect answer", "Points for no answer",
-                                      "Points multiplier for a streak", "Compounding amount for a streak",
+                                      "Points multiplier for a streak",
                                       "Randomise questions", "Randomise answer placement",
                                       "Pick random question when run out of time",
                                       "Bot difficulty", "Number of bots", "Next", "Back"]
@@ -1323,7 +1320,6 @@ class Game(SaveFile):
                                      str(self.points_for_correct_answer), str(self.points_for_incorrect_answer),
                                      str(self.points_for_no_answer),
                                      str(self.points_multiplier_for_a_streak),
-                                     str(self.compounding_amount_for_a_streak),
                                      str(self.randomise_questions), str(self.randomise_answer_placement),
                                      str(self.pick_random_question),
                                      str(self.bot_difficulty), str(self.how_many_bots)]
@@ -1389,10 +1385,6 @@ class Game(SaveFile):
                     self.points_multiplier_for_a_streak = gameplay_menu.get_input_option(
                         int, "Points multiplier for a streak")
 
-                case "Compounding amount for a streak":
-                    self.compounding_amount_for_a_streak = gameplay_menu.get_input_option(
-                        int, "Compounding amount for a streak")
-
                 case "Randomise questions":
                     self.randomise_questions = gameplay_menu.get_input_option(string_bool,
                                                                               "Randomise questions (True/False)")
@@ -1442,6 +1434,7 @@ class Game(SaveFile):
 
         # Create a socket
         try:
+            self.server_port = get_free_port(get_ip(), self.server_port)
             self.backend = QuizGameServer(get_ip(), self.server_port)
             self.backend.game = self
         except OSError:

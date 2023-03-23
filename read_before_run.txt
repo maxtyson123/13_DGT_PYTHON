@@ -1,9 +1,17 @@
 ### Setup and run ###
+- Please use Python 3.10 or above due to the use of match statements
 
-1. pip install -r requirements.txt
-or
-1. python -m pip install -r requirements.txt
+1. Tools/requirements.bat OR python -m pip install -r requirements.txt OR pip install -r requirements.txt
 2. run main.py
+
+### Run in Idle ###
+- If you want to run in idle (or other IDEs) follow these steps.
+
+1. Setup first
+2. Modify the script to change the following constants: compact_console = True, use_colour = False
+3. Run main.py with the following arguments: --ide (To do this in idle, go to Run -> Run Module Customized)
+
+- Note (CLI only) --ide tells the program to disable timed input, meaning time limits will not be enforced
 
 ### Modify Script ###
 - Some constants in the script can be modified to change the game's behavior
@@ -16,8 +24,6 @@ or
 7. renderer.py : auto_htmlify = Convert text to html when printing to the GUI
 8. renderer.py : auto_colour = Convert some strings to coloured vairants
 9. renderer.py : use_colour = Enable colour
-
-- When running in idle, change use_colour to False and compact_console to True for better user experience if using CLI mode
 
 ### Multiplayer - Local Test ###
 

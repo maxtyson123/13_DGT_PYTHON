@@ -7,6 +7,7 @@ from datetime import datetime
 # - - - - - - - Variables - - - - - - -#
 
 maxs_debugger = None
+start_time = time.time()
 
 session_message_log = []
 session_error_log = []
@@ -383,6 +384,10 @@ def close_debug_session() -> None:
     """
     Run the close_debug_session() function of the debugger, if it is initialized
     """
+
+    # Log the run time
+    debug_message(f"Script ran for {time.time() - start_time} seconds", "close")
+
     # Only run if the debugger is initialized
     if maxs_debugger is not None:
         maxs_debugger.close_debug_session()

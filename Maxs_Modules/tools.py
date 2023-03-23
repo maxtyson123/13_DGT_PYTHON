@@ -130,9 +130,13 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                         return None
             else:
                 user_input = get_input(input_message + " > ")
+                if user_input is None:
+                    user_input = ""
         else:
             user_input = pre_input
             pre_input = None
+
+
 
         # Check if it is a debug command
         if "debug" in user_input:
