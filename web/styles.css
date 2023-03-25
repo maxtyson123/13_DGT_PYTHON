@@ -288,3 +288,33 @@ input{
         background-position: 47% 0%
     }
 }
+
+.close-button-container{
+    display: flex;
+    justify-content: flex-end;
+     position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.close-button-container p{
+    padding-right: 10px;
+    font-size: 15px;
+}
+
+.close-button{
+    /* Red button in the top right corner of the website */
+    padding: 15px;
+    background-color: red;
+    border-radius: 0px 0px 0px 25px;
+    color: white;
+    border: none;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: 'Apple Chancery', cursive;
+}
+
+.close-button:hover{
+    background-color: #be1313;
+}

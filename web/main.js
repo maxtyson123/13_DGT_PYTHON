@@ -124,3 +124,7 @@ eel.expose(set_title)
 if (window.outerWidth < 1600 || window.outerHeight < 900){
     window.resizeTo(1600, 900);
 }
+
+function close_python_and_window(){
+    eel.close_python()
+}

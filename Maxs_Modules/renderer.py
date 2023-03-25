@@ -1,6 +1,7 @@
 # - - - - - - - Imports - - - - - - -#
 import os
 import re
+import signal
 import sys
 import time
 import eel
@@ -20,7 +21,7 @@ divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
 display_type = UserData().display_mode
-# Note change this to False to disable auto htmlify (leave the display_type == "GUI" part)
+# Note change this to be False to disable auto htmlify (leave the display_type == "GUI" part)
 auto_htmlify = True and display_type == "GUI"
 auto_colour = True
 use_colour = True
@@ -316,7 +317,7 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
         match wrap:
             case WrapMode.CHAR:
                 # Print the current text in the divider, cutting off the text at the console width
-                text = divider_symbol + item_to_print[:console_space_free]  + divider_symbol
+                text = divider_symbol + item_to_print[:console_space_free] + divider_symbol
                 render_text(text)
 
                 # Store the text to print as adding a space for readability
@@ -587,7 +588,9 @@ def get_gui_timed_input(prompt: str, timeout: int):
 
 
 def render_header(title: str, enclose_bottom: bool = True) -> None:
-    eel.set_title(title)
+    if display_type == "GUI":
+        eel.set_title(title)
+
     if auto_htmlify:
         render_text(f"<h2 class='menu-title'>{title}</h2>")
     else:
@@ -635,6 +638,16 @@ def round_to_decimal(number: float, decimal_places: int = 2) -> float:
     """
     return round(number * (10 ** decimal_places)) / (10 ** decimal_places)
 
+
+@eel.expose
+def close_python():
+    gui_close()
+    print("Window closed, closing python...")
+    # Get the process ID of the current process
+    pid = os.getpid()
+
+    # Kill the process and all its child threads
+    os.kill(pid, signal.SIGTERM)
 
 def init_gui():
     # Import here to prevent circular imports

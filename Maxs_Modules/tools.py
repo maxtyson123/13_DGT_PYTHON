@@ -107,7 +107,10 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
         if pre_input is None:
             # Check if there is a time limit and since inputimeout doesn't work in the IDE, check if the program is
             # running in the IDE
-            if max_time != 0 and not in_ide:
+            if in_ide:
+                max_time = 0
+
+            if max_time != 0:
                 # Check if the time limit has been reached
                 if time.time() - start_time > max_time:
                     return None

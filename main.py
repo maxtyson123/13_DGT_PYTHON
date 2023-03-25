@@ -253,7 +253,7 @@ def game_main_menu() -> None:
                 settings()
 
             case "Quit":
-                sys.exit()
+                break
 
 
 def tutorial() -> None:
@@ -379,5 +379,5 @@ if __name__ == "__main__":
     try:
         main()
     finally:
-        gui_close()
         close_debug_session()
+        gui_close()
