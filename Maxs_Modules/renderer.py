@@ -502,6 +502,14 @@ def print_text_on_same_line(text_to_print: str) -> None:
 
 
 def auto_style_text(text: str, force: bool = False) -> str:
+    """
+    Automatictly styles the text based on certain keywords. This is used to make the text more readable.
+    Colours are automatically converted into their ANSI escape codes.
+
+    @param text: The text to style
+    @param force: Force the text to be styled even if auto_colour is False
+    @return: The styled text
+    """
     if not auto_colour and not force:
         return text
 
@@ -535,13 +543,24 @@ def auto_style_text(text: str, force: bool = False) -> str:
 
 
 def render_text(text: str) -> None:
+    """
+    Prints the text to the console. If the display type is GUI then it will use the js function to print the text.
+    @param text: The text to print
+    """
     if display_type == "CLI":
         print(auto_style_text(text))
     elif display_type == "GUI":
         eel.print(str(auto_style_text(text)))
 
 
-def get_input(prompt: str = ""):
+def get_input(prompt: str = "") -> str:
+    """
+    Gets the user input. If the display type is GUI then it will use the js function to get the input.
+    Otherwise it will use the normal input function.
+
+    @param prompt: The prompt to display
+    @return: The user input
+    """
     # If the display type is CLI then use the normal input function
     if display_type == "CLI":
         return input(auto_style_text(prompt))
@@ -565,7 +584,15 @@ def get_input(prompt: str = ""):
         return user_input
 
 
-def get_gui_timed_input(prompt: str, timeout: int):
+def get_gui_timed_input(prompt: str, timeout: int) -> str:
+    """
+    Gets the user input using the GUI, but with a timeout. If the user does not enter anything within the timeout then
+    it will return None.
+
+    @param prompt: The prompt to display
+    @param timeout: The timeout in seconds
+    @return: The user input
+    """
     # Store start info
     user_input = ""
     start_time = time.time()
@@ -588,6 +615,12 @@ def get_gui_timed_input(prompt: str, timeout: int):
 
 
 def render_header(title: str, enclose_bottom: bool = True) -> None:
+    """
+    Renders a title header to the console or GUI.
+
+    @param title: The title to display
+    @param enclose_bottom: Whether to enclose the bottom of the header with a border (CLI only)
+    """
     if display_type == "GUI":
         eel.set_title(title)
 
@@ -609,7 +642,11 @@ def render_header(title: str, enclose_bottom: bool = True) -> None:
             render_text(divider)
 
 
-def render_quiz_header(game) -> None:
+def render_quiz_header(game: object) -> None:
+    """
+    Renders the quiz header to the console or GUI.
+    @param game: The game object contianing the quiz info
+    """
     current_question = game.current_question + 1
     question_amount = game.question_amount
     user = game.users[game.current_user_playing].styled_name()
@@ -640,7 +677,11 @@ def round_to_decimal(number: float, decimal_places: int = 2) -> float:
 
 
 @eel.expose
-def close_python():
+def close_python() -> None:
+    """
+    Closes the python process and GUI window. This is used by the GUI to close the python process when the window is
+    closed.
+    """
     gui_close()
     print("Window closed, closing python...")
     # Get the process ID of the current process
@@ -649,7 +690,11 @@ def close_python():
     # Kill the process and all its child threads
     os.kill(pid, signal.SIGTERM)
 
-def init_gui():
+
+def init_gui() -> None:
+    """
+    If the display type is GUI then start the web server on a free port (starting at 8080)
+    """
     # Import here to prevent circular imports
     from Maxs_Modules.network import get_free_port, get_ip
 
@@ -664,7 +709,10 @@ def init_gui():
                   port=web_port, host=web_ip)
 
 
-def gui_close():
+def gui_close() -> None:
+    """
+    If the display type is GUI then close the window of the web server
+    """
     # If the display type is GUI then close the web server
     if display_type == "GUI":
         eel.close_window()
