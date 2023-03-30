@@ -8,10 +8,13 @@
 - If you want to run in idle (or other IDEs) follow these steps.
 
 1. Setup first
-2. Modify the script to change the following constants: compact_console = True, use_colour = False
+2. Modify the script to change the following constants: (Maxs_Modules/renderer.py) compact_console = True, use_colour = False
 3. Run main.py with the following arguments: --ide (To do this in idle, go to Run -> Run Module Customized)
 
 - Note (CLI only) --ide tells the program to disable timed input, meaning time limits will not be enforced
+
+### Run on windows 11 ###
+- Windows 11 doesnt like the ░ symbol in console so it is recomended to change "divider_symbol"  (Maxs_Modules/renderer.py) 
 
 ### Modify Script ###
 - Some constants in the script can be modified to change the game's behavior

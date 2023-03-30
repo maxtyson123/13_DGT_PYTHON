@@ -491,7 +491,7 @@ class Game(SaveFile):
         # User Chosen Settings
         self.host_a_server = set_if_none(self.host_a_server, host_a_server_by_default)
         self.time_limit = set_if_none(self.time_limit, 10)
-        self.show_score_after_question_or_game = set_if_none(self.show_score_after_question_or_game, "Question")
+        self.show_score_after_question_or_game = set_if_none(self.show_score_after_question_or_game, "Game")
         self.show_correct_answer_after_question_or_game = set_if_none(self.show_correct_answer_after_question_or_game,
                                                                       "Question")
         self.points_for_correct_answer = set_if_none(self.points_for_correct_answer, 1)

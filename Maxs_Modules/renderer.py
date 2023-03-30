@@ -6,25 +6,32 @@ import sys
 import time
 import eel
 
-from Maxs_Modules.debug import debug_message
+from Maxs_Modules.debug import debug_message, in_ide
 from Maxs_Modules.files import UserData
 from Maxs_Modules.tools import get_user_input_of_type
 
 # - - - - - - - Variables - - - - - - -#
+# DONT CHANGE
+display_type = UserData().display_mode
 
-compact_console = False
+# CHANGE IN IDLE
+compact_console = True
+use_colour = False
+
+# CHANGE IF DESIRED
 console_width = 100
 divider_symbol = chr(9617)  # OR use '░'
+# Note change this to be False to disable auto htmlify (leave the display_type == "GUI" part)
+auto_htmlify = True and display_type == "GUI"
+auto_colour = True
+
+
 if compact_console:
     divider_symbol = "-"
 divider_symbol_size = len(divider_symbol)
 divider = divider_symbol * console_width
 menu_manager = None
-display_type = UserData().display_mode
-# Note change this to be False to disable auto htmlify (leave the display_type == "GUI" part)
-auto_htmlify = True and display_type == "GUI"
-auto_colour = True
-use_colour = True
+
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -142,7 +149,8 @@ def clear() -> None:
     if display_type == "GUI":
         eel.clear_screen()
     else:
-        os.system("cls")
+        if not in_ide:
+            os.system("cls")
 
 
 class Menu:
