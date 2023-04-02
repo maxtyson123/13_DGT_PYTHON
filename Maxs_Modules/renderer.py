@@ -15,8 +15,8 @@ from Maxs_Modules.tools import get_user_input_of_type
 display_type = UserData().display_mode
 
 # CHANGE IN IDLE
-compact_console = True
-use_colour = False
+compact_console = False
+use_colour = True
 
 # CHANGE IF DESIRED
 console_width = 100
