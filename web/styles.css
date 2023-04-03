@@ -318,3 +318,18 @@ input{
 .close-button:hover{
     background-color: #be1313;
 }
+
+
+.target-highlight {
+    -webkit-animation: target-fade 1.5s 1;
+    -moz-animation: target-fade 1.5s 1;
+}
+
+@-webkit-keyframes target-fade {
+    0% { background-color: rgba(255,255,153,.8); }
+   
+}
+@-moz-keyframes target-fade {
+    0% { background-color: rgba(255,255,153,.8); }
+
+}

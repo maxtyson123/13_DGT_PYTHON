@@ -19,6 +19,15 @@ const colour_codes = {
    "RESET":"[0m",
 }
 
+
+let input_buffer = ""
+let temp_input_buffer = ""
+let is_inputting = false
+
+const input_prompt = document.getElementById("input_prompt");
+const input_box = document.getElementById("input");
+const output_div = document.getElementById("output")
+const input_container = document.getElementsByClassName("quiz-input-container")[0]
 function translate_colours(text){
     // Loop through the colour codes
     for (const [key, value] of Object.entries(colour_codes)) {
@@ -31,31 +40,28 @@ function translate_colours(text){
 }
 
 function print(text){
+
+    // Log the text to console
     console.log(text);
 
+    // Convert the ANSI colour codes into html spans
     text = translate_colours(text)
 
-    document.getElementById("output").innerHTML += text + "<br>";
+    // Create a new line
+    output_div.innerHTML += text + "<br>";
 }
 eel.expose(print);
 
 function clear_screen(){
-    const output = document.getElementById("output")
-    output.innerHTML = ""
-    output.scrollIntoView()
-
+    // Clear the output
+    output_div.innerHTML = ""
+    
+    // Scroll to top
+    output_div.scrollIntoView()
 }
 eel.expose(clear_screen);
 
-
-let input_buffer = ""
-let temp_input_buffer = ""
-let is_inputting = false
 function get_input(prompt){
-    // Get the input boxs
-    const input_prompt = document.getElementById("input_prompt");
-    const input_box = document.getElementById("input");
-
     // Set the prompt
     input_prompt.innerHTML = translate_colours(prompt)
 
@@ -64,19 +70,27 @@ function get_input(prompt){
 
         // Define a handler
         function input_handler(e){
+
+            // Update the input buffer with the new input
             temp_input_buffer = input_box.value
-             if (e.key != "Enter"){
+             
+            // If the key is not enter then continue
+            if (e.key != "Enter"){
                 return
              }
 
+             // Store the input
              input_buffer = input_box.value
+             
+             // If the user has entered nothing 
              if (input_buffer == ""){
-                 // Make sure the loop breaks
+                 // Make sure the loop breaks as the python side input waits for the input buffer to not be empty
                  input_buffer = " "
              }
 
-             input_box.removeEventListener("keypress", input_handler)
-             is_inputting = false
+            // Stop listing to keypress as no longer waiting for input 
+            input_box.removeEventListener("keypress", input_handler)
+            is_inputting = false
         }
 
         // Register the handler as a listener
@@ -86,12 +100,14 @@ function get_input(prompt){
         is_inputting = true
     }
 
+    // Return the input to python
     return input_buffer
 
 }
 eel.expose(get_input);
 
 function force_get_input(){
+    // Returns what ever is already in the input box
     return temp_input_buffer
 }
 eel.expose(force_get_input);
@@ -104,18 +120,23 @@ function clear_input_buffer(){
 eel.expose(clear_input_buffer)
 
 function choose_item(option){
+    // Set the input buffer to the id of the button that was pressed
     input_buffer = option.id
     temp_input_buffer = input_buffer
     document.getElementById("input").value = input_buffer
+    
+    // Scroll to the input
     document.getElementById("input").scrollIntoView()
 }
 
 function close_window(){
+    // Called by python to close the window
     window.close()
 }
 eel.expose(close_window)
 
 function set_title(title){
+    // Called by python to set the title of the menu
     document.title = "Quiz Game UI | " + title
 }
 eel.expose(set_title)
@@ -126,5 +147,26 @@ if (window.outerWidth < 1600 || window.outerHeight < 900){
 }
 
 function close_python_and_window(){
+    // Intiate the python shutdown
     eel.close_python()
 }
+
+
+function highlight_input(){
+    addTargetingClass();
+    
+    setTimeout(function() {
+        removeTargetingClass();
+    }, 3000);
+  }
+eel.expose(highlight_input);
+
+input_box.click(highlight_input);
+  
+  function addTargetingClass() {
+    input_container.classList.add('target-highlight');
+  }
+  
+  function removeTargetingClass() {
+    input_container.classList.remove('target-highlight');
+  }

@@ -575,6 +575,9 @@ def get_input(prompt: str = "") -> str:
 
     # If the display type is GUI then use the js function to get the input
     elif display_type == "GUI":
+        # Prompt for input
+        eel.highlight_input()
+       
         # Wait for the user to enter something
         user_input = ""
         while user_input == "":
