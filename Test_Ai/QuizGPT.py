@@ -139,7 +139,7 @@ def extract_nouns(content):
     out = []
 
     try:
-        # Setup the extractor with the content passed in
+        # Set up the extractor with the content passed in
         extractor = pke.unsupervised.MultipartiteRank()
         extractor.load_document(input=content, language='en')
 
@@ -227,7 +227,6 @@ def filter_same_sense_words(original, wordlist):
     # Loop through each word in the wordlist and check if the sense matches the base sense
     for each_word in wordlist:
         if each_word[0].split('|')[1] == base_sense:
-
             # If the sense matches then add the word to the filtered words list. Also remove the sense and replace
             # the underscores with spaces
             filtered_words.append(each_word[0].split('|')[0].replace("_", " ").title().strip())
@@ -246,7 +245,6 @@ def get_highest_similarity_score(wordlist, wrd):
 
 
 def sense2vec_get_words(word, s2v, topn, question):
-    output = []
     try:
         # Get the best sense of the given word based on the provided senses
         sense = s2v.get_best_sense(word,
@@ -281,7 +279,6 @@ def sense2vec_get_words(word, s2v, topn, question):
 
 
 def mmr(doc_embedding, word_embeddings, words, num_of_keywords, lambda_param):
-
     # Calculate the similarity between the words in the document and the document itself
     word_doc_similarity = cosine_similarity(word_embeddings, doc_embedding)
 
@@ -302,7 +299,7 @@ def mmr(doc_embedding, word_embeddings, words, num_of_keywords, lambda_param):
         target_similarities = np.max(word_similarity[candidates_idx][:, keywords_idx], axis=1)
 
         # Calculate the Maximum Marginal Relevance (MMR) score for each candidate word
-        mmr = (lambda_param) * candidate_similarities - (1 - lambda_param) * target_similarities.reshape(-1, 1)
+        mmr = lambda_param * candidate_similarities - (1 - lambda_param) * target_similarities.reshape(-1, 1)
 
         # Select the candidate word with the highest MMR score
         mmr_idx = candidates_idx[np.argmax(mmr)]
@@ -386,7 +383,6 @@ def main():
 
         other_choices = ", ".join(distractions)
         print(f"Question: {question} Answer: {answer.capitalize()} | Other Choices: {other_choices}")
-
 
 
 if __name__ == "__main__":

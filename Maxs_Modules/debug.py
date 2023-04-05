@@ -6,8 +6,8 @@ from datetime import datetime
 
 # - - - - - - - Variables - - - - - - -#
 
-maxs_debugger = None
-start_time = time.time()
+QUIZ_DEBUGGER = None
+START_TIME = time.time()
 
 session_message_log = []
 session_error_log = []
@@ -25,7 +25,7 @@ def init_debug() -> None:
 
     # Make sure to be able to update the debugger variable, as using it as a global variable it has my name on it to
     # prevent it shadowing other modules
-    global maxs_debugger
+    global QUIZ_DEBUGGER
 
     # Import here to prevent circular imports
     from Maxs_Modules.tools import try_convert, set_if_none
@@ -256,7 +256,8 @@ def init_debug() -> None:
 
                     case "-store-individual":
                         self.individual_log_files = get_user_input_of_type(string_bool,
-                                                                           "Store the logs in individual files? (True/False)")
+                                                                           "Store the logs in individual files? ("
+                                                                           "True/False)")
 
                     case "-store-max":
                         self.max_log_history = get_user_input_of_type(int, "Maximum amount of logs to store: ")
@@ -277,7 +278,7 @@ def init_debug() -> None:
 
         def command_errors(self, *args: tuple) -> None:
             """
-            Allows the user to view/clear the errors (note: errors made by the error() funct, not the runtime errors)
+            Allows the user to view/clear the errors (note: errors made by the error() function, not the runtime errors)
             @param args: The args to pass to the command, if none are given it will show the help message
             """
             from Maxs_Modules.renderer import render_text
@@ -375,7 +376,7 @@ def init_debug() -> None:
             self.save()
 
     # Set the debugger to the debug class
-    maxs_debugger = Debug()
+    QUIZ_DEBUGGER = Debug()
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -386,11 +387,11 @@ def close_debug_session() -> None:
     """
 
     # Log the run time
-    debug_message(f"Script ran for {time.time() - start_time} seconds", "close")
+    debug_message(f"Script ran for {time.time() - START_TIME} seconds", "close")
 
     # Only run if the debugger is initialized
-    if maxs_debugger is not None:
-        maxs_debugger.close_debug_session()
+    if QUIZ_DEBUGGER is not None:
+        QUIZ_DEBUGGER.close_debug_session()
 
 
 def debug_cli(command: list) -> None:
@@ -399,8 +400,8 @@ def debug_cli(command: list) -> None:
     @param command: The command to handle and args to pass to the handler (as a list)
     """
     # Only run if the debugger is initialized
-    if maxs_debugger is not None:
-        maxs_debugger.handle(command)
+    if QUIZ_DEBUGGER is not None:
+        QUIZ_DEBUGGER.handle(command)
 
 
 def debug_message(message: str, log_type: str = "info") -> None:
@@ -411,8 +412,8 @@ def debug_message(message: str, log_type: str = "info") -> None:
     @param log_type: The type of log to print
     """
     # Only run if the debugger is initialized
-    if maxs_debugger is not None:
-        maxs_debugger.log(message, log_type)
+    if QUIZ_DEBUGGER is not None:
+        QUIZ_DEBUGGER.log(message, log_type)
 
 
 def error(error_message: str) -> None:
@@ -425,7 +426,7 @@ def error(error_message: str) -> None:
     render_text("ERROR: " + error_message)
 
     # Add the error to the error log if debug is enabled
-    if maxs_debugger is not None:
+    if QUIZ_DEBUGGER is not None:
         session_error_log.append(error_message)
 
     # Give the user time to read the error message

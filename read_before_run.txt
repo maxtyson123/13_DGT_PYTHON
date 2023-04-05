@@ -14,18 +14,18 @@
 - Note (CLI only) --ide tells the program to disable timed input, meaning time limits will not be enforced
 
 ### Run on windows 11 ###
-- Windows 11 doesnt like the ░ symbol in console so it is recomended to change "divider_symbol"  (Maxs_Modules/renderer.py) 
+- Windows 11 doesn't like the ░ symbol in console, so it is recommended to change "divider_symbol"  (Maxs_Modules/renderer.py)
 
 ### Modify Script ###
 - Some constants in the script can be modified to change the game's behavior
 1. game.py : max_number_of_questions = Maximum number of questions per game (shouldn't exceed 50)
-2. game.py : max_number_of_players = Maximum number of players per game (shouldn't exceed 4) (applys to bots as well)
+2. game.py : max_number_of_players = Maximum number of players per game (shouldn't exceed 4) (apply to bots as well)
 3. game.py : host_a_server_by_default = Should the default game be a server (True/False)
 4. renderer.py : compact_console = Use the compact variant of the console
 5. renderer.py : console_width = Width of the console
 6. renderer.py : divider_symbol = Symbol used as borders and such when printing, can be changed on compact console
 7. renderer.py : auto_htmlify = Convert text to html when printing to the GUI
-8. renderer.py : auto_colour = Convert some strings to coloured vairants
+8. renderer.py : auto_colour = Convert some strings to coloured variants
 9. renderer.py : use_colour = Enable colour
 
 ### Multiplayer - Local Test ###

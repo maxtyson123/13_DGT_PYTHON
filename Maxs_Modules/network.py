@@ -321,8 +321,6 @@ class QuizClient:
                                     json.loads(decoded)
                                     break
                                 except ValueError:
-                                    # TODO: This is not the best way of doing this as a malicious server could send
-                                    #  broken JSON and cause the client to loop forever
                                     continue
 
                             # If there is no data then the connection has been closed
@@ -402,6 +400,7 @@ class QuizClient:
         debug_message(f"Sending {message}", "network_client")
         sock.sendall(message.to_bytes())
 
+
 class QuizGameServer(QuizServer):
     game = None
     running = False
@@ -411,7 +410,7 @@ class QuizGameServer(QuizServer):
         """
         Handle data received from a client. This function can handle the client_join message type and the sync_player
         message. Both of these actions involve updating the game's users array with the new user data if the request
-        was handled without error. Upon handling the messages the server will send a error response to the socket if
+        was handled without error. Upon handling the messages the server will send an error response to the socket if
         the game is full or has already started or if the username is already taken.  If the game has already started
         then the server will only allow the client to join if they have a name that is already in the game's users
         but not connected, which is treated as a reconnect.

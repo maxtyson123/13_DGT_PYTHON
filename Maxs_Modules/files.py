@@ -7,8 +7,8 @@ from Maxs_Modules.tools import try_convert, set_if_none
 
 # - - - - - - - Variables - - - - - - -#
 
-offline_questions_file = "ProgramData/questions.json"
-data_folder = "UserData/"
+OFFLINE_QUESTIONS_JSON = "ProgramData/questions.json"
+DATA_FOLDER = "UserData/"
 
 
 # - - - - - - - Functions - - - - - - -#
@@ -22,7 +22,7 @@ def load_questions_from_file() -> dict:
     @return: JSON object of questions
     """
     # Open the file in read mode
-    with open(offline_questions_file, "r") as file:
+    with open(OFFLINE_QUESTIONS_JSON, "r") as file:
         # Read the file into a json object
         questions = json.load(file)
 
@@ -104,8 +104,8 @@ class SaveFile:
         """
         debug_message("Saving file to " + self.save_file, "save_file")
 
-        if not os.path.exists(data_folder):
-            os.mkdir(data_folder)
+        if not os.path.exists(DATA_FOLDER):
+            os.mkdir(DATA_FOLDER)
 
         # Open the file and dump the object as a dictionary, then close the file
         with open(self.save_file, "w") as file:
@@ -134,7 +134,7 @@ class UserData(SaveFile):
         """
         Create a new UserData object, loaded from setup.json
         """
-        super().__init__(data_folder + "data.json")
+        super().__init__(DATA_FOLDER + "data.json")
 
         # Load the data from the save file
         self.display_mode = try_convert(self.save_data.get("display_mode"), str)

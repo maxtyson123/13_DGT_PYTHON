@@ -12,6 +12,7 @@
     --secondary-colour: cornflowerblue;
 }
 
+/*noinspection CssUnusedSymbol*/
 .colour-code-black {
     color: #2d2c2c;
 }
@@ -119,7 +120,7 @@ button {
     width: 100%;
     background-color: #000000;
     box-shadow: 2px 2px 5px floralwhite;
-    border-radius: 0px 0px 25px 25px;
+    border-radius: 0 0 25px 25px;
 }
 
 input:focus {
@@ -136,7 +137,7 @@ input:focus {
 .quiz-game {
     background-color: var(--primary-color);
     box-shadow: 2px 2px 5px floralwhite;
-    border-radius: 25px 25px 0px 0px;
+    border-radius: 25px 25px 0 0;
     width: 100%;
 }
 
@@ -148,7 +149,7 @@ input:focus {
 }
 
 .menu-title{
-   padding: 0px 10px 0px 10px;
+   padding: 0 10px 0 10px;
 }
 
 .menu-option{
@@ -161,7 +162,7 @@ input:focus {
     background-color: black;
     color: var(--text-colour);
     border-radius: 10px;
-    padding: 0px 10px 0px 10px;
+    padding: 0 10px 0 10px;
     font-size: 18px;
 }
 
@@ -219,73 +220,73 @@ input{
 
 @-webkit-keyframes TitleAnim {
     0% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
     50% {
         background-position: 100% 50%
     }
     100% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
 }
 
 @-moz-keyframes TitleAnim {
     0% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
     50% {
         background-position: 100% 50%
     }
     100% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
 }
 
 @keyframes TitleAnim {
     0% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
     50% {
         background-position: 100% 50%
     }
     100% {
-        background-position: 0% 51%
+        background-position: 0 51%
     }
 }
 
 @-webkit-keyframes BackgroundAnim {
     0% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
     50% {
         background-position: 54% 100%
     }
     100% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
 }
 
 @-moz-keyframes BackgroundAnim {
     0% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
     50% {
         background-position: 54% 100%
     }
     100% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
 }
 
 @keyframes BackgroundAnim {
     0% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
     50% {
         background-position: 54% 100%
     }
     100% {
-        background-position: 47% 0%
+        background-position: 47% 0
     }
 }
 
@@ -306,7 +307,7 @@ input{
     /* Red button in the top right corner of the website */
     padding: 15px;
     background-color: red;
-    border-radius: 0px 0px 0px 25px;
+    border-radius: 0 0 0 25px;
     color: white;
     border: none;
     font-size: 25px;

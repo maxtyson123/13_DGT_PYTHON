@@ -1,18 +1,3 @@
-# TODOS:
-# [x] Base functionality: menus etc., file saving/loading
-# [x] Modules
-# [x] Base Game Setup: Settings, questions from API/Local, etc
-# [x] Clean Up
-# [x] Extended user experience: Colours, multi-page menus
-# [x] Easier debugging
-# [x] Multiplayer Base: Joining a game, creating a game, waiting for players
-# [x] Multiplayer Game Logic: Scores sync questions sync
-# [x] Clean Up aka more efficient and correct commenting
-# [x] GUI Base, port the current render to a simple GUI
-# [x] GUI Extended, Buttons instead of text based, css and other styling
-# [x] Clean Up
-# [.] Bug Hunting
-
 # - - - - - - - Imports - - - - - - -#
 import os
 import sys
@@ -27,7 +12,7 @@ from Maxs_Modules.renderer import Menu, clear, render_text, get_input, init_gui,
 from Maxs_Modules.tools import string_bool, ip_address
 
 # - - - - - - - Variables - - - - - - -#
-data_folder = "UserData/"
+DATA_FOLDER = "UserData/"
 
 
 # - - - - - - - MENUS - - - - - - -#

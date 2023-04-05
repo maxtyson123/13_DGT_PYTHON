@@ -147,7 +147,7 @@ if (window.outerWidth < 1600 || window.outerHeight < 900){
 }
 
 function close_python_and_window(){
-    // Intiate the python shutdown
+    // Initiate the python shutdown
     eel.close_python()
 }
 

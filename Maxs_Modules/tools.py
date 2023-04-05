@@ -98,7 +98,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
     @return: The user input converted to the type specified
     """
 
-    from Maxs_Modules.renderer import display_type, get_gui_timed_input, get_input
+    from Maxs_Modules.renderer import DISPLAY_TYPE, get_gui_timed_input, get_input
 
     # Store the start time
     start_time = time.time()
@@ -119,7 +119,7 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
                 time_left = max_time - (time.time() - start_time)
 
                 # If display then user the GUI input
-                if display_type == "GUI":
+                if DISPLAY_TYPE == "GUI":
                     user_input = get_gui_timed_input(input_message + " > ", time_left)
 
                     # This means the user timed out without entering anything
@@ -139,8 +139,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
             user_input = pre_input
             pre_input = None
 
-
-
         # Check if it is a debug command
         if "debug" in user_input:
             command = user_input.split(" ")
@@ -157,7 +155,6 @@ def get_user_input_of_type(type_to_convert: object, input_message: str = "", mus
 
             # Check if the list should be returned
             if gather_pre_input:
-
                 # Split the string into a list
                 user_input = user_input.split(",")
                 return user_input
@@ -207,13 +204,13 @@ def set_if_none(variable: object, value: object) -> object:
     return variable
 
 
-def try_convert(variable: object, type_to_convert: type, supress_errors: bool = False) -> object:
+def try_convert(variable: object, type_to_convert: type, suppress_errors: bool = False) -> object:
     """
     Try to convert a variable to a type, if it fails then return None
 
     @param variable: The variable to convert
     @param type_to_convert: The type to convert the variable to
-    @param supress_errors: Weather to supress errors or not (By default: False)
+    @param suppress_errors: Weather to suppress errors or not (By default: False)
     @return: The converted variable or None if it failed
     """
     if variable is None:
@@ -222,7 +219,7 @@ def try_convert(variable: object, type_to_convert: type, supress_errors: bool = 
     try:
         return type_to_convert(variable)
     except ValueError:
-        if not supress_errors:
+        if not suppress_errors:
             should_be_type = str(type_to_convert).replace("<class '", "").replace("'>", "")
             if "string_bool" in should_be_type:
                 error(f"Incorrect input ({variable}) should be True or False")

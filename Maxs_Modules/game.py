@@ -13,15 +13,16 @@ from Maxs_Modules.renderer import Menu, Colour, print_text_on_same_line, clear, 
     render_header, render_quiz_header, round_to_decimal
 
 # - - - - - - - Variables - - - - - - -#
-data_folder = "UserData/Games/"
-category_offset = 9
-max_number_of_questions = 50
+GAME_STORED_LOCATION = "UserData/Games/"
+CATEGORY_OFFSET_API = 9
+MAX_NUMBER_OF_QUESTIONS = 50
 quiz_categories = ("General Knowledge", "Books", "Film", "Music", "Musicals & Theatres", "Television", "Video Games",
                    "Board Games", "Science & Nature", "Computers", "Mathematics", "Mythology", "Sports", "Geography",
                    "History", "Politics", "Art", "Celebrities", "Animals", "Vehicles", "Comics", "Gadgets",
                    "Japanese Anime & Manga", "Cartoon & Animations")
-host_a_server_by_default = False
-max_number_of_players = 10
+HOST_SERVER_BY_DEFAULT = False
+MAX_NUMBER_OF_PLAYERS = 10
+
 
 # - - - - - - - Functions - - - - - - -#
 
@@ -62,7 +63,7 @@ def get_saved_games():
     @return: A list of all the saved games
     """
     # Get a list of all the files in the data folder
-    files = os.listdir(data_folder)
+    files = os.listdir(GAME_STORED_LOCATION)
     debug_message("Files in data folder: " + str(files), "Game")
 
     # Remove all the files that are not .json files
@@ -424,10 +425,10 @@ class Game(SaveFile):
         # If the quiz save is not none, then load the quiz save because the user wants to continue a game otherwise
         # generate a new save file
         if quiz_save is not None:
-            super().__init__(data_folder + quiz_save)
+            super().__init__(GAME_STORED_LOCATION + quiz_save)
             self.game_loaded = True
         else:
-            super().__init__(data_folder + generate_new_save_file())
+            super().__init__(GAME_STORED_LOCATION + generate_new_save_file())
 
         # Set the online enabled variable, note it is not saved because the online state can change between runs
         usersettings = UserData()
@@ -489,7 +490,7 @@ class Game(SaveFile):
         Sets the default settings if the settings are none
         """
         # User Chosen Settings
-        self.host_a_server = set_if_none(self.host_a_server, host_a_server_by_default)
+        self.host_a_server = set_if_none(self.host_a_server, HOST_SERVER_BY_DEFAULT)
         self.time_limit = set_if_none(self.time_limit, 10)
         self.show_score_after_question_or_game = set_if_none(self.show_score_after_question_or_game, "Game")
         self.show_correct_answer_after_question_or_game = set_if_none(self.show_correct_answer_after_question_or_game,
@@ -644,7 +645,7 @@ class Game(SaveFile):
             category_index = quiz_categories.index(self.quiz_category)
 
             # Add the offset to the index. This is because the api starts at 9 and not 0 (ends at 32)
-            self.api_category = category_index + category_offset
+            self.api_category = category_index + CATEGORY_OFFSET_API
 
         # Convert the type if it is not any
         if self.question_type != "Any":
@@ -661,7 +662,7 @@ class Game(SaveFile):
         """
         Starts the game. It first gets the questions if there are none, then shuffles the questions if the user wants
         (only if the game is a new one as when continuing the game the questions should be in the same order). If the
-        game is set to be hosted then a server is started up. Afterwards the game is checked to see if it is finished
+        game is set to be hosted then a server is started up. Afterward the game is checked to see if it is finished
         otherwise it will continue to play from the current state
         """
         # If there are no questions then get them
@@ -756,9 +757,9 @@ class Game(SaveFile):
 
     def show_question_markings(self) -> None:
         """
-        Shows the answer each player submitted for the questions. It begins at current_question and then goes through each
-        question after that, so when called best practice is to set current_question to 0. It will call itself in a
-        loop until it reaches the end of the questions array
+        Shows the answer each player submitted for the questions. It begins at current_question and then goes through
+        each question after that, so when called best practice is to set current_question to 0. It will call itself
+        in a loop until it reaches the end of the questions array
         """
 
         # Get the current question
@@ -874,7 +875,6 @@ class Game(SaveFile):
 
             # Check if the user has a streak
             if current_user.streak > 0:
-
                 # If the user has a streak then add the streak to the point
                 point = self.points_multiplier_for_a_streak * current_user.streak
 
@@ -912,7 +912,7 @@ class Game(SaveFile):
         """
         Shows the user the question in a menu and gets the user to answer it, utilising the Menu class's time_limit
         to force the user to answer in the specified amount of time. Then it marks the question and calculates the
-        score for the player. Afterwards it runs the next question. The start time and end time of this function is
+        score for the player. Afterward it runs the next question. The start time and end time of this function is
         calculated and then stored for later use to work out the timings for the stats.
         """
 
@@ -1063,7 +1063,8 @@ class Game(SaveFile):
         # If this is a client then wait for the server to sync and all players to answer
         elif is_client:
             # Check that the server hasn't closed
-            if self.check_server_error(): return
+            if self.check_server_error():
+                return
 
             # Send the users answer to the server
             self.backend.send_self()
@@ -1096,7 +1097,8 @@ class Game(SaveFile):
 
         # Check that the server hasn't closed
         if is_client:
-            if self.check_server_error(): return
+            if self.check_server_error():
+                return
 
         # Move onto the question
         self.play()
@@ -1247,15 +1249,16 @@ class Game(SaveFile):
         Shows a menu to configure the settings for a local hosted game
         """
 
-
         while True:
             local_menu_options = ["How many players", "Next", "Back"]
             local_menu_values = [str(self.how_many_players), "Play Game", "Gameplay Settings"]
             single_player_menu = Menu("Game Settings: Local", [local_menu_options, local_menu_values], True)
-            
+
             match single_player_menu.get_input():
                 case "How many players":
-                    self.how_many_players = single_player_menu.get_input_option(int, f"How many players (max {max_number_of_players})", range(1, max_number_of_players+1))
+                    self.how_many_players = single_player_menu.get_input_option(int,
+                                                                                f"How many players (max {MAX_NUMBER_OF_PLAYERS})",
+                                                                                range(1, MAX_NUMBER_OF_PLAYERS + 1))
                 case "Next":
                     self.set_players()
                     break
@@ -1287,8 +1290,8 @@ class Game(SaveFile):
 
                 case "Max Players":
                     self.max_players = networking_menu.get_input_option(int, f"Max Players (max "
-                                                                             f"{max_number_of_players})",
-                                                                        range(2, max_number_of_players+1))
+                                                                             f"{MAX_NUMBER_OF_PLAYERS})",
+                                                                        range(2, MAX_NUMBER_OF_PLAYERS + 1))
 
                 case "Next":
                     break
@@ -1391,7 +1394,8 @@ class Game(SaveFile):
 
                 case "Randomise answer placement":
                     self.randomise_answer_placement = gameplay_menu.get_input_option(string_bool,
-                                                                                     "Randomise answer placement (True/False)")
+                                                                                     "Randomise answer placement ("
+                                                                                     "True/False)")
 
                 case "Pick random question when run out of time":
                     self.pick_random_question = gameplay_menu.get_input_option(string_bool,
@@ -1402,8 +1406,8 @@ class Game(SaveFile):
 
                 case "Number of bots":
                     self.how_many_bots = gameplay_menu.get_input_option(int, f"Number of bots "
-                                                                             f"(max {max_number_of_players})",
-                                                                        range(1, max_number_of_players+1))
+                                                                             f"(max {MAX_NUMBER_OF_PLAYERS})",
+                                                                        range(1, MAX_NUMBER_OF_PLAYERS + 1))
 
                 case "Next":
                     if self.host_a_server:
@@ -1495,7 +1499,8 @@ class Game(SaveFile):
         time.sleep(0.5)
         self.backend.send_message_to_all("synced so start game", "move_on")
 
-        if self.check_server_error(): return
+        if self.check_server_error():
+            return
 
         # Start the game, check if the game has finished or play the game
         if self.check_game_finished():
@@ -1504,7 +1509,8 @@ class Game(SaveFile):
         else:
             self.play()
 
-        if self.check_server_error(): return
+        if self.check_server_error():
+            return
 
         # Kill the server
         self.backend.kill()
@@ -1542,7 +1548,8 @@ class Game(SaveFile):
         # Wait for send and response
         time.sleep(1)
 
-        if self.check_server_error(): return
+        if self.check_server_error():
+            return
 
         # Wait for the server to start the game
         clear()
@@ -1553,14 +1560,18 @@ class Game(SaveFile):
         self.backend.wait_for_move_on()
 
         # Play the game
-        if self.check_server_error(): return
+        if self.check_server_error():
+            return
+
         # Start the game, check if the game has finished or play the game
         if self.check_game_finished():
             # If the game has finished then show the results
             self.game_end()
         else:
             self.play()
-        if self.check_server_error(): return
+
+        if self.check_server_error():
+            return
 
         # Close the socket
         self.backend.close_connection(self.backend.client)

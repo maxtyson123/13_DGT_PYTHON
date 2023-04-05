@@ -12,26 +12,24 @@ from Maxs_Modules.tools import get_user_input_of_type
 
 # - - - - - - - Variables - - - - - - -#
 # DONT CHANGE
-display_type = UserData().display_mode
+DISPLAY_TYPE = UserData().display_mode
 
 # CHANGE IN IDLE
-compact_console = False
-use_colour = True
+COMPACT_CONSOLE = False
+ANSI_COLOURS_ENABLED = True
 
 # CHANGE IF DESIRED
-console_width = 100
-divider_symbol = chr(9617)  # OR use '░'
-# Note change this to be False to disable auto htmlify (leave the display_type == "GUI" part)
-auto_htmlify = True and display_type == "GUI"
-auto_colour = True
+CONSOLE_WIDTH = 100
+CONSOLE_SYMBOL = chr(9617)  # OR use '░'
+# Note change this to be False to disable auto htmlify (leave the DISPLAY_TYPE == "GUI" part)
+CONVERT_OUTPUT_TO_HTML = True and DISPLAY_TYPE == "GUI"
+ADD_COLOUR_TO_TEXT = True
 
-
-if compact_console:
-    divider_symbol = "-"
-divider_symbol_size = len(divider_symbol)
-divider = divider_symbol * console_width
+if COMPACT_CONSOLE:
+    CONSOLE_SYMBOL = "-"
+DIVIDER_SYMBOL_SIZE = len(CONSOLE_SYMBOL)
+DIVIDER = CONSOLE_SYMBOL * CONSOLE_WIDTH
 menu_manager = None
-
 
 
 # - - - - - - - Classes - - - - - - -#
@@ -51,33 +49,33 @@ class Colour:
     Note: from https://en.wikipedia.org/wiki/ANSI_escape_code
     """
     # Colours
-    BLACK = "\033[30m" if use_colour else ""
-    RED = "\033[31m" if use_colour else ""
-    GREEN = "\033[32m" if use_colour else ""
-    YELLOW = "\033[33m" if use_colour else ""
-    BLUE = "\033[34m" if use_colour else ""
-    MAGENTA = "\033[35m" if use_colour else ""
-    CYAN = "\033[36m" if use_colour else ""
-    WHITE = "\033[37m" if use_colour else ""
-    GREY = "\033[90m" if use_colour else ""
+    BLACK = "\033[30m" if ANSI_COLOURS_ENABLED else ""
+    RED = "\033[31m" if ANSI_COLOURS_ENABLED else ""
+    GREEN = "\033[32m" if ANSI_COLOURS_ENABLED else ""
+    YELLOW = "\033[33m" if ANSI_COLOURS_ENABLED else ""
+    BLUE = "\033[34m" if ANSI_COLOURS_ENABLED else ""
+    MAGENTA = "\033[35m" if ANSI_COLOURS_ENABLED else ""
+    CYAN = "\033[36m" if ANSI_COLOURS_ENABLED else ""
+    WHITE = "\033[37m" if ANSI_COLOURS_ENABLED else ""
+    GREY = "\033[90m" if ANSI_COLOURS_ENABLED else ""
 
     colours_list = (BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, GREY)
     colours_names_list = ("Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White", "Grey")
 
     # Styles
-    BOLD = "\033[1m" if use_colour else ""
-    DIM = "\033[2m" if use_colour else ""
-    ITALIC = "\033[3m" if use_colour else ""
-    UNDERLINE = "\033[4m" if use_colour else ""
-    BLINK = "\033[5m" if use_colour else ""
-    INVERT = "\033[7m" if use_colour else ""
-    STRIKETHROUGH = "\033[9m" if use_colour else ""
+    BOLD = "\033[1m" if ANSI_COLOURS_ENABLED else ""
+    DIM = "\033[2m" if ANSI_COLOURS_ENABLED else ""
+    ITALIC = "\033[3m" if ANSI_COLOURS_ENABLED else ""
+    UNDERLINE = "\033[4m" if ANSI_COLOURS_ENABLED else ""
+    BLINK = "\033[5m" if ANSI_COLOURS_ENABLED else ""
+    INVERT = "\033[7m" if ANSI_COLOURS_ENABLED else ""
+    STRIKETHROUGH = "\033[9m" if ANSI_COLOURS_ENABLED else ""
 
     styles_list = (BOLD, DIM, ITALIC, UNDERLINE, BLINK, INVERT, STRIKETHROUGH)
     styles_names_list = ("Bold", "Dim", "Italic", "Underline", "Blink", "Invert", "Strikethrough")
 
     # Reset
-    RESET = "\033[0m" if use_colour else ""
+    RESET = "\033[0m" if ANSI_COLOURS_ENABLED else ""
 
     # THEME
     error = RED
@@ -146,7 +144,7 @@ def clear() -> None:
     Clears the screen
     """
     # Check if GUI clear
-    if display_type == "GUI":
+    if DISPLAY_TYPE == "GUI":
         eel.clear_screen()
     else:
         if not in_ide:
@@ -220,13 +218,10 @@ class Menu:
 
         menu_items = self.show_menu()
 
-        False
-
         # Check if the menu has a pre-input
         if len(menu_manager.pre_input) > 0:
             debug_message(f"Using pre-input ({menu_manager.pre_input[0]}) from {menu_manager.pre_input}")
             user_input = menu_manager.pre_input[0]
-            True
             menu_manager.pre_input.pop(0)
 
         # Calculate the possible options
@@ -310,7 +305,7 @@ class Menu:
 
 def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
-    Prints the item in between two divider symbols and wraps the text if it is too long by default using Truncate but
+    Prints the item in between two DIVIDER symbols and wraps the text if it is too long by default using Truncate but
     will use whatever is passed in the wrap parameter.
 
     @param item_to_print: The text to print
@@ -318,14 +313,14 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
     @return: None
     """
     text_length = len(Colour.clean_text(item_to_print))
-    console_space_free = console_width - (divider_symbol_size * 2)
+    console_space_free = CONSOLE_WIDTH - (DIVIDER_SYMBOL_SIZE * 2)
 
     # If the text is longer than the console width then wrap it
     if text_length > console_space_free:
         match wrap:
             case WrapMode.CHAR:
-                # Print the current text in the divider, cutting off the text at the console width
-                text = divider_symbol + item_to_print[:console_space_free] + divider_symbol
+                # Print the current text in the DIVIDER, cutting off the text at the console width
+                text = CONSOLE_SYMBOL + item_to_print[:console_space_free] + CONSOLE_SYMBOL
                 render_text(text)
 
                 # Store the text to print as adding a space for readability
@@ -352,8 +347,8 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                         # Join the words together
                         item_to_print = " ".join(words)
 
-                        # Print the item in the divider, split at console width
-                        render_text(divider_symbol + item_to_print[:console_space_free] + divider_symbol)
+                        # Print the item in the DIVIDER, split at console width
+                        render_text(CONSOLE_SYMBOL + item_to_print[:console_space_free] + CONSOLE_SYMBOL)
                         current_size += console_space_free
 
                         # Store the text to print as adding a space for readability. Cut off the text already written
@@ -386,8 +381,8 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
                         # Break out of the loop
                         break
 
-                # Print the item in the divider
-                render_text(divider_symbol + item_to_print + divider_symbol)
+                # Print the item in the DIVIDER
+                render_text(CONSOLE_SYMBOL + item_to_print + CONSOLE_SYMBOL)
 
                 # Join the words together
                 item_to_print = " ".join(words)
@@ -410,49 +405,48 @@ def text_in_divider(item_to_print: str, wrap: WrapMode = WrapMode.TRUNCATE) -> N
 
     # The length of the text, minus console width, minus 2 for the border
     width_left = console_space_free - text_length
-    render_text(divider_symbol + item_to_print + Colour.RESET + " " * width_left + divider_symbol)
+    render_text(CONSOLE_SYMBOL + item_to_print + Colour.RESET + " " * width_left + CONSOLE_SYMBOL)
 
 
 def show_menu(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
-    Prints a divider at the start and end of the menu. Then prints the menu items and their index in the middle using
+    Prints a DIVIDER at the start and end of the menu. Then prints the menu items and their index in the middle using
     the text_in_divider function for each item with the wrap mode passed in.
 
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
-    if auto_htmlify:
+    if CONVERT_OUTPUT_TO_HTML:
         for x in range(len(menu_items)):
             item_to_print = f"<div class='menu-option'><button id='{x}' onclick='choose_item(this)'> <p " \
                             f"class='split_for_colour menu-item-main inline'>{menu_items[x]}</p><p " \
                             f"class='menu-item-secondary inline'></p></button></div>"
             render_text(item_to_print)
     else:
-        render_text(divider)
-        if not compact_console:
+        render_text(DIVIDER)
+        if not COMPACT_CONSOLE:
             text_in_divider("")
 
         # Loop through all the items in the menu
         for x in range(len(menu_items)):
             item_to_print = " [" + str(x) + "]" + " " + menu_items[x]
             text_in_divider(item_to_print, wrap)
-        if not compact_console:
+        if not COMPACT_CONSOLE:
             text_in_divider("")
-        render_text(divider)
+        render_text(DIVIDER)
 
 
 def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> None:
     """
     Prints the menu item from the first array and its index on the left. On the right it prints the item from the
-    second array. This is sandwiched inbetween two dividers. The item is wrapped if it is longer than
-    half the console width, allowing space for the divider and the value.
+    second array. This is sandwiched between two dividers. The item is wrapped if it is longer than
+    half the console width, allowing space for the DIVIDER and the value.
 
     @param wrap: How the text should be wrapped if it is too long (Truncate by default)
     @param menu_items: The list of menu items to print
     """
-    # TODO: Double Wrap
 
-    if auto_htmlify:
+    if CONVERT_OUTPUT_TO_HTML:
         for x in range(len(menu_items[0])):
             item_to_print = f"<div class='menu-option'><button id='{x}' onclick='choose_item(this)'><p " \
                             f"class='split_for_colour menu-item-main inline'>{menu_items[0][x]}</p><p class='menu" \
@@ -460,8 +454,8 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
                             f"inline'>{menu_items[1][x]}</p></button></div>"
             render_text(item_to_print)
     else:
-        render_text(divider)
-        if not compact_console:
+        render_text(DIVIDER)
+        if not COMPACT_CONSOLE:
             text_in_divider("")
         # Loop through all the items in the menu
         for x in range(len(menu_items[0])):
@@ -471,7 +465,7 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
             item_to_print_2 = "(" + menu_items[1][x] + ") "
 
             # Truncate the text if it is too long
-            allowed_width = int(console_width / 2)
+            allowed_width = int(CONSOLE_WIDTH / 2)
 
             if len(Colour.clean_text(item_to_print_1)) > allowed_width:
                 item_to_print_1 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
@@ -479,20 +473,20 @@ def show_menu_double(menu_items: list, wrap: WrapMode = WrapMode.TRUNCATE) -> No
             if len(Colour.clean_text(item_to_print_2)) > allowed_width:
                 item_to_print_2 = item_to_print_1[:allowed_width - 2]  # Truncate the text to fit half the console width
 
-            # Spacing inbetween the two items (similar to how it is done in "text_in_divider" function)
+            # Spacing between the two items (similar to how it is done in "text_in_divider" function)
             # The length of the text, minus console width, minus 2 for the border
-            width_left = console_width - len(Colour.clean_text(item_to_print_1)) - len(
+            width_left = CONSOLE_WIDTH - len(Colour.clean_text(item_to_print_1)) - len(
                 Colour.clean_text(item_to_print_2)) - 2
             spacing = " " * width_left
 
             # Combine the two items
-            final_item_to_print = divider_symbol + item_to_print_1 + Colour.RESET + spacing + item_to_print_2 + \
-                                  Colour.RESET + divider_symbol
+            final_item_to_print = CONSOLE_SYMBOL + item_to_print_1 + Colour.RESET + spacing + item_to_print_2 + \
+                                  Colour.RESET + CONSOLE_SYMBOL
             render_text(final_item_to_print)
 
-        if not compact_console:
+        if not COMPACT_CONSOLE:
             text_in_divider("")
-        render_text(divider)
+        render_text(DIVIDER)
 
 
 def print_text_on_same_line(text_to_print: str) -> None:
@@ -503,7 +497,7 @@ def print_text_on_same_line(text_to_print: str) -> None:
     @param text_to_print: The text to print
     """
     # Clear the line
-    sys.stdout.write('\r' + " " * console_width)
+    sys.stdout.write('\r' + " " * CONSOLE_WIDTH)
 
     # Print the text
     sys.stdout.write('\r' + text_to_print)
@@ -511,14 +505,14 @@ def print_text_on_same_line(text_to_print: str) -> None:
 
 def auto_style_text(text: str, force: bool = False) -> str:
     """
-    Automatictly styles the text based on certain keywords. This is used to make the text more readable.
+    Automatically styles the text based on certain keywords. This is used to make the text more readable.
     Colours are automatically converted into their ANSI escape codes.
 
     @param text: The text to style
     @param force: Force the text to be styled even if auto_colour is False
     @return: The styled text
     """
-    if not auto_colour and not force:
+    if not ADD_COLOUR_TO_TEXT and not force:
         return text
 
     if text is None:
@@ -555,29 +549,29 @@ def render_text(text: str) -> None:
     Prints the text to the console. If the display type is GUI then it will use the js function to print the text.
     @param text: The text to print
     """
-    if display_type == "CLI":
+    if DISPLAY_TYPE == "CLI":
         print(auto_style_text(text))
-    elif display_type == "GUI":
+    elif DISPLAY_TYPE == "GUI":
         eel.print(str(auto_style_text(text)))
 
 
 def get_input(prompt: str = "") -> str:
     """
     Gets the user input. If the display type is GUI then it will use the js function to get the input.
-    Otherwise it will use the normal input function.
+    Otherwise, it will use the normal input function.
 
     @param prompt: The prompt to display
     @return: The user input
     """
     # If the display type is CLI then use the normal input function
-    if display_type == "CLI":
+    if DISPLAY_TYPE == "CLI":
         return input(auto_style_text(prompt))
 
     # If the display type is GUI then use the js function to get the input
-    elif display_type == "GUI":
+    elif DISPLAY_TYPE == "GUI":
         # Prompt for input
         eel.highlight_input()
-       
+
         # Wait for the user to enter something
         user_input = ""
         while user_input == "":
@@ -632,48 +626,48 @@ def render_header(title: str, enclose_bottom: bool = True) -> None:
     @param title: The title to display
     @param enclose_bottom: Whether to enclose the bottom of the header with a border (CLI only)
     """
-    if display_type == "GUI":
+    if DISPLAY_TYPE == "GUI":
         eel.set_title(title)
 
-    if auto_htmlify:
+    if CONVERT_OUTPUT_TO_HTML:
         render_text(f"<h2 class='menu-title'>{title}</h2>")
     else:
         # Print spacer and title
-        render_text(divider)
-        if not compact_console:
+        render_text(DIVIDER)
+        if not COMPACT_CONSOLE:
             text_in_divider("")
 
-        text_in_divider(" " + title.center(console_width - (divider_symbol_size * 2) - 1), WrapMode.WORD)
+        text_in_divider(" " + title.center(CONSOLE_WIDTH - (DIVIDER_SYMBOL_SIZE * 2) - 1), WrapMode.WORD)
 
-        if not compact_console:
+        if not COMPACT_CONSOLE:
             text_in_divider("")
 
         # Allow for a bottom border
         if enclose_bottom:
-            render_text(divider)
+            render_text(DIVIDER)
 
 
 def render_quiz_header(game: object) -> None:
     """
     Renders the quiz header to the console or GUI.
-    @param game: The game object contianing the quiz info
+    @param game: The game object containing the quiz info
     """
     current_question = game.current_question + 1
     question_amount = game.question_amount
     user = game.users[game.current_user_playing].styled_name()
     time_limit = game.time_limit
 
-    if auto_htmlify:
+    if CONVERT_OUTPUT_TO_HTML:
         render_text(f"<p class='question-header'>Question {current_question} of {question_amount} | User: {user} | "
                     f"Time Limit: {time_limit} seconds</p>")
     else:
-        render_text(divider)
-        if not compact_console:
+        render_text(DIVIDER)
+        if not COMPACT_CONSOLE:
             text_in_divider("")
         text_in_divider(f" Question {current_question} of {question_amount}")
         text_in_divider(f" User: {user}", WrapMode.WORD)
         text_in_divider(f" Time Limit: {time_limit} seconds")
-        if not compact_console:
+        if not COMPACT_CONSOLE:
             text_in_divider("")
 
 
@@ -710,7 +704,7 @@ def init_gui() -> None:
     from Maxs_Modules.network import get_free_port, get_ip
 
     # If the display type is GUI then start the web server
-    if display_type == "GUI":
+    if DISPLAY_TYPE == "GUI":
         web_ip = get_ip()
         web_port = get_free_port(web_ip, 8080)
         print(web_port)
@@ -725,5 +719,5 @@ def gui_close() -> None:
     If the display type is GUI then close the window of the web server
     """
     # If the display type is GUI then close the web server
-    if display_type == "GUI":
+    if DISPLAY_TYPE == "GUI":
         eel.close_window()
