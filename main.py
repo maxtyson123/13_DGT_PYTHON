@@ -6,7 +6,7 @@ from natsort import natsorted
 
 from Maxs_Modules.debug import debug_message, init_debug, close_debug_session, handle_arg
 from Maxs_Modules.files import UserData
-from Maxs_Modules.game import get_saved_games, Game
+from game import get_saved_games, Game
 from Maxs_Modules.network import get_ip
 from Maxs_Modules.renderer import Menu, clear, render_text, get_input, init_gui, gui_close
 from Maxs_Modules.tools import string_bool, ip_address

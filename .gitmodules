@@ -1,0 +1,3 @@
+[submodule "PythonTools"]
+	path = Maxs_Modules
+	url = https://github.com/maxtyson123/PythonTools
